@@ -2,10 +2,10 @@
 require File.expand_path('../lib/yggdrasil/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["tkusukawa"]
+  gem.authors       = ["Tomohisa Kusukawa"]
   gem.email         = ["t.kusukawa@gmail.com"]
-  gem.description   = %q{ruby script to manage server configurations by subversion.}
-  gem.summary       = %q{ruby script to manage server configurations by subversion.}
+  gem.description   = %q{Yggdrasil is a configuration management tool by Subversion.}
+  gem.summary       = %q{Type 'yggdrasil help' for usage.}
   gem.homepage      = "https://github.com/tkusukawa/yggdrasil"
 
   gem.files         = `git ls-files`.split($\)

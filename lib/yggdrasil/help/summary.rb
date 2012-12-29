@@ -19,5 +19,6 @@ Available subcommand:
    version
 
 Yggdrasil is a configuration management tool by Subversion.
+
 EOS
 end

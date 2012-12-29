@@ -1,0 +1,3 @@
+class Yggdrasil
+
+end
