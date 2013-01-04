@@ -1,13 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require 'yggdrasil'
 
-#include Yggdrasil
-
-if ARGV.size==0 then
-  puts "Type '#{File::basename($0)} help' for usage.\n"
-else
-  Yggdrasil::command(ARGV)
-end
-
+Yggdrasil::command(ARGV)

@@ -1,45 +1,92 @@
 class Yggdrasil
-  CMD= File::basename($0)
 
-  global_options = <<"EOS"
+  HELP_GLOBAL_OPTIONS = <<"EOS"
 Global options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
 EOS
 
+  HELP_SUBCOMMANDS = <<EOS
+usage: #{CMD} <subcommand> [options] [args]
+Yggdrasil version #{VERSION}
+Type '#{CMD} help <subcommand>' for help on a specific subcommand.
+
+Available subcommands:
+   add
+   cleanup
+   commit (ci)
+   diff (di)
+   help (?, h)
+   init
+   list (ls)
+   log
+   status (stat, st)
+   revert
+   update
+   version
+
+Yggdrasil is a configuration management tool by Subversion.
+
+EOS
+
+  # @param [Array] args
   def Yggdrasil.help(args)
-    if args.size==0 then
-      load "yggdrasil/help/summary.rb"
+    if args.size == 0 then
+      puts HELP_SUBCOMMANDS
+    elsif args.size != 1 then
+      command_error "too many arguments."
     else
-      args.each do |subcommand|
-        case subcommand
-          when 'add'
-            load "yggdrasil/help/add.rb"
-          when 'cleanup'
-            load "yggdrasil/help/cleanup.rb"
-          when 'commit', 'ci'
-            load "yggdrasil/help/commit.rb"
-          when 'diff', 'di'
-            load "yggdrasil/help/diff.rb"
-          when 'help', '?', 'h'
-            load "yggdrasil/help/help.rb"
-          when 'init'
-            load "yggdrasil/help/init.rb"
-          when 'list', 'ls'
-            load "yggdrasil/help/list.rb"
-          when 'log'
-            load "yggdrasil/help/log.rb"
-          when 'status', 'stat', 'st'
-            load "yggdrasil/help/status.rb"
-          when 'revert'
-            load "yggdrasil/help/revert.rb"
-          when 'update'
-            load "yggdrasil/help/update.rb"
-          when 'version'
-            load "yggdrasil/help/version.rb"
-          else
-            puts "\"#{subcommand}\": unknown subcommand."
-        end
+      case args[0]
+        when 'add'
+          puts <<"EOS"
+EOS
+        when 'cleanup'
+          puts <<"EOS"
+EOS
+        when 'commit', 'ci'
+          puts <<"EOS"
+EOS
+        when 'diff', 'di'
+          puts <<"EOS"
+EOS
+        when 'help', '?', 'h'
+          puts <<"EOS"
+help (?,h): Describe the usage of this program or its subcommands.
+usage: #{CMD} help [SUBCOMMAND]
+
+EOS
+        when 'init'
+          puts <<"EOS"
+init: Check environment and initialize configuration.
+usage: #{CMD} init [OPTIONS...]
+
+Valid options:
+  --repo ARG               : specify svn repository
+
+EOS
+        when 'list', 'ls'
+          puts <<"EOS"
+EOS
+        when 'log'
+          puts <<"EOS"
+EOS
+        when 'status', 'stat', 'st'
+          puts <<"EOS"
+EOS
+        when 'revert'
+          puts <<"EOS"
+EOS
+        when 'update'
+          puts <<"EOS"
+EOS
+        when 'version', '--version'
+          puts <<"EOS"
+version: See the program version
+usage: #{CMD} version
+
+EOS
+        else
+          command_error "Unknown subcommand: '#{subcommand}'"
       end
     end
   end

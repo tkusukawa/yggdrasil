@@ -1,8 +1,15 @@
+require 'systemu'
 require "yggdrasil/version"
 require "yggdrasil/help"
+require "yggdrasil/init"
 
 class Yggdrasil
+
   def Yggdrasil.command(args)
+    if args.size == 0 then
+      Yggdrasil::help([])
+      return
+    end
     case args[0]
       when 'add'
         Yggdrasil.new.add(args[1..-1])
@@ -29,10 +36,29 @@ class Yggdrasil
       when 'version', '--version'
         Yggdrasil::version
       else
-        puts "Unknown command: '#{args[0]}'"
-        puts "Type '#{CMD} help' for usage."
+        command_error "Unknown subcommand: '#{args[0]}'"
     end
   end
+
+  # @param [String] msg
+  def Yggdrasil.command_error(msg)
+    puts "#{CMD} error: #{msg}"
+    puts "Type '#{CMD} help' for usage."
+    puts
+    exit 1
+  end
+
+  # @param [String] cmd
+  def Yggdrasil.exec_command(cmd)
+    stat, out = systemu cmd
+    unless stat.success? then
+      puts "#{CMD} error: command failure: #{cmd}"
+      puts
+      exit stat.exitstatus
+    end
+    return out
+  end
+
 end
 
 

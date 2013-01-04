@@ -22,10 +22,10 @@ Or install it yourself as:
 
 ## Environment
 
-Linux
-Subversion command-line client
-Ruby
-Gem
+* Linux
+* Subversion command-line client
+* Ruby
+* Gem
 
 ## Contributing
 

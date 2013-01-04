@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Tomohisa Kusukawa"]
   gem.email         = ["t.kusukawa@gmail.com"]
   gem.description   = %q{Yggdrasil is a configuration management tool by Subversion.}
-  gem.summary       = %q{Type 'yggdrasil help' for usage.}
+  gem.summary       = "Type 'yggdrasil help' for usage."
   gem.homepage      = "https://github.com/tkusukawa/yggdrasil"
 
   gem.files         = `git ls-files`.split($\)
@@ -14,4 +14,9 @@ Gem::Specification.new do |gem|
   gem.name          = "yggdrasil"
   gem.require_paths = ["lib"]
   gem.version       = Yggdrasil::VERSION
+
+  gem.add_dependency "systemu", ">=2.0.0"
+
+  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "simplecov"
 end
