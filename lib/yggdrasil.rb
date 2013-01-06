@@ -59,6 +59,31 @@ class Yggdrasil
     return out
   end
 
+  def Yggdrasil.parse_options(args, valid_params)
+    options = Hash.new
+    pos = 0
+    while args.size > pos
+      if valid_params.has_key?(args[pos])
+        option_note = args[pos]
+        option_key = valid_params[option_note]
+        args = args[0...pos]+args[pos+1..-1]
+        if option_key.to_s[-1] == '?'
+          options[option_key] = true
+        else
+          unless args.size > pos
+            command_error "Not enough arguments provided: #{option_note}"
+          end
+          option_value = args[pos]
+          args = args[0...pos]+args[pos+1..-1]
+          options[option_key] = option_value
+        end
+        next
+      end
+      pos += 1
+    end
+    return args, options
+  end
+
 end
 
 

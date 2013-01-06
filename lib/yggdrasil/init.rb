@@ -1,28 +1,13 @@
-require 'rubygems'
-
 class Yggdrasil
 
   # @param [Array] args
   def Yggdrasil.init(args)
-
     ENV['LANG'] = 'en_US.UTF-8'
 
-    arg_hash=Hash.new
-    while args.size!=0 do
-      option=args.shift
-      case option
-        when '--repo'
-          command_error "Not enough arguments provided: #{option}" if args.empty?
-          arg_hash[:repo]=args.shift
-        when '--username'
-          command_error "Not enough arguments provided: #{option}" if args.empty?
-          arg_hash[:username]=args.shift
-        when '--password'
-          command_error "Not enough arguments provided: #{option}" if args.empty?
-          arg_hash[:password]=args.shift
-        else
-          command_error "invalid option: #{option}"
-      end
+    args, arg_hash = parse_options(args,
+        {'--repo'=>:repo, '--username'=>:username, '--password'=>:password})
+    if args.size != 0
+      command_error "invalid arguments: #{args.join(',')}"
     end
 
     out = exec_command 'which svn'
