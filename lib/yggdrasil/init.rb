@@ -1,3 +1,5 @@
+require 'rubygems'
+
 class Yggdrasil
 
   # @param [Array] args
@@ -40,7 +42,7 @@ class Yggdrasil
     end
 
     until arg_hash.has_key?(:repo) do
-      print "Input svn repo URL:"
+      print "Input svn repo URL: "
       input = $stdin.gets
 
       unless /^(http:|file:|svn:)/ =~ input
@@ -53,13 +55,17 @@ class Yggdrasil
     arg_hash[:repo].chomp!('/')
 
     until arg_hash.has_key?(:username) do
-      print "Input svn username:"
+      print "Input svn username: "
       input = $stdin.gets
       arg_hash[:username] = input.chomp
     end
     until arg_hash.has_key?(:password) do
-      print "Input svn password:"
+      print "Input svn password: "
+      #input = `sh -c 'read -s hoge;echo $hoge'`
+      `stty -echo`
       input = $stdin.gets
+      `stty echo`
+      puts
       arg_hash[:password] = input.chomp
     end
 

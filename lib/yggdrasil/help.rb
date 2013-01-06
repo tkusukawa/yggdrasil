@@ -39,6 +39,10 @@ EOS
       case args[0]
         when 'add'
           puts <<"EOS"
+add: Add files to management list(subversion)
+usage #{CMD} add [OPTIONS...] [FILES...]
+
+#{HELP_GLOBAL_OPTIONS}
 EOS
         when 'cleanup'
           puts <<"EOS"
@@ -63,6 +67,7 @@ usage: #{CMD} init [OPTIONS...]
 Valid options:
   --repo ARG               : specify svn repository
 
+#{HELP_GLOBAL_OPTIONS}
 EOS
         when 'list', 'ls'
           puts <<"EOS"

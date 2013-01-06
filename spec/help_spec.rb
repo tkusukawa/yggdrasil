@@ -79,14 +79,44 @@ Type '#{File.basename($0)} help' for usage.
 EOS
   end
 
-  help_version = <<"EOS"
+  it 'should show help of version' do
+    $stdout = StringIO.new
+    Yggdrasil.command %w{help version}
+    $stdout.string.should == <<"EOS"
 version: See the program version
 usage: #{File.basename($0)} version
 
 EOS
-  it 'should show version' do
+  end
+
+  it 'should show help of init' do
     $stdout = StringIO.new
-    Yggdrasil.command %w{help version}
-    $stdout.string.should == help_version
+    Yggdrasil.command %w{help init}
+    $stdout.string.should == <<"EOS"
+init: Check environment and initialize configuration.
+usage: #{File.basename($0)} init [OPTIONS...]
+
+Valid options:
+  --repo ARG               : specify svn repository
+
+Global options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
+EOS
+  end
+
+  it 'should show help of add' do
+    $stdout = StringIO.new
+    Yggdrasil.command %w{help add}
+    $stdout.string.should == <<"EOS"
+add: Add files to management list(subversion)
+usage #{File.basename($0)} add [OPTIONS...] [FILES...]
+
+Global options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
+EOS
   end
 end
