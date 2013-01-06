@@ -3,7 +3,7 @@ require File.expand_path('../lib/yggdrasil/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Tomohisa Kusukawa"]
-  gem.email         = ["t.kusukawa@gmail.com"]
+  gem.email         = %w{t.kusukawa@gmail.com}
   gem.description   = %q{Yggdrasil is a configuration management tool by Subversion.}
   gem.summary       = "Type 'yggdrasil help' for usage."
   gem.homepage      = "https://github.com/tkusukawa/yggdrasil"
@@ -12,10 +12,8 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "yggdrasil"
-  gem.require_paths = ["lib"]
+  gem.require_paths = %w{lib}
   gem.version       = Yggdrasil::VERSION
-
-  gem.add_dependency "systemu", ">=2.0.0"
 
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "simplecov"

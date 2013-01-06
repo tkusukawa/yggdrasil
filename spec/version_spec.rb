@@ -1,4 +1,4 @@
-require 'yggdrasil'
+require File.dirname(__FILE__) + '/../lib/yggdrasil'
 
 describe Yggdrasil, "version" do
   show_version = <<"EOS"
@@ -11,13 +11,13 @@ EOS
 
   it 'should show version on "version"' do
     $stdout = StringIO.new
-    Yggdrasil.command ['version']
+    Yggdrasil.command %w{version}
     $stdout.string.should == show_version
   end
 
   it 'should show version on "--version"' do
     $stdout = StringIO.new
-    Yggdrasil.command ['--version']
+    Yggdrasil.command %w{--version}
     $stdout.string.should == show_version
   end
 

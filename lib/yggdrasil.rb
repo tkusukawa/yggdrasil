@@ -1,4 +1,4 @@
-require 'systemu'
+require "open3"
 require "yggdrasil/version"
 require "yggdrasil/help"
 require "yggdrasil/init"
@@ -6,7 +6,7 @@ require "yggdrasil/init"
 class Yggdrasil
 
   def Yggdrasil.command(args)
-    if args.size == 0 then
+    if args.size == 0
       Yggdrasil::help([])
       return
     end
@@ -50,8 +50,8 @@ class Yggdrasil
 
   # @param [String] cmd
   def Yggdrasil.exec_command(cmd)
-    stat, out = systemu cmd
-    unless stat.success? then
+    out,stat = Open3.capture2e cmd
+    unless stat.success?
       puts "#{CMD} error: command failure: #{cmd}"
       puts
       exit stat.exitstatus

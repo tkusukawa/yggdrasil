@@ -1,4 +1,4 @@
-require 'yggdrasil'
+require File.dirname(__FILE__) + '/../lib/yggdrasil'
 
 describe Yggdrasil, "help" do
 
@@ -33,25 +33,25 @@ EOS
 
   it 'should show subcommands on "help"' do
     $stdout = StringIO.new
-    Yggdrasil.command ['help']
+    Yggdrasil.command %w{help}
     $stdout.string.should == show_subcommands
   end
 
   it 'should show subcommands on "h"' do
     $stdout = StringIO.new
-    Yggdrasil.command ['h']
+    Yggdrasil.command %w{h}
     $stdout.string.should == show_subcommands
   end
 
   it 'should show subcommands on "?"' do
     $stdout = StringIO.new
-    Yggdrasil.command ['?']
+    Yggdrasil.command %w{?}
     $stdout.string.should == show_subcommands
   end
 
   it 'should be unknown subcommand on "hoge"' do
     $stdout = StringIO.new
-    lambda{Yggdrasil.command(['hoge'])}.should raise_error(SystemExit)
+    lambda{Yggdrasil.command(%w{hoge})}.should raise_error(SystemExit)
     $stdout.string.should ==
         "#{File.basename($0)} error: Unknown subcommand: 'hoge'\n"\
         "Type '#{File.basename($0)} help' for usage.\n\n"
@@ -65,13 +65,13 @@ EOS
 
   it 'should show help_help' do
     $stdout = StringIO.new
-    Yggdrasil.command ['help', 'help']
+    Yggdrasil.command %w{help help}
     $stdout.string.should == help_help
   end
 
-  it 'should show help_help x2' do
+  it 'should error too many arguments' do
     $stdout = StringIO.new
-    lambda{Yggdrasil.command(['help', 'help', 'help'])}.should raise_error(SystemExit)
+    lambda{Yggdrasil.command(%w{help help help})}.should raise_error(SystemExit)
     $stdout.string.should == <<"EOS"
 #{File.basename($0)} error: too many arguments.
 Type '#{File.basename($0)} help' for usage.
@@ -86,7 +86,7 @@ usage: #{File.basename($0)} version
 EOS
   it 'should show version' do
     $stdout = StringIO.new
-    Yggdrasil.command ['help', 'version']
+    Yggdrasil.command %w{help version}
     $stdout.string.should == help_version
   end
 end
