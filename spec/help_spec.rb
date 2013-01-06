@@ -22,6 +22,7 @@ Available subcommands:
    version
 
 Yggdrasil is a configuration management tool by Subversion.
+You should type 'yggdrasil init' at first.
 
 EOS
 
@@ -53,8 +54,7 @@ EOS
     $stdout = StringIO.new
     lambda{Yggdrasil.command(%w{hoge})}.should raise_error(SystemExit)
     $stdout.string.should ==
-        "#{File.basename($0)} error: Unknown subcommand: 'hoge'\n"\
-        "Type '#{File.basename($0)} help' for usage.\n\n"
+        "#{File.basename($0)} error: Unknown subcommand: 'hoge'\n\n"
   end
 
   help_help = <<"EOS"
@@ -74,7 +74,6 @@ EOS
     lambda{Yggdrasil.command(%w{help help help})}.should raise_error(SystemExit)
     $stdout.string.should == <<"EOS"
 #{File.basename($0)} error: too many arguments.
-Type '#{File.basename($0)} help' for usage.
 
 EOS
   end
@@ -98,8 +97,6 @@ usage: #{File.basename($0)} init [OPTIONS...]
 
 Valid options:
   --repo ARG               : specify svn repository
-
-Global options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
 
@@ -110,13 +107,25 @@ EOS
     $stdout = StringIO.new
     Yggdrasil.command %w{help add}
     $stdout.string.should == <<"EOS"
-add: Add files to management list(subversion)
-usage #{File.basename($0)} add [OPTIONS...] [FILES...]
-
-Global options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
+add: Add files to management list (add to subversion)
+usage #{File.basename($0)} add [FILES...]
 
 EOS
   end
+
+  it 'should show help of commit' do
+    $stdout = StringIO.new
+    Yggdrasil.command %w{help commit}
+    $stdout.string.should == <<"EOS"
+commit (ci): Send changes from your local file to the repository.
+usage: #{File.basename($0)} commit [OPTIONS...] [FILES...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -m [--message] ARG       : specify log message ARG
+
+EOS
+  end
+
 end

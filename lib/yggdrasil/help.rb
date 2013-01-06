@@ -1,11 +1,5 @@
 class Yggdrasil
 
-  HELP_GLOBAL_OPTIONS = <<"EOS"
-Global options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-EOS
-
   HELP_SUBCOMMANDS = <<EOS
 usage: #{CMD} <subcommand> [options] [args]
 Yggdrasil version #{VERSION}
@@ -26,6 +20,7 @@ Available subcommands:
    version
 
 Yggdrasil is a configuration management tool by Subversion.
+You should type 'yggdrasil init' at first.
 
 EOS
 
@@ -34,24 +29,35 @@ EOS
     if args.size == 0 then
       puts HELP_SUBCOMMANDS
     elsif args.size != 1 then
-      command_error "too many arguments."
+      error "too many arguments."
     else
       case args[0]
         when 'add'
           puts <<"EOS"
-add: Add files to management list(subversion)
-usage #{CMD} add [OPTIONS...] [FILES...]
+add: Add files to management list (add to subversion)
+usage #{CMD} add [FILES...]
 
-#{HELP_GLOBAL_OPTIONS}
 EOS
         when 'cleanup'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'commit', 'ci'
           puts <<"EOS"
+commit (ci): Send changes from your local file to the repository.
+usage: #{CMD} commit [OPTIONS...] [FILES...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -m [--message] ARG       : specify log message ARG
+
 EOS
         when 'diff', 'di'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'help', '?', 'h'
           puts <<"EOS"
@@ -66,23 +72,34 @@ usage: #{CMD} init [OPTIONS...]
 
 Valid options:
   --repo ARG               : specify svn repository
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
 
-#{HELP_GLOBAL_OPTIONS}
 EOS
         when 'list', 'ls'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'log'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'status', 'stat', 'st'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'revert'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'update'
           puts <<"EOS"
+Sorry.
+Under construction.
 EOS
         when 'version', '--version'
           puts <<"EOS"
@@ -91,7 +108,7 @@ usage: #{CMD} version
 
 EOS
         else
-          command_error "Unknown subcommand: '#{subcommand}'"
+          error "Unknown subcommand: '#{subcommand}'"
       end
     end
   end

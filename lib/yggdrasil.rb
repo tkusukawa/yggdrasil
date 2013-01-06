@@ -2,6 +2,8 @@ require "open3"
 require "yggdrasil/version"
 require "yggdrasil/help"
 require "yggdrasil/init"
+require "yggdrasil/add"
+require "yggdrasil/commit"
 
 class Yggdrasil
 
@@ -36,14 +38,13 @@ class Yggdrasil
       when 'version', '--version'
         Yggdrasil::version
       else
-        command_error "Unknown subcommand: '#{args[0]}'"
+        error "Unknown subcommand: '#{args[0]}'"
     end
   end
 
   # @param [String] msg
-  def Yggdrasil.command_error(msg)
+  def Yggdrasil.error(msg)
     puts "#{CMD} error: #{msg}"
-    puts "Type '#{CMD} help' for usage."
     puts
     exit 1
   end
@@ -70,9 +71,7 @@ class Yggdrasil
         if option_key.to_s[-1] == '?'
           options[option_key] = true
         else
-          unless args.size > pos
-            command_error "Not enough arguments provided: #{option_note}"
-          end
+          error "Not enough arguments provided: #{option_note}" unless args.size > pos
           option_value = args[pos]
           args = args[0...pos]+args[pos+1..-1]
           options[option_key] = option_value
@@ -84,6 +83,33 @@ class Yggdrasil
     return args, options
   end
 
+  def initialize
+    ENV['LANG'] = 'en_US.UTF-8'
+
+    # load config value from config file
+    @config=Hash.new
+    begin
+      config_file = open("#{ENV['HOME']}/.yggdrasil/config")
+    rescue
+      puts "#{CMD} error: can not open config file: #{ENV['HOME']}/.yggdrasil/config"
+      exit 1
+    end
+    l = 0
+    while (line = config_file.gets)
+      l += 1
+      next if /^\s*#.*$/ =~ line  # comment line
+      if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
+        @config[$1.to_sym] = $2
+      else
+        puts "#{CMD} error: syntax error. :#{ENV['HOME']}/.yggdrasil/config(#{l})"
+        exit 1
+      end
+    end
+    config_file.close
+    ENV["PATH"] = @config[:path]
+    @svn = @config[:svn]
+    @repo = @config[:repo]
+    @work_dir = `readlink -f .`
+    @mirror_dir = ENV["HOME"]+"/.yggdrasil/mirror"
+  end
 end
-
-

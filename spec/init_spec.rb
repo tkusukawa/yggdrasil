@@ -12,7 +12,6 @@ describe Yggdrasil, "init" do
     lambda{Yggdrasil.command(%w{init --repo})}.should raise_error(SystemExit)
     $stdout.string.should == <<"EOS"
 #{File.basename($0)} error: Not enough arguments provided: --repo
-Type '#{File.basename($0)} help' for usage.
 
 EOS
   end

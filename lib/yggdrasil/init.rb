@@ -4,10 +4,10 @@ class Yggdrasil
   def Yggdrasil.init(args)
     ENV['LANG'] = 'en_US.UTF-8'
 
-    args, arg_hash = parse_options(args,
+    args, options = parse_options(args,
         {'--repo'=>:repo, '--username'=>:username, '--password'=>:password})
     if args.size != 0
-      command_error "invalid arguments: #{args.join(',')}"
+      error "invalid arguments: #{args.join(',')}"
     end
 
     out = exec_command 'which svn'
@@ -26,7 +26,7 @@ class Yggdrasil
       exit 1
     end
 
-    until arg_hash.has_key?(:repo) do
+    until options.has_key?(:repo) do
       print "Input svn repo URL: "
       input = $stdin.gets
 
@@ -34,31 +34,31 @@ class Yggdrasil
         puts "ERROR: Invalid URL."
         redo
       end
-      arg_hash[:repo] = input
+      options[:repo] = input
     end
-    arg_hash[:repo].chomp!
-    arg_hash[:repo].chomp!('/')
+    options[:repo].chomp!
+    options[:repo].chomp!('/')
 
-    until arg_hash.has_key?(:username) do
+    until options.has_key?(:username) do
       print "Input svn username: "
       input = $stdin.gets
-      arg_hash[:username] = input.chomp
+      options[:username] = input.chomp
     end
-    until arg_hash.has_key?(:password) do
+    until options.has_key?(:password) do
       print "Input svn password: "
       #input = `sh -c 'read -s hoge;echo $hoge'`
       `stty -echo`
       input = $stdin.gets
       `stty echo`
       puts
-      arg_hash[:password] = input.chomp
+      options[:password] = input.chomp
     end
 
     puts "SVN access test..."
     loop do
       ret = Open3.capture2e "#{svn_path} ls --no-auth-cache --non-interactive"\
-                          " --username '#{arg_hash[:username]}' --password '#{arg_hash[:password]}'"\
-                          " #{arg_hash[:repo]}"
+                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                          " #{options[:repo]}"
       if ret[1].success?
         puts "SVN access: OK."
         break
@@ -66,14 +66,14 @@ class Yggdrasil
 
       ret = Open3.capture2e "#{svn_path} mkdir --parents -m 'yggdrasil init'"\
                           " --no-auth-cache --non-interactive"\
-                          " --username '#{arg_hash[:username]}' --password '#{arg_hash[:password]}'"\
-                          " #{arg_hash[:repo]}"
+                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                          " #{options[:repo]}"
       if ret[1].success?
         puts "SVN mkdir: OK."
         break
       end
 
-      puts "SVN error: can not access to '#{arg_hash[:repo]}'."
+      puts "SVN error: can not access to '#{options[:repo]}'."
       exit 1
     end
 
@@ -82,12 +82,12 @@ class Yggdrasil
                "path=#{ENV['PATH']}\n"\
                "svn=#{svn_path}\n"\
                "svn_version=#{svn_version}\n"\
-               "repo=#{arg_hash[:repo]}\n"
+               "repo=#{options[:repo]}\n"
 
     ret = Open3.capture2e "#{svn_path} checkout"\
                         " --no-auth-cache --non-interactive"\
-                        " --username '#{arg_hash[:username]}' --password '#{arg_hash[:password]}'"\
-                        " #{arg_hash[:repo]} #{config_dir+'/mirror'}"
+                        " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                        " #{options[:repo]} #{config_dir+'/mirror'}"
     unless ret[1].success?
       puts "SVN checkout: error."
       exit 1
