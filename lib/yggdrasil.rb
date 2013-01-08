@@ -8,6 +8,8 @@ require "yggdrasil/commit"
 class Yggdrasil
 
   def Yggdrasil.command(args)
+    ENV['LANG'] = 'en_US.UTF-8'
+
     if args.size == 0
       Yggdrasil::help([])
       return
@@ -42,6 +44,7 @@ class Yggdrasil
     end
   end
 
+  protected
   # @param [String] msg
   def Yggdrasil.error(msg)
     puts "#{CMD} error: #{msg}"
@@ -84,7 +87,6 @@ class Yggdrasil
   end
 
   def initialize
-    ENV['LANG'] = 'en_US.UTF-8'
 
     # load config value from config file
     @config=Hash.new

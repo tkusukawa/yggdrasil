@@ -12,10 +12,12 @@ describe Yggdrasil, "commit" do
 
   it 'should commit all' do
     Yggdrasil.command %w{add Gemfile /etc/fstab}
-    cmd_args = ['commit', '--username', 'hoge', '--password', 'foo', '-m', 'COMMIT LOG']
-#    $stdout = StringIO.new
+    `svn commit -m 'commit fstab' /tmp/yggdrasil-test/.yggdrasil/mirror/etc /tmp/yggdrasil-test/.yggdrasil/mirror/etc/fstab`
+
+    cmd_args = ['commit', '--username', 'hoge', '--password', 'foo']
+    $stdin = StringIO.new ("Y\nmsg test\n")
+    #$stdout = StringIO.new
     Yggdrasil.command cmd_args
     #$stdout.string.should == "hoge"
-#    "abc".should == "abc"
   end
 end
