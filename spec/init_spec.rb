@@ -60,13 +60,11 @@ EOS
     `svnserve -d`
 
     $stdout = StringIO.new
-    $stdin = StringIO.new(<<"EOS")
-svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/
-hoge
-foo
-EOS
-    cmd_args = %w{init}
-    Yggdrasil.command cmd_args
+    Yggdrasil.command %w{init},
+                      "svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/\n"\
+                      "hoge\n"\
+                      "foo\n"
+
     $stdout.string.should == \
       "Input svn repo URL: "\
       "Input svn username: "\

@@ -124,6 +124,35 @@ Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
   -m [--message] ARG       : specify log message ARG
+  --non-interactive        : do no interactive prompting
+
+EOS
+  end
+
+  it 'should show help of cleanup' do
+    $stdout = StringIO.new
+    Yggdrasil.command %w{help cleanup}
+    $stdout.string.should == <<"EOS"
+cleanup: clean up the working copy
+usage: #{File.basename($0)} cleanup [OPTIONS...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
+EOS
+  end
+
+  it 'should show help of diff' do
+    $stdout = StringIO.new
+    Yggdrasil.command %w{help diff}
+    $stdout.string.should == <<"EOS"
+diff (di): Display the differences between two revisions or paths.
+usage: #{File.basename($0)} diff [-r N[:M]] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
 
 EOS
   end

@@ -11,7 +11,7 @@ class Yggdrasil
     end
 
     out = exec_command 'which svn'
-    svn_path = out.chomp
+    svn = out.chomp
 
     out = exec_command 'svn --version'
     unless /version (\d+\.\d+\.\d+) / =~ out
@@ -39,36 +39,23 @@ class Yggdrasil
     options[:repo].chomp!
     options[:repo].chomp!('/')
 
-    until options.has_key?(:username) do
-      print "Input svn username: "
-      input = $stdin.gets
-      options[:username] = input.chomp
-    end
-    until options.has_key?(:password) do
-      print "Input svn password: "
-      #input = `sh -c 'read -s hoge;echo $hoge'`
-      `stty -echo`
-      input = $stdin.gets
-      `stty echo`
-      puts
-      options[:password] = input.chomp
-    end
+    options = input_user_pass(options)
 
     puts "SVN access test..."
     loop do
-      ret = Open3.capture2e "#{svn_path} ls --no-auth-cache --non-interactive"\
-                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                          " #{options[:repo]}"
-      if ret[1].success?
+      ret = exec_command "#{svn} ls --no-auth-cache --non-interactive"\
+                         " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                         " #{options[:repo]}", false
+      unless ret.nil?
         puts "SVN access: OK."
         break
       end
 
-      ret = Open3.capture2e "#{svn_path} mkdir --parents -m 'yggdrasil init'"\
-                          " --no-auth-cache --non-interactive"\
-                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                          " #{options[:repo]}"
-      if ret[1].success?
+      ret = exec_command "#{svn} mkdir --parents -m 'yggdrasil init'"\
+                         " --no-auth-cache --non-interactive"\
+                         " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                         " #{options[:repo]}", false
+      unless ret.nil?
         puts "SVN mkdir: OK."
         break
       end
@@ -80,15 +67,15 @@ class Yggdrasil
     Dir.mkdir config_dir, 0755
     File.write config_dir+'/config',
                "path=#{ENV['PATH']}\n"\
-               "svn=#{svn_path}\n"\
+               "svn=#{svn}\n"\
                "svn_version=#{svn_version}\n"\
                "repo=#{options[:repo]}\n"
 
-    ret = Open3.capture2e "#{svn_path} checkout"\
-                        " --no-auth-cache --non-interactive"\
-                        " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                        " #{options[:repo]} #{config_dir+'/mirror'}"
-    unless ret[1].success?
+    ret = exec_command "#{svn} checkout"\
+                       " --no-auth-cache --non-interactive"\
+                       " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                       " #{options[:repo]} #{config_dir+'/mirror'}", false
+    if ret.nil?
       puts "SVN checkout: error."
       exit 1
     end

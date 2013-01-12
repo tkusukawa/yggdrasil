@@ -40,8 +40,13 @@ usage #{CMD} add [FILES...]
 EOS
         when 'cleanup'
           puts <<"EOS"
-Sorry.
-Under construction.
+cleanup: clean up the working copy
+usage: #{CMD} cleanup [OPTIONS...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
 EOS
         when 'commit', 'ci'
           puts <<"EOS"
@@ -52,12 +57,18 @@ Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
   -m [--message] ARG       : specify log message ARG
+  --non-interactive        : do no interactive prompting
 
 EOS
         when 'diff', 'di'
           puts <<"EOS"
-Sorry.
-Under construction.
+diff (di): Display the differences between two revisions or paths.
+usage: #{CMD} diff [-r N[:M]] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
 EOS
         when 'help', '?', 'h'
           puts <<"EOS"

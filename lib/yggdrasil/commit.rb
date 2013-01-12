@@ -2,85 +2,63 @@ class Yggdrasil
 
   # @param [Array] args
   def commit(args)
-    args, options = Yggdrasil.parse_options(args,
-        {'--username'=>:username, '--password'=>:password, '-m'=>:message, '--message'=>:message})
+    args, options = parse_options(args,
+        {'--username'=>:username, '--password'=>:password,
+         '-m'=>:message, '--message'=>:message, '--non-interactive'=>:non_interactive?})
 
-    until options.has_key?(:username) do
-      print "Input svn username: "
-      input = $stdin.gets
-      options[:username] = input.chomp
-    end
-    until options.has_key?(:password) do
-      print "Input svn password: "
-      #input = `sh -c 'read -s hoge;echo $hoge'`
-      `stty -echo`
-      input = $stdin.gets
-      `stty echo`
-      puts
-      options[:password] = input.chomp
-    end
+    options = input_user_pass(options)
 
-    current_dir = `readlink -f .`.chomp
-    files = args
-    if files.size == 0
-      FileUtils.cd @mirror_dir do
-        svn_cmd = "#{@svn} ls --username '#{options[:username]}' --password '#{options[:password]}'"\
-                  " --depth infinity #{@repo}"
-        out = Yggdrasil.exec_command(svn_cmd)
-        puts "\n" "exec: svn ls\n#{out}"
-        files = out.split(/\n/)
-        svn_cmd = "#{@svn} status --username '#{options[:username]}' --password '#{options[:password]}' -q"
-        out = Yggdrasil.exec_command(svn_cmd)
-        puts "\n" "exec: svn status\n#{out}"
-        out.split(/\n/).each do |line|
-          if /^.*\s(\S+)\s*$/ =~ line
-            files.push($1)
-          end
-        end
-      end
-      current_dir = ''
-    end
+    files = sync_mirror(options)
+    files = args if args.size!=0
 
-    files.collect! do |file|
-      if %r{^/} =~ file
-        file
-      else
-        "#{current_dir.chomp('/')}/#{file}"
-      end
-    end
-    files.sort!
-    files.uniq!
-
+    file_num = 0
+    num_file = Array.new
     FileUtils.cd @mirror_dir do
       files.each do |file|
-        unless File.exist?(file)
-          Yggdrasil.exec_command "#{@svn} delete #{file.sub(%r{^/},'')}"
-          next
-        end
-        if File.file?(file)
-          FileUtils.copy_file file, @mirror_dir+file
-          Yggdrasil.exec_command "#{@svn} status #{file.sub(%r{^/},'')}"
+        file = @work_dir+'/'+file unless %r{^/} =~ file
+        relative = file.sub(%r{^/}, '')
+        next if File.exist?(file) && !File.file?(file)
+        out = exec_command("#@svn status --no-auth-cache --non-interactive #{relative}").chomp!
+        if out && out != ""
+          num_file[file_num] = {:relative=>relative, :status=>out}
+          file_num += 1
         end
       end
     end
 
-    puts "Do you want to commit above? [Yn]:"
-    if $stdin.gets.chomp == 'Y'
-      until options.has_key?(:message) do
-        print "Input log message: "
-        input = $stdin.gets
-        options[:message] = input.chomp
+    until options.has_key?(:non_interactive?)
+      (0...num_file.size).each do |i|
+        puts "#{i}:#{num_file[i][:status]}"
       end
-      file_list = ''
-      files.each do |file|
-        file_list += ' '+file.sub(%r{^/}, '' )
+      puts "Do you want to commit above? [Yn|<num to diff>]:"
+      res = $stdin.gets
+      return unless res
+      res.chomp!
+      break if res == 'Y'
+      return if res == 'n'
+      if /^\d+$/ =~ res
+        FileUtils.cd @mirror_dir do
+          puts exec_command("#@svn diff --no-auth-cache --non-interactive #{num_file[res.to_i][:relative]}")
+        end
       end
-      svn_cmd = "#{@svn} commit -m '#{options[:message]}'"\
-                " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                " #{file_list}"
-      FileUtils.cd @mirror_dir do
-        Yggdrasil.exec_command(svn_cmd)
-      end
+    end
+
+    # if res == 'Y'
+    until options.has_key?(:message) do
+      print "Input log message: "
+      input = $stdin.gets
+      options[:message] = input.chomp
+    end
+    file_list = ''
+    files.each do |file|
+      file_list += ' '+file.sub(%r{^/}, '')
+    end
+
+    FileUtils.cd @mirror_dir do
+      exec_command "#@svn commit -m '#{options[:message]}'"\
+                   " --no-auth-cache --non-interactive"\
+                   " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                   " #{file_list}"
     end
   end
 end

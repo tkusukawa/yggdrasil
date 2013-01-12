@@ -4,10 +4,13 @@ require "yggdrasil/help"
 require "yggdrasil/init"
 require "yggdrasil/add"
 require "yggdrasil/commit"
+require "yggdrasil/cleanup"
+require "yggdrasil/diff"
 
 class Yggdrasil
 
-  def Yggdrasil.command(args)
+  def Yggdrasil.command(args, input = nil)
+    $stdin = StringIO.new(input) if input != nil
     ENV['LANG'] = 'en_US.UTF-8'
 
     if args.size == 0
@@ -16,29 +19,29 @@ class Yggdrasil
     end
     case args[0]
       when 'add'
-        Yggdrasil.new.add(args[1..-1])
+        new.add(args[1..-1])
       when 'cleanup'
-        Yggdrasil.new.cleanup(args[1..-1])
+        new.cleanup(args[1..-1])
       when 'commit', 'ci'
-        Yggdrasil.new.commit(args[1..-1])
+        new.commit(args[1..-1])
       when 'diff', 'di'
-        Yggdrasil.new.diff(args[1..-1])
+        new.diff(args[1..-1])
       when 'help', 'h', '?'
-        Yggdrasil::help(args[1..-1])
+        help(args[1..-1])
       when 'init'
-        Yggdrasil::init(args[1..-1])
+        init(args[1..-1])
       when 'list', 'ls'
-        Yggdrasil.new.list(args[1..-1])
+        new.list(args[1..-1])
       when 'log'
-        Yggdrasil.new.log(args[1..-1])
+        new.log(args[1..-1])
       when 'status', 'stat', 'st'
-        Yggdrasil.new.status(args[1..-1])
+        new.status(args[1..-1])
       when 'revert'
-        Yggdrasil.new.revert(args[1..-1])
+        new.revert(args[1..-1])
       when 'update'
-        Yggdrasil.new.update(args[1..-1])
+        new.update(args[1..-1])
       when 'version', '--version'
-        Yggdrasil::version
+        version
       else
         error "Unknown subcommand: '#{args[0]}'"
     end
@@ -53,9 +56,10 @@ class Yggdrasil
   end
 
   # @param [String] cmd
-  def Yggdrasil.exec_command(cmd)
+  def Yggdrasil.exec_command(cmd, err_exit=true)
     out,stat = Open3.capture2e cmd
     unless stat.success?
+      return nil unless err_exit
       puts "#{CMD} error: command failure: #{cmd}"
       puts
       exit stat.exitstatus
@@ -86,9 +90,36 @@ class Yggdrasil
     return args, options
   end
 
+  def Yggdrasil.input_user_pass(options)
+    until options.has_key?(:username) do
+      print "Input svn username: "
+      input = $stdin.gets
+      options[:username] = input.chomp
+    end
+    until options.has_key?(:password) do
+      print "Input svn password: "
+      #input = `sh -c 'read -s hoge;echo $hoge'`
+      `stty -echo`
+      input = $stdin.gets
+      `stty echo`
+      puts
+      options[:password] = input.chomp
+    end
+    return options
+  end
+
   def initialize
 
-    # load config value from config file
+    @config = read_config
+    ENV["PATH"] = @config[:path]
+    @svn = @config[:svn]
+    @repo = @config[:repo]
+    @work_dir = `readlink -f .`.chomp
+    @mirror_dir = ENV["HOME"]+"/.yggdrasil/mirror"
+  end
+
+  # load config value from config file
+  def read_config
     @config=Hash.new
     begin
       config_file = open("#{ENV['HOME']}/.yggdrasil/config")
@@ -108,10 +139,43 @@ class Yggdrasil
       end
     end
     config_file.close
-    ENV["PATH"] = @config[:path]
-    @svn = @config[:svn]
-    @repo = @config[:repo]
-    @work_dir = `readlink -f .`
-    @mirror_dir = ENV["HOME"]+"/.yggdrasil/mirror"
+    return @config
+  end
+
+  def sync_mirror(options)
+    FileUtils.cd @mirror_dir do
+      out = exec_command("#@svn ls --no-auth-cache --non-interactive"\
+                           " --username '#{options[:username]}' --password '#{options[:password]}'"\
+                           " --depth infinity #@repo")
+      files = out.split(/\n/)
+      out = exec_command("#@svn status -q --no-auth-cache --non-interactive"\
+                           " --username '#{options[:username]}' --password '#{options[:password]}'")
+      out.split(/\n/).each do |line|
+        if /^.*\s(\S+)\s*$/ =~ line
+          files.push($1)
+        end
+      end
+      files.sort!
+      files.uniq!
+      paths=Array.new
+      files.each do |file|
+        absolute = '/'+file
+        if !File.exist?(absolute)
+          exec_command "#@svn delete --force --no-auth-cache --non-interactive"\
+                       " #{file}"
+        elsif File.file?(absolute)
+          if !File.exist?(@mirror_dir+absolute)
+            exec_command "#@svn revert --no-auth-cache --non-interactive #{file}"
+          end
+          FileUtils.copy_file absolute, @mirror_dir+absolute
+        end
+        paths.push absolute
+      end
+      return paths
+    end
+  end
+
+  def method_missing(action, *args)
+    Yggdrasil.__send__ action, *args
   end
 end
