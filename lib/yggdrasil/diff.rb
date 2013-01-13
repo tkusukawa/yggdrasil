@@ -2,7 +2,8 @@ class Yggdrasil
 
   # @param [Array] args
   def diff(args)
-    args, options = parse_options(args, {'--username'=>:username, '--password'=>:password, '-r'=>:revision})
+    args, options = parse_options(args,
+        {'--username'=>:username, '--password'=>:password, '-r'=>:revision, '--revision'=>:revision})
     options = input_user_pass(options)
 
     sync_mirror options
@@ -17,7 +18,7 @@ class Yggdrasil
     cmd_arg += "-r #{options[:revision]} " if options.has_key?(:revision)
     cmd_arg += paths.join(' ')
     FileUtils.cd @mirror_dir do
-      puts exec_command(cmd_arg)
+      puts system3(cmd_arg)
     end
   end
 end

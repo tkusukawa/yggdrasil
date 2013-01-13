@@ -9,9 +9,9 @@ class Yggdrasil
 
     options = input_user_pass(options)
 
-    exec_command "rm -rf #@mirror_dir"
+    system3 "rm -rf #@mirror_dir"
 
-    exec_command "#@svn checkout"\
+    system3 "#@svn checkout"\
                  " --no-auth-cache --non-interactive"\
                  " --username '#{options[:username]}' --password '#{options[:password]}'"\
                  " #@repo #@mirror_dir"

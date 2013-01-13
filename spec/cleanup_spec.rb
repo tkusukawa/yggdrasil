@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/yggdrasil'
+require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "cleanup" do
   before do

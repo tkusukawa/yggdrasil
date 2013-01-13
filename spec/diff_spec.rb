@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/yggdrasil'
+require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "diff" do
   before do
@@ -10,7 +10,7 @@ describe Yggdrasil, "diff" do
     # init
     `svnadmin create /tmp/yggdrasil-test/svn-repo`
     Yggdrasil.command %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-                          %w{--username hoge --password foo}
+                      %w{--username hoge --password foo}
 
     # add files and commit
     `echo hoge > /tmp/yggdrasil-test/A`
@@ -34,11 +34,12 @@ describe Yggdrasil, "diff" do
   it 'should success diff (local - repo)' do
     puts "---- should success diff (local - repo)"
     puts "-- absolute and relative"
-    $stdout = StringIO.new
-    FileUtils.cd "/tmp/yggdrasil-test" do
-      Yggdrasil.command(%w{diff /tmp/yggdrasil-test/A B --username hoge --password foo})
+    out = catch_stdout do
+      FileUtils.cd "/tmp/yggdrasil-test" do
+        Yggdrasil.command(%w{diff /tmp/yggdrasil-test/A B --username hoge --password foo})
+      end
     end
-    $stdout.string.should == <<"EOS"
+    out.should == <<"EOS"
 Index: tmp/yggdrasil-test/A
 ===================================================================
 --- tmp/yggdrasil-test/A	(revision 3)
@@ -56,11 +57,13 @@ Index: tmp/yggdrasil-test/B
 +FOO
 EOS
 
-    puts "-- specify revision"
-    $stdout = StringIO.new
-    FileUtils.cd "/tmp/yggdrasil-test" do
-      Yggdrasil.command %w{diff -r 2:3 A --username hoge --password foo}
-      $stdout.string.should == <<"EOS"
+    puts "-- specify revision (-r)"
+    out = catch_stdout do
+      FileUtils.cd "/tmp/yggdrasil-test" do
+        Yggdrasil.command %w{diff -r 2:3 A --username hoge --password foo}
+      end
+    end
+    out.should == <<"EOS"
 Index: tmp/yggdrasil-test/A
 ===================================================================
 --- tmp/yggdrasil-test/A	(revision 2)
@@ -69,6 +72,22 @@ Index: tmp/yggdrasil-test/A
  hoge
 +foo
 EOS
+
+    puts "-- specify revision (--revision)"
+    out = catch_stdout do
+      FileUtils.cd "/tmp/yggdrasil-test" do
+        Yggdrasil.command %w{diff --revision 3 A --username hoge --password foo}
+      end
     end
+    out.should == <<"EOS"
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A	(revision 3)
++++ tmp/yggdrasil-test/A	(working copy)
+@@ -1,2 +1,3 @@
+ hoge
+ foo
++HOGE
+EOS
   end
 end

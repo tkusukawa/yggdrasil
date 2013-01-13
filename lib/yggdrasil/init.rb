@@ -10,10 +10,10 @@ class Yggdrasil
       error "invalid arguments: #{args.join(',')}"
     end
 
-    out = exec_command 'which svn'
+    out = system3 'which svn'
     svn = out.chomp
 
-    out = exec_command 'svn --version'
+    out = system3 'svn --version'
     unless /version (\d+\.\d+\.\d+) / =~ out
       puts "#{CMD} error: can not find version string: svn --version"
       exit 1
@@ -43,7 +43,7 @@ class Yggdrasil
 
     puts "SVN access test..."
     loop do
-      ret = exec_command "#{svn} ls --no-auth-cache --non-interactive"\
+      ret = system3 "#{svn} ls --no-auth-cache --non-interactive"\
                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
                          " #{options[:repo]}", false
       unless ret.nil?
@@ -51,7 +51,7 @@ class Yggdrasil
         break
       end
 
-      ret = exec_command "#{svn} mkdir --parents -m 'yggdrasil init'"\
+      ret = system3 "#{svn} mkdir --parents -m 'yggdrasil init'"\
                          " --no-auth-cache --non-interactive"\
                          " --username '#{options[:username]}' --password '#{options[:password]}'"\
                          " #{options[:repo]}", false
@@ -71,7 +71,7 @@ class Yggdrasil
                "svn_version=#{svn_version}\n"\
                "repo=#{options[:repo]}\n"
 
-    ret = exec_command "#{svn} checkout"\
+    ret = system3 "#{svn} checkout"\
                        " --no-auth-cache --non-interactive"\
                        " --username '#{options[:username]}' --password '#{options[:password]}'"\
                        " #{options[:repo]} #{config_dir+'/mirror'}", false

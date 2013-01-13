@@ -6,6 +6,7 @@ require "yggdrasil/add"
 require "yggdrasil/commit"
 require "yggdrasil/cleanup"
 require "yggdrasil/diff"
+require "yggdrasil/list"
 
 class Yggdrasil
 
@@ -47,24 +48,29 @@ class Yggdrasil
     end
   end
 
+  # @param [String] cmd
+  def Yggdrasil.system3(cmd, err_exit=true, stdin=nil)
+    if stdin.nil?
+      out,stat = Open3.capture2e cmd
+    else
+      out,stat = Open3.capture2e cmd, :stdin_data=>stdin
+    end
+    unless stat.success?
+      return nil unless err_exit
+      $stderr.puts "#{CMD} error: command failure: #{cmd}"
+      $stderr.puts "command output:"
+      $stderr.puts out
+      exit stat.exitstatus
+    end
+    return out
+  end
+
   protected
   # @param [String] msg
   def Yggdrasil.error(msg)
     puts "#{CMD} error: #{msg}"
     puts
     exit 1
-  end
-
-  # @param [String] cmd
-  def Yggdrasil.exec_command(cmd, err_exit=true)
-    out,stat = Open3.capture2e cmd
-    unless stat.success?
-      return nil unless err_exit
-      puts "#{CMD} error: command failure: #{cmd}"
-      puts
-      exit stat.exitstatus
-    end
-    return out
   end
 
   def Yggdrasil.parse_options(args, valid_params)
@@ -99,9 +105,9 @@ class Yggdrasil
     until options.has_key?(:password) do
       print "Input svn password: "
       #input = `sh -c 'read -s hoge;echo $hoge'`
-      `stty -echo`
+      system3 'stty -echo', false
       input = $stdin.gets
-      `stty echo`
+      system3 'stty echo', false
       puts
       options[:password] = input.chomp
     end
@@ -139,16 +145,16 @@ class Yggdrasil
       end
     end
     config_file.close
-    return @config
+    @config
   end
 
   def sync_mirror(options)
     FileUtils.cd @mirror_dir do
-      out = exec_command("#@svn ls --no-auth-cache --non-interactive"\
+      out = system3("#@svn ls --no-auth-cache --non-interactive"\
                            " --username '#{options[:username]}' --password '#{options[:password]}'"\
                            " --depth infinity #@repo")
       files = out.split(/\n/)
-      out = exec_command("#@svn status -q --no-auth-cache --non-interactive"\
+      out = system3("#@svn status -q --no-auth-cache --non-interactive"\
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
         if /^.*\s(\S+)\s*$/ =~ line
@@ -161,11 +167,11 @@ class Yggdrasil
       files.each do |file|
         absolute = '/'+file
         if !File.exist?(absolute)
-          exec_command "#@svn delete --force --no-auth-cache --non-interactive"\
+          system3 "#@svn delete --force --no-auth-cache --non-interactive"\
                        " #{file}"
         elsif File.file?(absolute)
           if !File.exist?(@mirror_dir+absolute)
-            exec_command "#@svn revert --no-auth-cache --non-interactive #{file}"
+            system3 "#@svn revert --no-auth-cache --non-interactive #{file}"
           end
           FileUtils.copy_file absolute, @mirror_dir+absolute
         end

@@ -63,11 +63,19 @@ EOS
         when 'diff', 'di'
           puts <<"EOS"
 diff (di): Display the differences between two revisions or paths.
-usage: #{CMD} diff [-r N[:M]] [PATH...]
+usage: #{CMD} diff [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
+                             A revision argument can be one of:
+                                NUMBER       revision number
+                                '{' DATE '}' revision at start of the date
+                                'HEAD'       latest in repository
+                                'BASE'       base rev of item's working copy
+                                'COMMITTED'  last commit at or before BASE
+                                'PREV'       revision just before COMMITTED
 
 EOS
         when 'help', '?', 'h'
@@ -89,8 +97,23 @@ Valid options:
 EOS
         when 'list', 'ls'
           puts <<"EOS"
-Sorry.
-Under construction.
+list (ls): List directory entries in the repository.
+usage: #{CMD} list [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
+                             A revision argument can be one of:
+                                NUMBER       revision number
+                                '{' DATE '}' revision at start of the date
+                                'HEAD'       latest in repository
+                                'BASE'       base rev of item's working copy
+                                'COMMITTED'  last commit at or before BASE
+                                'PREV'       revision just before COMMITTED
+  -R [--recursive]         : descend recursively, same as --depth=infinity
+  --depth ARG              : limit operation by depth ARG ('empty', 'files',
+                            'immediates', or 'infinity')
 EOS
         when 'log'
           puts <<"EOS"

@@ -1,6 +1,7 @@
-require File.dirname(__FILE__) + '/../lib/yggdrasil'
+require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "version" do
+
   show_version = <<"EOS"
 #{File.basename($0)}, version #{Yggdrasil::VERSION}
 
@@ -10,15 +11,14 @@ Yggdrasil is open source software, see https://github.com/tkusukawa/yggdrasil/
 EOS
 
   it 'should show version on "version"' do
-    $stdout = StringIO.new
-    Yggdrasil.command %w{version}
-    $stdout.string.should == show_version
+    puts '---- should show version on "version"'
+    out = catch_stdout{Yggdrasil.command %w{version}}
+    out.should == show_version
   end
 
   it 'should show version on "--version"' do
-    $stdout = StringIO.new
-    Yggdrasil.command %w{--version}
-    $stdout.string.should == show_version
+    puts '---- should show version on "--version"'
+    out = catch_stdout{Yggdrasil.command %w{--version}}
+    out.should == show_version
   end
-
 end

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/yggdrasil'
+require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "commit" do
   before do
@@ -71,7 +71,7 @@ describe Yggdrasil, "commit" do
     Yggdrasil.command %w{commit --username hoge --password foo -m delete},
                       "0\n1\nY\n"
 
-    puts "\n-- check committed delte file"
+    puts "\n-- check committed delete file"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
     res.should == "A\n"

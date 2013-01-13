@@ -18,7 +18,7 @@ class Yggdrasil
         file = @work_dir+'/'+file unless %r{^/} =~ file
         relative = file.sub(%r{^/}, '')
         next if File.exist?(file) && !File.file?(file)
-        out = exec_command("#@svn status --no-auth-cache --non-interactive #{relative}").chomp!
+        out = system3("#@svn status --no-auth-cache --non-interactive #{relative}").chomp!
         if out && out != ""
           num_file[file_num] = {:relative=>relative, :status=>out}
           file_num += 1
@@ -38,7 +38,7 @@ class Yggdrasil
       return if res == 'n'
       if /^\d+$/ =~ res
         FileUtils.cd @mirror_dir do
-          puts exec_command("#@svn diff --no-auth-cache --non-interactive #{num_file[res.to_i][:relative]}")
+          puts system3("#@svn diff --no-auth-cache --non-interactive #{num_file[res.to_i][:relative]}")
         end
       end
     end
@@ -55,7 +55,7 @@ class Yggdrasil
     end
 
     FileUtils.cd @mirror_dir do
-      exec_command "#@svn commit -m '#{options[:message]}'"\
+      system3 "#@svn commit -m '#{options[:message]}'"\
                    " --no-auth-cache --non-interactive"\
                    " --username '#{options[:username]}' --password '#{options[:password]}'"\
                    " #{file_list}"
