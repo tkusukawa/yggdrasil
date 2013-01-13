@@ -118,7 +118,7 @@ EOS
         when 'log'
           puts <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
-usage: #{CMD} log [OPTIONS...] [PATH...]
+usage: #{CMD} log [OPTIONS...] [PATH]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -134,8 +134,12 @@ Valid options:
 EOS
         when 'status', 'stat', 'st'
           puts <<"EOS"
-Sorry.
-Under construction.
+status (stat, st): Print the status of managed files and directories.
+usage: #{CMD} status [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
 EOS
         when 'revert'
           puts <<"EOS"

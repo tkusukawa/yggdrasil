@@ -194,7 +194,7 @@ EOS
     out = catch_stdout{Yggdrasil.command %w{help log}}
     out.should == <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
-usage: #{File.basename($0)} log [OPTIONS...] [PATH...]
+usage: #{File.basename($0)} log [OPTIONS...] [PATH]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -207,6 +207,19 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
+EOS
+  end
+
+  it 'should show help of status' do
+    puts '---- should show help of status'
+    out = catch_stdout{Yggdrasil.command %w{help status}}
+    out.should == <<"EOS"
+status (stat, st): Print the status of managed files and directories.
+usage: #{File.basename($0)} status [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
 EOS
   end
 end

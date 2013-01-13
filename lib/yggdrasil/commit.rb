@@ -15,7 +15,7 @@ class Yggdrasil
     num_file = Array.new
     FileUtils.cd @mirror_dir do
       files.each do |file|
-        file = @work_dir+'/'+file unless %r{^/} =~ file
+        file = @current_dir+'/'+file unless %r{^/} =~ file
         relative = file.sub(%r{^/}, '')
         next if File.exist?(file) && !File.file?(file)
         out = system3("#@svn status --no-auth-cache --non-interactive #{relative}").chomp!

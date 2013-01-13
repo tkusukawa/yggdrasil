@@ -8,6 +8,7 @@ require "yggdrasil/cleanup"
 require "yggdrasil/diff"
 require "yggdrasil/list"
 require "yggdrasil/log"
+require "yggdrasil/status"
 
 class Yggdrasil
 
@@ -121,7 +122,7 @@ class Yggdrasil
     ENV["PATH"] = @config[:path]
     @svn = @config[:svn]
     @repo = @config[:repo]
-    @work_dir = `readlink -f .`.chomp
+    @current_dir = `readlink -f .`.chomp
     @mirror_dir = ENV["HOME"]+"/.yggdrasil/mirror"
   end
 
