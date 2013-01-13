@@ -188,4 +188,25 @@ Valid options:
                             'immediates', or 'infinity')
 EOS
   end
+
+  it 'should show help of log' do
+    puts '---- should show help of log'
+    out = catch_stdout{Yggdrasil.command %w{help log}}
+    out.should == <<"EOS"
+log: Show the log messages for a set of revision(s) and/or file(s).
+usage: #{File.basename($0)} log [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
+                             A revision argument can be one of:
+                                NUMBER       revision number
+                                '{' DATE '}' revision at start of the date
+                                'HEAD'       latest in repository
+                                'BASE'       base rev of item's working copy
+                                'COMMITTED'  last commit at or before BASE
+                                'PREV'       revision just before COMMITTED
+EOS
+  end
 end

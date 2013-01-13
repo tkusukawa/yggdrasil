@@ -7,6 +7,7 @@ require "yggdrasil/commit"
 require "yggdrasil/cleanup"
 require "yggdrasil/diff"
 require "yggdrasil/list"
+require "yggdrasil/log"
 
 class Yggdrasil
 

@@ -57,6 +57,30 @@ Index: tmp/yggdrasil-test/B
 +FOO
 EOS
 
+    puts "-- no path"
+    out = catch_stdout do
+      FileUtils.cd "/tmp/yggdrasil-test" do
+        Yggdrasil.command %w{diff --username hoge --password foo}
+      end
+    end
+    out.should == <<"EOS"
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A\t(revision 3)
++++ tmp/yggdrasil-test/A\t(working copy)
+@@ -1,2 +1,3 @@
+ hoge
+ foo
++HOGE
+Index: tmp/yggdrasil-test/B
+===================================================================
+--- tmp/yggdrasil-test/B\t(revision 2)
++++ tmp/yggdrasil-test/B\t(working copy)
+@@ -1 +1,2 @@
+ foo
++FOO
+EOS
+
     puts "-- specify revision (-r)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do

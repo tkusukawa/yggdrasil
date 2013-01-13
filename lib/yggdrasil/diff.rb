@@ -9,9 +9,13 @@ class Yggdrasil
     sync_mirror options
 
     paths = Array.new
-    args.each do |path|
-      path = "#@work_dir/#{path}" unless %r{^/} =~ path
-      paths.push path.sub(%r{^/}, '')
+    if args.size == 0
+      paths.push @work_dir.sub(%r{^/}, '')
+    else
+      args.each do |path|
+        path = "#@work_dir/#{path}" unless %r{^/} =~ path
+        paths.push path.sub(%r{^/}, '')
+      end
     end
 
     cmd_arg = "#@svn diff "
