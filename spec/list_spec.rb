@@ -1,25 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "list" do
-  before do
-    puts "-------- before do (list)"
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
-    puts '-- create repo'
-    `svnadmin create /tmp/yggdrasil-test/svn-repo`
-    puts '-- ygg init'
-    Yggdrasil.command %w{init} +
-        %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-        %w{--username hoge --password foo}
-    puts '-- add files'
-    `echo hoge > /tmp/yggdrasil-test/A`
-    `echo foo  > /tmp/yggdrasil-test/B`
-    Yggdrasil.command %w{add} +
-        %w{/tmp/yggdrasil-test/A /tmp/yggdrasil-test/B}
-    puts '-- commit'
-    Yggdrasil.command %w{commit --non-interactive -m add\ files} +
-        %w{--username hoge --password foo}
+  it '-------- list' do
+    puts '-------- list'
+    prepare_environment
+    init_yggdrasil
   end
 
   it 'should show list (absolute path)' do

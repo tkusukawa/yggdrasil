@@ -18,9 +18,10 @@ class Yggdrasil
       end
     end
 
-    cmd_arg = "#@svn diff "
-    cmd_arg += "-r #{options[:revision]} " if options.has_key?(:revision)
-    cmd_arg += paths.join(' ')
+    cmd_arg = "#@svn diff --no-auth-cache --non-interactive"
+    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
+    cmd_arg += " -r #{options[:revision]}" if options.has_key?(:revision)
+    cmd_arg += ' '+paths.join(' ')
     FileUtils.cd @mirror_dir do
       puts system3(cmd_arg)
     end

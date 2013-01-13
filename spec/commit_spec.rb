@@ -1,14 +1,14 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "commit" do
-  before do
-    puts '-------- before do (commit)'
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
-    `svnadmin create /tmp/yggdrasil-test/svn-repo`
-    cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/ --username hoge --password foo}
-    Yggdrasil.command cmd_args
+  it '-------- commit' do
+    puts '-------- commit'
+    prepare_environment
+
+    puts '-- init'
+    Yggdrasil.command %w{init} +
+                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
+                          %w{--username hoge --password foo}
   end
 
   it 'should commit added file' do
@@ -28,7 +28,9 @@ describe Yggdrasil, "commit" do
     res = `svn cat file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test/A`
     puts res
     res.should == "hoge\n"
+  end
 
+  it 'should commit modified file' do
     puts "---- should commit modified file"
     puts "-- modify"
     `echo hoge >> /tmp/yggdrasil-test/A`
@@ -41,8 +43,9 @@ describe Yggdrasil, "commit" do
     res = `svn cat file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test/A`
     puts res
     res.should == "hoge\nhoge\n"
+  end
 
-
+  it 'should commit specified file only' do
     puts "---- should commit specified file only"
     `echo A >> /tmp/yggdrasil-test/A`
     `echo B >> /tmp/yggdrasil-test/B`
@@ -56,8 +59,9 @@ describe Yggdrasil, "commit" do
     res = `svn cat file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test/B`
     puts res
     res.should == "foo\nB\n"
+  end
 
-
+  it 'should not commit deleted file' do
     puts "---- should not commit deleted file"
     `rm -f /tmp/yggdrasil-test/A`
 

@@ -1,11 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "init" do
-  before do
-    puts '-------- before do (init)'
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
+  it '-------- init' do
+    puts '-------- init'
+    prepare_environment
   end
 
   it 'should error: "Not enough arguments provided"' do
@@ -78,10 +76,5 @@ EOS
       "Input svn password: \n"\
       "SVN access test...\n"\
       "SVN mkdir: OK.\n"
-  end
-
-  after do
-    `pkill svnserve`
-    # `rm -rf /tmp/yggdrasil-test`
   end
 end

@@ -12,16 +12,17 @@ class Yggdrasil
       error "current directory is not managed." unless File.exist?(dir)
       args.push dir
     else
-    args.collect! do |arg|
-      if %r{^/} =~ arg
-        @mirror_dir+arg
-      else
-        @mirror_dir+@current_dir+'/'+arg
+      args.collect! do |arg|
+        if %r{^/} =~ arg
+          @mirror_dir+arg
+        else
+          @mirror_dir+@current_dir+'/'+arg
+        end
       end
     end
-    end
 
-    cmd_arg = "#@svn log --verbose"
+    cmd_arg = "#@svn log --verbose --no-auth-cache --non-interactive"
+    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
     if options.has_key?(:revision)
       cmd_arg += " -r #{options[:revision]}"
     else

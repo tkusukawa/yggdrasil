@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "help" do
+  puts '-------- help'
 
   show_subcommands = <<"EOS"
 usage: #{File.basename($0)} <subcommand> [options] [args]
@@ -220,6 +221,29 @@ usage: #{File.basename($0)} status [OPTIONS...] [PATH...]
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+EOS
+  end
+
+  it 'should show help of update' do
+    puts '---- should show help of update'
+    out = catch_stdout{Yggdrasil.command %w{help update}}
+    out.should == <<"EOS"
+update (up): Bring changes from the repository into the local files.
+usage: #{File.basename($0)} update [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
+                             A revision argument can be one of:
+                                NUMBER       revision number
+                                '{' DATE '}' revision at start of the date
+                                'HEAD'       latest in repository
+                                'BASE'       base rev of item's working copy
+                                'COMMITTED'  last commit at or before BASE
+                                'PREV'       revision just before COMMITTED
+  --depth ARG              : limit operation by depth ARG ('empty', 'files',
+                            'immediates', or 'infinity')
 EOS
   end
 end

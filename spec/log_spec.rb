@@ -1,33 +1,25 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "log" do
-  before do
-    puts "-------- before do (log)"
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
-    puts '-- create repo'
-    `svnadmin create /tmp/yggdrasil-test/svn-repo`
-    puts '-- ygg init'
-    Yggdrasil.command %w{init} +
-                      %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-                      %w{--username hoge --password foo}
-    puts '-- add files'
-    `echo hoge > /tmp/yggdrasil-test/A`
-    `echo foo  > /tmp/yggdrasil-test/B`
-    Yggdrasil.command %w{add} +
-                      %w{/tmp/yggdrasil-test/A /tmp/yggdrasil-test/B}
-    puts '-- commit'
-    Yggdrasil.command %w{commit --non-interactive -m add\ files} +
-                      %w{--username hoge --password foo}
+  it '-------- log' do
+    puts '-------- log'
+    prepare_environment
+    init_yggdrasil
   end
 
   it 'should show log (absolute path)' do
     puts '---- should show log (absolute path)'
     out = catch_stdout{Yggdrasil.command(%w{log /tmp} +
                                          %w{--username hoge --password foo})}
-    out.sub!(%r{20..-..-.. .*20..\)}, '')
+    out.gsub!(%r{20..-..-.. .*20..\)}, '')
     out.should == <<"EOS"
+------------------------------------------------------------------------
+r3 | hoge |  | 1 line
+Changed paths:
+   M /mng-repo/host-name/tmp/yggdrasil-test/A
+   M /mng-repo/host-name/tmp/yggdrasil-test/B
+
+modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
 Changed paths:
@@ -49,8 +41,15 @@ EOS
                           %w{--username hoge --password foo}
       end
     end
-    out.sub!(%r{20..-..-.. .*20..\)}, '')
+    out.gsub!(%r{20..-..-.. .*20..\)}, '')
     out.should == <<"EOS"
+------------------------------------------------------------------------
+r3 | hoge |  | 1 line
+Changed paths:
+   M /mng-repo/host-name/tmp/yggdrasil-test/A
+   M /mng-repo/host-name/tmp/yggdrasil-test/B
+
+modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
 Changed paths:
@@ -72,8 +71,15 @@ EOS
                           %w{--username hoge --password foo}
       end
     end
-    out.sub!(%r{20..-..-.. .*20..\)}, '')
+    out.gsub!(%r{20..-..-.. .*20..\)}, '')
     out.should == <<"EOS"
+------------------------------------------------------------------------
+r3 | hoge |  | 1 line
+Changed paths:
+   M /mng-repo/host-name/tmp/yggdrasil-test/A
+   M /mng-repo/host-name/tmp/yggdrasil-test/B
+
+modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
 Changed paths:

@@ -1,39 +1,18 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "diff" do
-  before do
-    puts '-------- before do (diff)'
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
-
-    # init
-    `svnadmin create /tmp/yggdrasil-test/svn-repo`
-    Yggdrasil.command %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-                      %w{--username hoge --password foo}
-
-    # add files and commit
-    `echo hoge > /tmp/yggdrasil-test/A`
-    `echo foo > /tmp/yggdrasil-test/B`
-    FileUtils.cd "/tmp/yggdrasil-test" do
-      Yggdrasil.command %w{add A B}
-      Yggdrasil.command %w{commit --non-interactive --username hoge --password foo -m add\ A}
-    end
-
-    # modify A and commit
-    `echo foo >> /tmp/yggdrasil-test/A`
-    FileUtils.cd "/tmp/yggdrasil-test" do
-      Yggdrasil.command %w{commit --non-interactive --username hoge --password foo -m modify\ A}
-    end
+  it '-------- diff' do
+    puts '-------- diff'
+    prepare_environment
+    init_yggdrasil
 
     # modify and not commit yet
     `echo HOGE >> /tmp/yggdrasil-test/A`
     `echo FOO >> /tmp/yggdrasil-test/B`
   end
 
-  it 'should success diff (local - repo)' do
-    puts "---- should success diff (local - repo)"
-    puts "-- absolute and relative"
+  it 'should success diff (absolute/relative path)' do
+    puts "---- should success diff (absolute/relative path)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command(%w{diff /tmp/yggdrasil-test/A B --username hoge --password foo})
@@ -46,18 +25,21 @@ Index: tmp/yggdrasil-test/A
 +++ tmp/yggdrasil-test/A	(working copy)
 @@ -1,2 +1,3 @@
  hoge
- foo
+ hoge
 +HOGE
 Index: tmp/yggdrasil-test/B
 ===================================================================
---- tmp/yggdrasil-test/B	(revision 2)
+--- tmp/yggdrasil-test/B	(revision 3)
 +++ tmp/yggdrasil-test/B	(working copy)
-@@ -1 +1,2 @@
+@@ -1,2 +1,3 @@
+ foo
  foo
 +FOO
 EOS
+  end
 
-    puts "-- no path"
+  it 'should success (no path)' do
+    puts "---- should success (no path)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff --username hoge --password foo}
@@ -70,18 +52,21 @@ Index: tmp/yggdrasil-test/A
 +++ tmp/yggdrasil-test/A\t(working copy)
 @@ -1,2 +1,3 @@
  hoge
- foo
+ hoge
 +HOGE
 Index: tmp/yggdrasil-test/B
 ===================================================================
---- tmp/yggdrasil-test/B\t(revision 2)
+--- tmp/yggdrasil-test/B\t(revision 3)
 +++ tmp/yggdrasil-test/B\t(working copy)
-@@ -1 +1,2 @@
+@@ -1,2 +1,3 @@
+ foo
  foo
 +FOO
 EOS
+  end
 
-    puts "-- specify revision (-r)"
+  it 'should success (-r)' do
+    puts "---- should success (-r)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff -r 2:3 A --username hoge --password foo}
@@ -94,10 +79,12 @@ Index: tmp/yggdrasil-test/A
 +++ tmp/yggdrasil-test/A	(revision 3)
 @@ -1 +1,2 @@
  hoge
-+foo
++hoge
 EOS
+  end
 
-    puts "-- specify revision (--revision)"
+  it 'should success (--revision)' do
+    puts "---- should success (--revision)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff --revision 3 A --username hoge --password foo}
@@ -110,7 +97,7 @@ Index: tmp/yggdrasil-test/A
 +++ tmp/yggdrasil-test/A	(working copy)
 @@ -1,2 +1,3 @@
  hoge
- foo
+ hoge
 +HOGE
 EOS
   end

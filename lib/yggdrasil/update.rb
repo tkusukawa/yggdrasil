@@ -1,32 +1,28 @@
 class Yggdrasil
 
   # @param [Array] args
-  def list(args)
+  def update(args)
     args, options = parse_options(args,
-        {'--username'=>:username, '--password'=>:password,
-         '-r'=>:revision, '--revision'=>:revision,
-         '-R'=>:recursive?, '--recursive'=>:recursive?,
-         '--depth'=>:depth})
+                                  {'--username'=>:username, '--password'=>:password,
+                                   '-r'=>:revision, '--revision'=>:revision, '--depth'=>:depth})
     options = input_user_pass(options)
-
     sync_mirror options
 
-    repos = Array.new
+    paths = Array.new
     if args.size == 0
-      repos.push @repo+@current_dir
+      paths.push @current_dir.sub(%r{^/}, '')
     else
       args.each do |path|
         path = "#@current_dir/#{path}" unless %r{^/} =~ path
-        repos.push @repo+path
+        paths.push path.sub(%r{^/}, '')
       end
     end
 
-    cmd_arg = "#@svn list --no-auth-cache --non-interactive"
+    cmd_arg = "#@svn update --no-auth-cache --non-interactive"
     cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
     cmd_arg += " -r #{options[:revision]}" if options.has_key?(:revision)
-    cmd_arg += " -R" if options.has_key?(:recursive?)
     cmd_arg += " --depth #{options[:depth]}" if options.has_key?(:depth)
-    cmd_arg += ' ' + repos.join(' ')
+    cmd_arg += ' ' + paths.join(' ')
     FileUtils.cd @mirror_dir do
       puts system3(cmd_arg)
     end

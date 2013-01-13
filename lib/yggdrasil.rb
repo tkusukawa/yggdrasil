@@ -9,6 +9,7 @@ require "yggdrasil/diff"
 require "yggdrasil/list"
 require "yggdrasil/log"
 require "yggdrasil/status"
+require "yggdrasil/update"
 
 class Yggdrasil
 

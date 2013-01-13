@@ -148,8 +148,22 @@ Under construction.
 EOS
         when 'update'
           puts <<"EOS"
-Sorry.
-Under construction.
+update (up): Bring changes from the repository into the local files.
+usage: #{CMD} update [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
+                             A revision argument can be one of:
+                                NUMBER       revision number
+                                '{' DATE '}' revision at start of the date
+                                'HEAD'       latest in repository
+                                'BASE'       base rev of item's working copy
+                                'COMMITTED'  last commit at or before BASE
+                                'PREV'       revision just before COMMITTED
+  --depth ARG              : limit operation by depth ARG ('empty', 'files',
+                            'immediates', or 'infinity')
 EOS
         when 'version', '--version'
           puts <<"EOS"

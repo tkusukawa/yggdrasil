@@ -1,15 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe Yggdrasil, "add" do
-  before do
-    puts '-------- before do (add)'
-    `rm -rf /tmp/yggdrasil-test`
-    Dir.mkdir('/tmp/yggdrasil-test', 0755)
-    ENV['HOME']='/tmp/yggdrasil-test'
-    `svnadmin create /tmp/yggdrasil-test/svn-repo`
-    Yggdrasil.command %w{init} +
-        %w{--username hoge --password foo} +
-        %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/}
+  it '-------- add' do
+    puts '-------- add'
+    prepare_environment
+    init_yggdrasil
   end
 
   it 'should warn: add non-exist files' do

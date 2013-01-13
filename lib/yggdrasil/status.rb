@@ -18,7 +18,8 @@ class Yggdrasil
       end
     end
 
-    cmd_arg = "#@svn status"
+    cmd_arg = "#@svn status -u --no-auth-cache --non-interactive"
+    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
     cmd_arg += ' ' + paths.join(' ')
     FileUtils.cd @mirror_dir do
       puts system3(cmd_arg)
