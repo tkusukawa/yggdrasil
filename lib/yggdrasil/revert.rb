@@ -28,7 +28,7 @@ class Yggdrasil
         if ls_hash.has_key?(target_file)
           FileUtils.copy_file @mirror_dir+'/'+target_file, '/'+target_file
         else
-          system3 "rm -rf @mirror_dir+'/'+target_file"
+          system3 "rm -rf #{@mirror_dir+'/'+target_file}"
         end
       end
     end

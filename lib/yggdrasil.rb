@@ -154,11 +154,10 @@ class Yggdrasil
 
   def sync_mirror(options)
     FileUtils.cd @mirror_dir do
-      out = system3("#@svn ls --no-auth-cache --non-interactive"\
-                           " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                           " --depth infinity #@repo")
+      out = system3("#@svn ls #@repo --depth infinity --no-auth-cache --non-interactive" +
+                           " --username '#{options[:username]}' --password '#{options[:password]}'")
       files = out.split(/\n/)
-      out = system3("#@svn status -q --no-auth-cache --non-interactive"\
+      out = system3("#@svn status -q --depth infinity --no-auth-cache --non-interactive" +
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
         files << $1 if /^.*\s(\S+)\s*$/ =~ line
@@ -208,8 +207,8 @@ class Yggdrasil
     # search parent dir of commit files
     parents = Array.new
     updates.each do |update|
-      matched_updates.each do |commit_file|
-        parents << update if commit_file.match("^#{update}/")
+      matched_updates.each do |matched_update|
+        parents << update if matched_update.match("^#{update}/")
       end
     end
     matched_updates += parents

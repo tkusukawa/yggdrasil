@@ -171,8 +171,7 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
-  --depth ARG              : limit operation by depth ARG ('empty', 'files',
-                            'immediates', or 'infinity')
+  --non-interactive        : do no interactive prompting
 
 EOS
         when 'version', '--version'
