@@ -73,7 +73,7 @@ EOS
     out.should == \
       "Input svn repo URL: "\
       "Input svn username: "\
-      "Input svn password: \n"\
+      "Input svn password: "\
       "SVN access test...\n"\
       "SVN mkdir: OK.\n"
   end

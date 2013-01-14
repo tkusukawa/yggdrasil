@@ -4,7 +4,7 @@ require File.expand_path('../lib/yggdrasil/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Tomohisa Kusukawa"]
   gem.email         = %w{t.kusukawa@gmail.com}
-  gem.description   = %q{Yggdrasil is a configuration management tool by Subversion.}
+  gem.description   = %q{Yggdrasil is a subversion wrapper to manage configuration files.}
   gem.summary       = "Type 'yggdrasil help' for usage."
   gem.homepage      = "https://github.com/tkusukawa/yggdrasil"
 

@@ -1,6 +1,6 @@
 # Yggdrasil
 
-Yggdrasil is a configuration management tool by Subversion.
+Yggdrasil is a subversion wrapper to manage configuration files.
 
 ## Installation
 
@@ -18,6 +18,23 @@ Or install it yourself as:
 
 ## Usage
 
+* Install subversion
+    $ sudo yum install subversion
+
+* Prepare subversion repository and init Yggdrasil.
+    $ svnadmin create ~/svn-repo
+    $ yggdrasil init --repo file://$HOME/svn-repo
+  You should use svn-server if you have.
+  In that case, the configuration files of
+  all the servers can be managed on the unification.
+
+* Add configuration files
+    $ yggdrasil add ~/.bashrc  ..etc
+
+* Check modify and/or delete
+    $ yggdrasil status /
+
+* Refer Help
     $ yggdrasil help
 
 ## Environment
@@ -26,14 +43,6 @@ Or install it yourself as:
 * Subversion command-line client
 * Ruby
 * Gem
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
 
 ## License
 

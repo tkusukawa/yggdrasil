@@ -23,9 +23,22 @@ describe Yggdrasil, "status" do
     end
     out.should == <<"EOS"
 M                3   tmp/yggdrasil-test/A
-Status against revision:      3
 D                3   tmp/yggdrasil-test/B
-Status against revision:      3
+EOS
+  end
+
+  it 'should show status(/)' do
+    puts "---- should show status(/)"
+    out = catch_stdout do
+      FileUtils.cd "/tmp/yggdrasil-test" do
+        Yggdrasil.command %w{status / --username hoge --password foo}
+      end
+    end
+    out.should == <<"EOS"
+M                3   tmp/yggdrasil-test/A
+D                3   tmp/yggdrasil-test/B
+A                0   tmp/yggdrasil-test/c/C
+A                0   tmp/yggdrasil-test/c
 EOS
   end
 
@@ -41,7 +54,6 @@ M                3   tmp/yggdrasil-test/A
 D                3   tmp/yggdrasil-test/B
 A                0   tmp/yggdrasil-test/c/C
 A                0   tmp/yggdrasil-test/c
-Status against revision:      3
 EOS
   end
 end

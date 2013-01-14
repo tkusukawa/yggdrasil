@@ -1,3 +1,4 @@
+require 'fileutils'
 require "open3"
 require "yggdrasil/version"
 require "yggdrasil/help"
@@ -89,7 +90,7 @@ class Yggdrasil
           options[option_key] = true
         else
           error "Not enough arguments provided: #{option_note}" unless args.size > pos
-          option_value = args[pos]
+          option_value = args[pos].dup
           args = args[0...pos]+args[pos+1..-1]
           options[option_key] = option_value
         end
@@ -112,7 +113,6 @@ class Yggdrasil
       system3 'stty -echo', false
       input = $stdin.gets
       system3 'stty echo', false
-      puts
       options[:password] = input.chomp
     end
     return options
@@ -153,6 +153,7 @@ class Yggdrasil
   end
 
   def sync_mirror(options)
+    updates = Array.new
     FileUtils.cd @mirror_dir do
       out = system3("#@svn ls #@repo --depth infinity --no-auth-cache --non-interactive" +
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
@@ -164,7 +165,6 @@ class Yggdrasil
       end
       files.sort!
       files.uniq!
-      updates=Array.new
       files.each do |file|
         if !File.exist?('/'+file)
           system3 "#@svn delete #{file} --force" +
@@ -175,10 +175,14 @@ class Yggdrasil
           end
           FileUtils.copy_file '/'+file, @mirror_dir+'/'+file
         end
-        updates << file
       end
-      return updates
+      out = system3("#@svn status -q --depth infinity --no-auth-cache --non-interactive" +
+                        " --username '#{options[:username]}' --password '#{options[:password]}'")
+      out.split(/\n/).each do |line|
+        updates << $1 if /^.*\s(\S+)\s*$/ =~ line
+      end
     end
+    updates
   end
 
   def select_updates(updates, target_paths)
@@ -220,7 +224,7 @@ class Yggdrasil
       (0...updates.size).each do |i|
         puts "#{i}:#{updates[i]}"
       end
-      puts "OK? [Y|n|<num to diff>]:"
+      print "OK? [Y|n|<num to diff>]:"
       res = $stdin.gets
       return nil unless res
       res.chomp!

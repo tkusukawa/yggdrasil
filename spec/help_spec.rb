@@ -223,6 +223,8 @@ usage: #{File.basename($0)} status [OPTIONS...] [PATH...]
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+  --depth ARG              : limit operation by depth ARG ('empty', 'files',
+                            'immediates', or 'infinity')
 
 EOS
   end

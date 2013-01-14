@@ -27,7 +27,7 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "Status against revision:      3\n"
+    out.should == ""
   end
 
   it 'should revert modified file' do
@@ -45,7 +45,7 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "Status against revision:      3\n"
+    out.should == ""
   end
 
   it 'should accept password interactive' do
@@ -61,7 +61,7 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "Status against revision:      3\n"
+    out.should == ""
   end
 
   it 'should revert specified file only' do
@@ -81,7 +81,6 @@ describe Yggdrasil, "revert" do
     puts out
     out.should == <<"EOS"
 M                3   tmp/yggdrasil-test/A
-Status against revision:      3
 EOS
   end
 
@@ -101,7 +100,6 @@ EOS
     puts out
     out.should == <<"EOS"
 D                3   tmp/yggdrasil-test/A
-Status against revision:      3
 EOS
   end
 
@@ -124,6 +122,6 @@ EOS
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "Status against revision:      3\n"
+    out.should == ""
   end
 end
