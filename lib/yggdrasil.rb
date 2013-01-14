@@ -164,47 +164,46 @@ class Yggdrasil
       end
       files.sort!
       files.uniq!
-      paths=Array.new
+      updates=Array.new
       files.each do |file|
-        absolute = '/'+file
-        if !File.exist?(absolute)
-          system3 "#@svn delete --force --no-auth-cache --non-interactive"\
-                       " #{file}"
-        elsif File.file?(absolute)
-          if !File.exist?(@mirror_dir+absolute)
+        if !File.exist?('/'+file)
+          system3 "#@svn delete #{file} --force" +
+                      " --no-auth-cache --non-interactive"
+        elsif File.file?('/'+file)
+          if !File.exist?(@mirror_dir+'/'+file)
             system3 "#@svn revert --no-auth-cache --non-interactive #{file}"
           end
-          FileUtils.copy_file absolute, @mirror_dir+absolute
+          FileUtils.copy_file '/'+file, @mirror_dir+'/'+file
         end
-        paths << absolute
+        updates << file
       end
-      return paths
+      return updates
     end
   end
 
-  def select_targets(options, args)
-    updates = sync_mirror(options)
+  def select_updates(updates, target_paths)
 
-    if  args.size == 0
-      args << @current_dir
+    target_relatives = Array.new
+    if  target_paths.size == 0
+      target_relatives << @current_dir.sub(%r{^/},'')
     else
-      args.collect! do |arg|
-        if %r{^/} =~ arg
-          arg
+      target_paths.each do |path|
+        if %r{^/} =~ path
+          target_relatives << path.sub(%r{^/},'') # cut first '/'
         else
-          @current_dir + '/' + arg
+          target_relatives << @current_dir.sub(%r{^/},'') + '/' + path
         end
       end
     end
 
     # search updated files in the specified dir
-    cond = '^'+args.join('|^') # make reg exp
+    cond = '^'+target_relatives.join('|^') # make reg exp
     matched_updates = Array.new
     updates.each do |update|
       matched_updates << update if update.match(cond)
     end
 
-    # search parent dir of commit files
+    # search parent updates of matched updates
     parents = Array.new
     updates.each do |update|
       matched_updates.each do |matched_update|
@@ -212,47 +211,28 @@ class Yggdrasil
       end
     end
     matched_updates += parents
-    matched_updates.sort!
-    matched_updates.uniq!
+    matched_updates.sort.uniq
+  end
 
-    target_files = Array.new
-    target_files_status = Array.new
-    FileUtils.cd @mirror_dir do
-      matched_updates.each do |commit_file|
-        relative = commit_file.sub(%r{^/}, '')
-        out = system3("#@svn status #{relative} --depth empty" +
-                          " --no-auth-cache --non-interactive")
-        out.chomp!
-        if out && out != ""
-          target_files << relative
-          target_files_status << out
-        end
-      end
-    end
-
-    return nil if target_files_status.size == 0 # no files to commit
-
+  def confirm_updates(updates, options)
     until options.has_key?(:non_interactive?)
       puts
-      (0...target_files_status.size).each do |i|
-        puts "#{i}:#{target_files_status[i]}"
+      (0...updates.size).each do |i|
+        puts "#{i}:#{updates[i]}"
       end
       puts "OK? [Y|n|<num to diff>]:"
       res = $stdin.gets
-      return unless res
+      return nil unless res
       res.chomp!
-      break if res == 'Y'
       return nil if res == 'n'
-      next unless target_files_status[res.to_i]
+      break if res == 'Y'
+      next unless updates[res.to_i]
       if /^\d+$/ =~ res
-        FileUtils.cd @mirror_dir do
-          puts system3("#@svn diff --no-auth-cache --non-interactive #{target_files[res.to_i]}")
-        end
+        yield updates[res.to_i]
       end
     end
-
-    # res == 'Y' or --non-interactive
-    target_files
+    # res == 'Y'
+    updates
   end
 
   def method_missing(action, *args)
