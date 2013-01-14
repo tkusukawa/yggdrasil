@@ -34,13 +34,13 @@ def init_yggdrasil
   Yggdrasil.command %w{add} +
                     %w{/tmp/yggdrasil-test/A /tmp/yggdrasil-test/B}
   puts '-- commit'
-  Yggdrasil.command %w{commit --non-interactive -m add\ files} +
+  Yggdrasil.command %w{commit / --non-interactive -m add\ files} +
                     %w{--username hoge --password foo}
   puts '-- modify'
   `echo hoge >> /tmp/yggdrasil-test/A`
   `echo foo  >> /tmp/yggdrasil-test/B`
   puts '-- commit'
-  Yggdrasil.command %w{commit --non-interactive -m modify} +
+  Yggdrasil.command %w{commit / --non-interactive -m modify} +
                     %w{--username hoge --password foo}
 end
 

@@ -8,20 +8,23 @@ describe Yggdrasil, "status" do
 
     # modify and not commit yet
     `echo HOGE >> /tmp/yggdrasil-test/A`
-    `echo FOO >> /tmp/yggdrasil-test/B`
+    `rm -f /tmp/yggdrasil-test/B`
+    `mkdir /tmp/yggdrasil-test/c`
+    `echo bar > /tmp/yggdrasil-test/c/C`
+    Yggdrasil.command %w{add /tmp/yggdrasil-test/c/C}
   end
 
   it 'should show status(absolute and relative)' do
     puts "---- should show status(absolute and relative)"
     out = catch_stdout do
       FileUtils.cd "/tmp/yggdrasil-test" do
-        Yggdrasil.command(%w{status /tmp/yggdrasil-test/A B --username hoge --password foo})
+        Yggdrasil.command %w{status /tmp/yggdrasil-test/A B --username hoge --password foo}
       end
     end
     out.should == <<"EOS"
 M                3   tmp/yggdrasil-test/A
 Status against revision:      3
-M                3   tmp/yggdrasil-test/B
+D                3   tmp/yggdrasil-test/B
 Status against revision:      3
 EOS
   end
@@ -35,7 +38,9 @@ EOS
     end
     out.should == <<"EOS"
 M                3   tmp/yggdrasil-test/A
-M                3   tmp/yggdrasil-test/B
+D                3   tmp/yggdrasil-test/B
+A                0   tmp/yggdrasil-test/c/C
+A                0   tmp/yggdrasil-test/c
 Status against revision:      3
 EOS
   end

@@ -10,6 +10,7 @@ require "yggdrasil/list"
 require "yggdrasil/log"
 require "yggdrasil/status"
 require "yggdrasil/update"
+require "yggdrasil/revert"
 
 class Yggdrasil
 
@@ -160,9 +161,7 @@ class Yggdrasil
       out = system3("#@svn status -q --no-auth-cache --non-interactive"\
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
-        if /^.*\s(\S+)\s*$/ =~ line
-          files.push($1)
-        end
+        files << $1 if /^.*\s(\S+)\s*$/ =~ line
       end
       files.sort!
       files.uniq!
@@ -178,10 +177,83 @@ class Yggdrasil
           end
           FileUtils.copy_file absolute, @mirror_dir+absolute
         end
-        paths.push absolute
+        paths << absolute
       end
       return paths
     end
+  end
+
+  def select_targets(options, args)
+    updates = sync_mirror(options)
+
+    if  args.size == 0
+      args << @current_dir
+    else
+      args.collect! do |arg|
+        if %r{^/} =~ arg
+          arg
+        else
+          @current_dir + '/' + arg
+        end
+      end
+    end
+
+    # search updated files in the specified dir
+    cond = '^'+args.join('|^') # make reg exp
+    matched_updates = Array.new
+    updates.each do |update|
+      matched_updates << update if update.match(cond)
+    end
+
+    # search parent dir of commit files
+    parents = Array.new
+    updates.each do |update|
+      matched_updates.each do |commit_file|
+        parents << update if commit_file.match("^#{update}/")
+      end
+    end
+    matched_updates += parents
+    matched_updates.sort!
+    matched_updates.uniq!
+
+    target_files = Array.new
+    target_files_status = Array.new
+    FileUtils.cd @mirror_dir do
+      matched_updates.each do |commit_file|
+        relative = commit_file.sub(%r{^/}, '')
+        out = system3("#@svn status #{relative} --depth empty" +
+                          " --no-auth-cache --non-interactive")
+        out.chomp!
+        if out && out != ""
+          target_files << relative
+          target_files_status << out
+        end
+      end
+    end
+
+    return nil if target_files_status.size == 0 # no files to commit
+
+    until options.has_key?(:non_interactive?)
+      puts
+      (0...target_files_status.size).each do |i|
+        puts "#{i}:#{target_files_status[i]}"
+      end
+      puts "OK? [Y|n|<num to diff>]:"
+      res = $stdin.gets
+      return unless res
+      res.chomp!
+      break if res == 'Y'
+      return nil if res == 'n'
+      next unless target_files_status[res.to_i]
+      if /^\d+$/ =~ res
+        FileUtils.cd @mirror_dir do
+          puts system3("#@svn diff --no-auth-cache --non-interactive #{target_files[res.to_i]}")
+        end
+      end
+    end
+
+    # res == 'Y' or --non-interactive
+    target_files
   end
 
   def method_missing(action, *args)

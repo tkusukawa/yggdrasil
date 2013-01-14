@@ -10,7 +10,7 @@ class Yggdrasil
     if args.size == 0
       dir = @mirror_dir+@current_dir
       error "current directory is not managed." unless File.exist?(dir)
-      args.push dir
+      args << dir
     else
       args.collect! do |arg|
         if %r{^/} =~ arg

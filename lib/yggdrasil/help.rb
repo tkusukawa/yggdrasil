@@ -114,6 +114,7 @@ Valid options:
   -R [--recursive]         : descend recursively, same as --depth=infinity
   --depth ARG              : limit operation by depth ARG ('empty', 'files',
                             'immediates', or 'infinity')
+
 EOS
         when 'log'
           puts <<"EOS"
@@ -131,6 +132,7 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
+
 EOS
         when 'status', 'stat', 'st'
           puts <<"EOS"
@@ -140,11 +142,18 @@ usage: #{CMD} status [OPTIONS...] [PATH...]
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+
 EOS
         when 'revert'
           puts <<"EOS"
-Sorry.
-Under construction.
+revert: Restore pristine working copy file (undo most local edits).
+usage: #{CMD} revert [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  --non-interactive        : do no interactive prompting
+
 EOS
         when 'update'
           puts <<"EOS"
@@ -164,6 +173,7 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
   --depth ARG              : limit operation by depth ARG ('empty', 'files',
                             'immediates', or 'infinity')
+
 EOS
         when 'version', '--version'
           puts <<"EOS"
