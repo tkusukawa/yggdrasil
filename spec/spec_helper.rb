@@ -12,13 +12,18 @@ def prepare_environment
   `svnadmin create /tmp/yggdrasil-test/svn-repo`
 
   puts '-- launch svnserve'
-  Yggdrasil.system3 'cat > /tmp/yggdrasil-test/svn-repo/conf/passwd', true, "[users]\nhoge = foo"
-  Yggdrasil.system3 'cat > /tmp/yggdrasil-test/svn-repo/conf/svnserve.conf', true, <<"EOS"
+
+  File.open("/tmp/yggdrasil-test/svn-repo/conf/passwd", "w") do |f|
+    f.write "[users]\nhoge = foo"
+  end
+  File.open("/tmp/yggdrasil-test/svn-repo/conf/svnserve.conf", "w") do |f|
+    f.write <<"EOS"
 [general]
 anon-access = none
 auth-access = write
 password-db = passwd
 EOS
+  end
   `svnserve -d`
 end
 

@@ -54,13 +54,10 @@ class Yggdrasil
   end
 
   # @param [String] cmd
-  def Yggdrasil.system3(cmd, err_exit=true, stdin=nil)
-    if stdin.nil?
-      out,stat = Open3.capture2e cmd
-    else
-      out,stat = Open3.capture2e cmd, :stdin_data=>stdin
-    end
-    unless stat.success?
+  def Yggdrasil.system3(cmd, err_exit=true)
+    out = `#{cmd}`
+
+    unless $?.success?
       return nil unless err_exit
       $stderr.puts "#{CMD} error: command failure: #{cmd}"
       $stderr.puts "command output:"

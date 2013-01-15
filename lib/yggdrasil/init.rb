@@ -65,11 +65,12 @@ class Yggdrasil
     end
 
     Dir.mkdir config_dir, 0755
-    File.write config_dir+'/config',
-               "path=#{ENV['PATH']}\n"\
-               "svn=#{svn}\n"\
-               "svn_version=#{svn_version}\n"\
-               "repo=#{options[:repo]}\n"
+    File.open(config_dir+'/config', "w") do |f|
+      f.write "path=#{ENV['PATH']}\n"\
+              "svn=#{svn}\n"\
+              "svn_version=#{svn_version}\n"\
+              "repo=#{options[:repo]}\n"
+    end
 
     ret = system3 "#{svn} checkout"\
                        " --no-auth-cache --non-interactive"\

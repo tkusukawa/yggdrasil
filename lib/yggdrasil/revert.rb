@@ -9,6 +9,10 @@ class Yggdrasil
 
     updates = sync_mirror(options)
     matched_updates = select_updates(updates, target_paths)
+    if matched_updates.size == 0
+      puts "\nno files."
+      return
+    end
 
     confirmed_updates = confirm_updates(matched_updates,options) do |relative_path|
       FileUtils.cd @mirror_dir do
