@@ -18,11 +18,11 @@ Or install it yourself as:
 
 ## Usage
 
-* Install subversion
+Install subversion:
 
     $ sudo yum install subversion
 
-* Prepare subversion repository and init Yggdrasil.
+Prepare subversion repository and init Yggdrasil:
 
     $ svnadmin create ~/svn-repo
     $ yggdrasil init --repo file://$HOME/svn-repo
@@ -31,15 +31,15 @@ Or install it yourself as:
   In that case, the configuration files of
   all the servers can be managed on the unification.
 
-* Add configuration files
+Add configuration files:
 
     $ yggdrasil add ~/.bashrc  ..etc
 
-* Check modify and/or delete
+Check modify and/or delete:
 
     $ yggdrasil status /
 
-* Refer Help
+Refer Help:
 
     $ yggdrasil help
 
