@@ -2,7 +2,6 @@ class Yggdrasil
 
   # @param [Array] args
   def add(args)
-    add_relatives = Array.new
     while (arg = args.shift)
       file_path = `readlink -f #{arg}`.chomp
       exit $?.exitstatus unless $?.success?
@@ -10,15 +9,16 @@ class Yggdrasil
         puts "no such file: #{file_path}"
         next
       end
-      mirror_path = @mirror_dir + file_path
-      mirror_dir = File.dirname(mirror_path)
-      FileUtils.mkdir_p(mirror_dir) unless File.exist?(mirror_dir)
-      FileUtils.copy file_path, mirror_path
-      add_relatives << file_path.sub(%r{^/}, '')
-    end
-    if add_relatives.size != 0
-      FileUtils.cd @mirror_dir do
-        puts system3("#@svn add --no-auth-cache --non-interactive --parents #{add_relatives.join(' ')}")
+      mirror_path = @mirror_dir
+      file_path.split('/')[1..-1].each do |part|
+        mirror_path += '/'+part
+        next if File.exist?(mirror_path)
+        if mirror_path == @mirror_dir+file_path
+          FileUtils.copy file_path, mirror_path
+        else
+          Dir.mkdir mirror_path
+        end
+        puts system3("#@svn add --no-auth-cache --non-interactive #{mirror_path}")
       end
     end
   end

@@ -16,10 +16,12 @@ describe Yggdrasil, "add" do
     out.should == "no such file: /etc/hoge\n"
   end
 
-  it 'should success: add exist files' do
+  it 'should success: add exist files (relative)' do
     puts '---- should success: add exist files'
-    Yggdrasil.command %w{add Gemfile /etc/fstab /etc/fstab}
+    Yggdrasil.command %w{add Gemfile /etc/fstab}
     File.exist?("/tmp/yggdrasil-test/.yggdrasil/mirror#{`readlink -f Gemfile`.chomp}").should be_true
+  end
+  it 'should success: add exist files (absolute)' do
     File.exist?("/tmp/yggdrasil-test/.yggdrasil/mirror#{`readlink -f /etc/fstab`.chomp}").should be_true
   end
 end

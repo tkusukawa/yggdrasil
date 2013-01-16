@@ -4,25 +4,15 @@ Yggdrasil is a subversion wrapper to manage configuration files.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'yggdrasil'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
     $ gem install yggdrasil
+
+And you have to install subversion:
+
+    (e.g.)$ sudo yum install subversion
 
 ## Usage
 
-Install subversion:
-
-    $ sudo yum install subversion
-
-Prepare subversion repository and init Yggdrasil:
+Prepare subversion repository and initialize Yggdrasil:
 
     $ svnadmin create ~/svn-repo
     $ yggdrasil init --repo file://$HOME/svn-repo
