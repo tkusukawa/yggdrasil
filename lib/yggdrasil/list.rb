@@ -13,7 +13,7 @@ class Yggdrasil
 
     repos = Array.new
     if args.size == 0
-      repos << @repo+@current_dir
+      repos << @repo + @current_dir
     else
       args.each do |path|
         path = "#@current_dir/#{path}" unless %r{^/} =~ path

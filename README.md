@@ -14,7 +14,7 @@ And you have to install subversion:
 
 Prepare subversion repository and initialize Yggdrasil:
 
-    $ svnadmin create ~/svn-repo
+    (e.g.)$ svnadmin create ~/svn-repo
     $ yggdrasil init --repo file://$HOME/svn-repo
 
   You should use svn-server if you have.
@@ -23,7 +23,7 @@ Prepare subversion repository and initialize Yggdrasil:
 
 Add configuration files:
 
-    $ yggdrasil add ~/.bashrc  ..etc
+    $ yggdrasil add /etc/hosts /etc/fstab   ..etc
 
 Check modify and/or delete:
 

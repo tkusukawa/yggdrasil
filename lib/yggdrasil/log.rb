@@ -8,15 +8,15 @@ class Yggdrasil
     options = input_user_pass(options)
 
     if args.size == 0
-      dir = @mirror_dir+@current_dir
+      dir = @mirror_dir + @current_dir
       error "current directory is not managed." unless File.exist?(dir)
       args << dir
     else
       args.collect! do |arg|
         if %r{^/} =~ arg
-          @mirror_dir+arg
+          @mirror_dir + arg
         else
-          @mirror_dir+@current_dir+'/'+arg
+          @mirror_dir + @current_dir + '/' + arg
         end
       end
     end

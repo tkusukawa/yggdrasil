@@ -56,7 +56,7 @@ class Yggdrasil
       # reflect mirror to real file
       confirmed_updates.each do |update_file|
         if File.exist?(update_file)
-          FileUtils.copy_file @mirror_dir+'/'+update_file, '/'+update_file
+          FileUtils.copy_file "#@mirror_dir/#{update_file}", "/#{update_file}"
         else
           system3 "rm -rf /#{update_file}"
         end

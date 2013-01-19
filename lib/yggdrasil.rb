@@ -35,7 +35,7 @@ class Yggdrasil
       when 'help', 'h', '?'
         help(args[1..-1])
       when 'init'
-        init(args[1..-1])
+        new(false).init(args[1..-1])
       when 'list', 'ls'
         new.list(args[1..-1])
       when 'log'
@@ -115,38 +115,41 @@ class Yggdrasil
     return options
   end
 
-  def initialize
-
-    @config = read_config
-    ENV["PATH"] = @config[:path]
-    @svn = @config[:svn]
-    @repo = @config[:repo]
+  def initialize(exist_config = true)
     @current_dir = `readlink -f .`.chomp
-    @mirror_dir = ENV["HOME"]+"/.yggdrasil/mirror"
+    @config_dir = "#{ENV["HOME"]}/.yggdrasil"
+    @config_file = "#@config_dir/config"
+    @mirror_dir = "#@config_dir/mirror"
+
+    return unless exist_config
+    configs = read_config
+    ENV["PATH"] = configs[:path]
+    @svn = configs[:svn]
+    @repo = configs[:repo]
   end
 
   # load config value from config file
   def read_config
-    @config=Hash.new
+    configs = Hash.new
     begin
-      config_file = open("#{ENV['HOME']}/.yggdrasil/config")
+      File.open(@config_file) do |file|
+        l = 0
+        while (line = file.gets)
+          l += 1
+          next if /^\s*#.*$/ =~ line  # comment line
+          if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
+            configs[$1.to_sym] = $2
+          else
+            puts "#{CMD} error: syntax error. :#@config_file(#{l})"
+            exit 1
+          end
+        end
+      end
     rescue
-      puts "#{CMD} error: can not open config file: #{ENV['HOME']}/.yggdrasil/config"
+      puts "#{CMD} error: can not open config file: #@config_file"
       exit 1
     end
-    l = 0
-    while (line = config_file.gets)
-      l += 1
-      next if /^\s*#.*$/ =~ line  # comment line
-      if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
-        @config[$1.to_sym] = $2
-      else
-        puts "#{CMD} error: syntax error. :#{ENV['HOME']}/.yggdrasil/config(#{l})"
-        exit 1
-      end
-    end
-    config_file.close
-    @config
+    configs
   end
 
   def sync_mirror(options)
@@ -163,14 +166,14 @@ class Yggdrasil
       files.sort!
       files.uniq!
       files.each do |file|
-        if !File.exist?('/'+file)
+        if !File.exist?("/#{file}")
           system3 "#@svn delete #{file} --force" +
                       " --no-auth-cache --non-interactive"
-        elsif File.file?('/'+file)
-          if !File.exist?(@mirror_dir+'/'+file)
+        elsif File.file?("/#{file}")
+          if !File.exist?("#@mirror_dir/#{file}")
             system3 "#@svn revert --no-auth-cache --non-interactive #{file}"
           end
-          FileUtils.copy_file '/'+file, @mirror_dir+'/'+file
+          FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
         end
       end
       out = system3("#@svn status -q --depth infinity --no-auth-cache --non-interactive" +

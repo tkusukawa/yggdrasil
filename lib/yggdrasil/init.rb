@@ -1,8 +1,7 @@
 class Yggdrasil
 
   # @param [Array] args
-  def Yggdrasil.init(args)
-    ENV['LANG'] = 'en_US.UTF-8'
+  def init(args)
 
     args, options = parse_options(args,
         {'--repo'=>:repo, '--username'=>:username, '--password'=>:password})
@@ -20,9 +19,8 @@ class Yggdrasil
     end
     svn_version=$1
 
-    config_dir =  ENV["HOME"] + '/.yggdrasil'
-    if File.exist?(config_dir)
-      puts "#{CMD} error: already exist .yggdrasil directory: #{config_dir}"
+    if File.exist?(@config_file)
+      puts "#{CMD} error: already exist config file: #@config_file"
       exit 1
     end
 
@@ -64,8 +62,8 @@ class Yggdrasil
       exit 1
     end
 
-    Dir.mkdir config_dir, 0755
-    File.open(config_dir+'/config', "w") do |f|
+    Dir.mkdir @config_dir, 0755
+    File.open(@config_file, "w") do |f|
       f.write "path=#{ENV['PATH']}\n"\
               "svn=#{svn}\n"\
               "svn_version=#{svn_version}\n"\
@@ -75,7 +73,7 @@ class Yggdrasil
     ret = system3 "#{svn} checkout"\
                        " --no-auth-cache --non-interactive"\
                        " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                       " #{options[:repo]} #{config_dir+'/mirror'}", false
+                       " #{options[:repo]} #@mirror_dir", false
     if ret.nil?
       puts "SVN checkout: error."
       exit 1

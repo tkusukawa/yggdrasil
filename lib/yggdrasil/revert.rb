@@ -39,11 +39,11 @@ class Yggdrasil
       # reflect mirror to real file
       confirmed_updates.each do |file|
         if ls_hash.has_key?(file)
-          if File.file?(@mirror_dir+'/'+file)
-            FileUtils.copy_file @mirror_dir+'/'+file, '/'+file
+          if File.file?("#@mirror_dir/#{file}")
+            FileUtils.copy_file "#@mirror_dir/#{file}", "/#{file}"
           end
         else
-          system3 "rm -rf #{@mirror_dir+'/'+file}"
+          system3 "rm -rf #{@mirror_dir + '/' + file}"
         end
       end
     end
