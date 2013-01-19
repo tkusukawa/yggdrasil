@@ -11,11 +11,11 @@ class Yggdrasil
 
     paths = String.new
     if args.size == 0
-      paths += ' '+@current_dir.sub(%r{^/}, '')
+      paths += ' '+@current_dir.sub(%r{^/*}, '')
     else
       args.each do |path|
         path = "#@current_dir/#{path}" unless %r{^/} =~ path
-        paths += ' ' + path.sub(%r{^/}, '')
+        paths += ' ' + path.sub(%r{^/*}, '')
       end
     end
 

@@ -8,7 +8,7 @@ describe Yggdrasil, "init" do
 
   it 'should error: "Not enough arguments provided"' do
     puts '---- should error: "Not enough arguments provided"'
-    out = catch_stdout do
+    out = catch_out_err do
       lambda{Yggdrasil.command(%w{init --repo})}.should raise_error(SystemExit)
     end
     out.should == "#{File.basename($0)} error: Not enough arguments provided: --repo\n\n"
@@ -17,7 +17,7 @@ describe Yggdrasil, "init" do
   it 'should error: can not access to SVN server' do
     puts '---- should error: can not access to SVN server'
     `rm -rf /tmp/yggdrasil-test/.yggdrasil`
-    out = catch_stdout do
+    out = catch_out_err do
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/hoge --username hoge --password foo}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
@@ -29,7 +29,7 @@ describe Yggdrasil, "init" do
     `rm -rf /tmp/yggdrasil-test/.yggdrasil`
     `rm -rf /tmp/yggdrasil-test/svn-repo`
 
-    catch_stdout do # > /dev/null
+    catch_out_err do # > /dev/null
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/ --username hoge --password foo}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
@@ -41,7 +41,7 @@ describe Yggdrasil, "init" do
     `rm -rf /tmp/yggdrasil-test/svn-repo`
     `svnadmin create /tmp/yggdrasil-test/svn-repo`
 
-    out = catch_stdout do
+    out = catch_out_err do
       Yggdrasil.command %w{init} +
           %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
           %w{--username hoge --password foo}
@@ -70,7 +70,7 @@ EOS
     end
     `svnserve -d`
 
-    out = catch_stdout do
+    out = catch_out_err do
       Yggdrasil.command %w{init},
           "svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/\n"\
           "hoge\n"\

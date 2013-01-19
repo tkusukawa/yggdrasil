@@ -12,13 +12,13 @@ EOS
 
   it 'should show version on "version"' do
     puts '---- should show version on "version"'
-    out = catch_stdout{Yggdrasil.command %w{version}}
+    out = catch_out_err{Yggdrasil.command %w{version}}
     out.should == show_version
   end
 
   it 'should show version on "--version"' do
     puts '---- should show version on "--version"'
-    out = catch_stdout{Yggdrasil.command %w{--version}}
+    out = catch_out_err{Yggdrasil.command %w{--version}}
     out.should == show_version
   end
 end

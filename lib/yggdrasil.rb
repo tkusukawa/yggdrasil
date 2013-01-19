@@ -55,9 +55,10 @@ class Yggdrasil
 
   # @param [String] cmd
   def Yggdrasil.system3(cmd, err_exit=true)
-    out = `#{cmd}`
+    out = `#{cmd} 2>&1`
+    stat = $?
 
-    unless $?.success?
+    unless stat.success?
       return nil unless err_exit
       $stderr.puts "#{CMD} error: command failure: #{cmd}"
       $stderr.puts "command output:"
@@ -189,13 +190,13 @@ class Yggdrasil
 
     target_relatives = Array.new
     if  target_paths.size == 0
-      target_relatives << @current_dir.sub(%r{^/},'')
+      target_relatives << @current_dir.sub(%r{^/*},'')
     else
       target_paths.each do |path|
         if %r{^/} =~ path
-          target_relatives << path.sub(%r{^/},'') # cut first '/'
+          target_relatives << path.sub(%r{^/*},'') # cut first '/'
         else
-          target_relatives << @current_dir.sub(%r{^/},'') + '/' + path
+          target_relatives << @current_dir.sub(%r{^/*},'') + '/' + path
         end
       end
     end

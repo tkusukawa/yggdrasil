@@ -16,7 +16,7 @@ describe Yggdrasil, "status" do
 
   it 'should show status(absolute and relative)' do
     puts "---- should show status(absolute and relative)"
-    out = catch_stdout do
+    out = catch_out_err do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{status /tmp/yggdrasil-test/A B --username hoge --password foo}
       end
@@ -29,7 +29,7 @@ EOS
 
   it 'should show status(/)' do
     puts "---- should show status(/)"
-    out = catch_stdout do
+    out = catch_out_err do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{status / --username hoge --password foo}
       end
@@ -44,7 +44,7 @@ EOS
 
   it 'should show status (no path)' do
     puts "---- should show status (no path)"
-    out = catch_stdout do
+    out = catch_out_err do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{status --username hoge --password foo}
       end

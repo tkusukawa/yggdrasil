@@ -9,10 +9,10 @@ describe Yggdrasil, "add" do
 
   it 'should warn: add non-exist files' do
     puts '---- should warn: add non-exist files'
-    out = catch_stdout{Yggdrasil.command %w{add hoge}}
+    out = catch_out_err{Yggdrasil.command %w{add hoge}}
     out.should == "no such file: #{`readlink -f hoge`}"
 
-    out = catch_stdout{Yggdrasil.command %w{add /etc/hoge}}
+    out = catch_out_err{Yggdrasil.command %w{add /etc/hoge}}
     out.should == "no such file: /etc/hoge\n"
   end
 
