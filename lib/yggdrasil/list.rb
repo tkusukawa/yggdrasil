@@ -5,8 +5,7 @@ class Yggdrasil
     args, options = parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '-r'=>:revision, '--revision'=>:revision,
-         '-R'=>:recursive?, '--recursive'=>:recursive?,
-         '--depth'=>:depth})
+         '-R'=>:recursive?, '--recursive'=>:recursive?})
     options = input_user_pass(options)
 
     sync_mirror options
@@ -25,7 +24,6 @@ class Yggdrasil
     cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
     cmd_arg += " -r #{options[:revision]}" if options.has_key?(:revision)
     cmd_arg += " -R" if options.has_key?(:recursive?)
-    cmd_arg += " --depth #{options[:depth]}" if options.has_key?(:depth)
     cmd_arg += ' ' + repos.join(' ')
     FileUtils.cd @mirror_dir do
       puts system3(cmd_arg)

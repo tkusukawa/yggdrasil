@@ -111,9 +111,7 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
-  -R [--recursive]         : descend recursively, same as --depth=infinity
-  --depth ARG              : limit operation by depth ARG ('empty', 'files',
-                            'immediates', or 'infinity')
+  -R [--recursive]         : descend recursively
 
 EOS
         when 'log'
@@ -142,8 +140,6 @@ usage: #{CMD} status [OPTIONS...] [PATH...]
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
-  --depth ARG              : limit operation by depth ARG ('empty', 'files',
-                            'immediates', or 'infinity')
 
 EOS
         when 'revert'

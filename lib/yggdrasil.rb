@@ -111,6 +111,7 @@ class Yggdrasil
       system3 'stty -echo', false
       input = $stdin.gets
       system3 'stty echo', false
+      puts
       options[:password] = input.chomp
     end
     return options

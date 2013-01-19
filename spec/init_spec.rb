@@ -78,7 +78,7 @@ EOS
     out.should == \
       "Input svn repo URL: "\
       "Input svn username: "\
-      "Input svn password: "\
+      "Input svn password: \n"\
       "SVN access test...\n"\
       "SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo\n"\
       "not exist directory(s): mng-repo/host-name\n"\
