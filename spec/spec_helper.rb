@@ -32,7 +32,7 @@ def init_yggdrasil
   puts '-- init'
   Yggdrasil.command %w{init} +
                     %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-                    %w{--username hoge --password foo}
+                    %w{--username hoge --password foo --parents}
   puts '-- add'
   `echo hoge > /tmp/yggdrasil-test/A`
   `echo foo  > /tmp/yggdrasil-test/B`
@@ -52,10 +52,8 @@ end
 def catch_out_err
   exit 1 unless block_given?
   tmp_out = $stdout
-  tmp_err = $stderr
-  $stdout = $stderr = StringIO.new
+  $stdout = StringIO.new
   yield
   $stdout, tmp_out = tmp_out, $stdout
-  $stderr = tmp_err
   tmp_out.string
 end

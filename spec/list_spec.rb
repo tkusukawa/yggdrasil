@@ -38,7 +38,7 @@ describe Yggdrasil, "list" do
 
   it 'should show list (with options)' do
     puts '---- should show list (with options)'
-    out = catch_out_err{Yggdrasil.command(%w{list --revision 2 --recursive --depth infinity /tmp} +
+    out = catch_out_err{Yggdrasil.command(%w{list -R --revision 2 --recursive /tmp} +
                                              %w{--username hoge --password foo})}
     out.should == "yggdrasil-test/\nyggdrasil-test/A\nyggdrasil-test/B\n"
   end

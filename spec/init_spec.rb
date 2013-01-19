@@ -41,12 +41,10 @@ describe Yggdrasil, "init" do
     `rm -rf /tmp/yggdrasil-test/svn-repo`
     `svnadmin create /tmp/yggdrasil-test/svn-repo`
 
-    out = catch_out_err do
-      Yggdrasil.command %w{init} +
-          %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-          %w{--username hoge --password foo}
-    end
-    out.should == "SVN access test...\nSVN mkdir: OK.\n"
+    Yggdrasil.command %w{init --debug} +
+                          %w{--repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
+                          %w{--username hoge --password foo},
+                      "Y\n"
   end
 
   it 'should success: create config file (interactive)' do
@@ -74,13 +72,16 @@ EOS
       Yggdrasil.command %w{init},
           "svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/\n"\
           "hoge\n"\
-          "foo\n"
-    end
+          "foo\n"\
+          "Y\n"
+      end
     out.should == \
       "Input svn repo URL: "\
       "Input svn username: "\
       "Input svn password: "\
       "SVN access test...\n"\
-      "SVN mkdir: OK.\n"
+      "SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo\n"\
+      "not exist directory(s): mng-repo/host-name\n"\
+      "make directory(s)? [Yn]: "
   end
 end

@@ -19,7 +19,7 @@ class Yggdrasil
         else
           Dir.mkdir mirror_path
         end
-        puts system3("#@svn add --no-auth-cache --non-interactive #{mirror_path}")
+        puts system3("#@svn add #{mirror_path}")
       end
     end
   end

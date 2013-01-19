@@ -79,9 +79,8 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == <<"EOS"
-M                3   tmp/yggdrasil-test/A
-EOS
+    out.gsub!(%r{ +}, ' ')
+    out.should == "M 3 tmp/yggdrasil-test/A\n"
   end
 
   it 'should not revert deleted file' do
@@ -97,10 +96,10 @@ EOS
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
+    out.chomp!
     puts out
-    out.should == <<"EOS"
-D                3   tmp/yggdrasil-test/A
-EOS
+    out.gsub!(%r{\s+},' ')
+    out.should == "D 3 tmp/yggdrasil-test/A"
   end
 
   it 'should revert all files at once' do

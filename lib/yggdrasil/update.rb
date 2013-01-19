@@ -11,7 +11,7 @@ class Yggdrasil
 
     updates = Array.new
     FileUtils.cd @mirror_dir do
-      out = system3("#@svn status -qu --depth infinity --no-auth-cache --non-interactive" +
+      out = system3("#@svn status -qu --no-auth-cache --non-interactive" +
                       " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\*.*\s(\S+)\s*$/ =~ line

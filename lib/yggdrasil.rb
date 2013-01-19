@@ -156,10 +156,10 @@ class Yggdrasil
   def sync_mirror(options)
     updates = Array.new
     FileUtils.cd @mirror_dir do
-      out = system3("#@svn ls #@repo --depth infinity --no-auth-cache --non-interactive" +
+      out = system3("#@svn ls #@repo -R --no-auth-cache --non-interactive" +
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
       files = out.split(/\n/)
-      out = system3("#@svn status -q --depth infinity --no-auth-cache --non-interactive" +
+      out = system3("#@svn status -q --no-auth-cache --non-interactive" +
                            " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
         files << $1 if /^.*\s(\S+)\s*$/ =~ line
@@ -172,12 +172,12 @@ class Yggdrasil
                       " --no-auth-cache --non-interactive"
         elsif File.file?("/#{file}")
           if !File.exist?("#@mirror_dir/#{file}")
-            system3 "#@svn revert --no-auth-cache --non-interactive #{file}"
+            system3 "#@svn revert #{file}"
           end
           FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
         end
       end
-      out = system3("#@svn status -q --depth infinity --no-auth-cache --non-interactive" +
+      out = system3("#@svn status -q --no-auth-cache --non-interactive" +
                         " --username '#{options[:username]}' --password '#{options[:password]}'")
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\s(\S+)\s*$/ =~ line

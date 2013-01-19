@@ -24,15 +24,11 @@ class Yggdrasil
     return if confirmed_updates.size == 0
 
     FileUtils.cd @mirror_dir do
-      system3 "#@svn revert"\
-                   " --no-auth-cache --non-interactive"\
-                   " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                   " #{confirmed_updates.reverse.join(' ')}"
+      system3 "#@svn revert #{confirmed_updates.reverse.join(' ')}"
 
       # make ls hash
-      out = system3("#@svn ls --no-auth-cache --non-interactive"\
-                           " --username '#{options[:username]}' --password '#{options[:password]}'"\
-                           " --depth infinity #@repo")
+      out = system3("#@svn ls -R #@repo --no-auth-cache --non-interactive"\
+                           " --username '#{options[:username]}' --password '#{options[:password]}'")
       ls_hash = Hash.new
       out.split(/\n/).each {|relative| ls_hash[relative]=true}
 

@@ -106,13 +106,16 @@ EOS
     puts "---- should error: diff with incorrect option"
     cmd = %w{diff --hoge --username hoge --password foo}
 
-    out = catch_out_err do
-      FileUtils.cd "/" do
-        lambda{Yggdrasil.command cmd}.should raise_error(SystemExit)
-      end
+    tmp_err = $stderr
+    $stderr = StringIO.new
+    FileUtils.cd "/" do
+      lambda{Yggdrasil.command cmd}.should raise_error(SystemExit)
     end
+    out = $stderr.string
+    $stderr = tmp_err
+    out.sub!(%r{/\S*svn}, 'svn')
     out.should == <<"EOS"
-rspec error: command failure: /usr/bin/svn diff --no-auth-cache --non-interactive --username hoge --password foo --hoge
+rspec error: command failure: svn diff --no-auth-cache --non-interactive --username hoge --password foo --hoge
 command output:
 svn: invalid option: --hoge
 Type 'svn help' for usage.
