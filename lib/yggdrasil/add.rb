@@ -3,8 +3,7 @@ class Yggdrasil
   # @param [Array] args
   def add(args)
     while (arg = args.shift)
-      file_path = `readlink -f #{arg}`.chomp
-      exit $?.exitstatus unless $?.success?
+      file_path = system3("readlink -f #{arg}").chomp
       unless File.exist?(file_path)
         puts "no such file: #{file_path}"
         next

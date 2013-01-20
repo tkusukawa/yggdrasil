@@ -29,34 +29,34 @@ EOS
 
   it 'should show subcommands on no subcommands' do
     puts '---- should show subcommands on no subcommands'
-    out = catch_out_err{Yggdrasil.command []}
+    out = catch_out{Yggdrasil.command []}
     out.should == show_subcommands
   end
 
   it 'should show subcommands on "help"' do
     puts '---- should show subcommands on "help"'
-    out = catch_out_err{Yggdrasil.command %w{help}}
+    out = catch_out{Yggdrasil.command %w{help}}
     out.should == show_subcommands
   end
 
   it 'should show subcommands on "h"' do
     puts '---- should show subcommands on "h"'
-    out = catch_out_err{Yggdrasil.command %w{h}}
+    out = catch_out{Yggdrasil.command %w{h}}
     out.should == show_subcommands
   end
 
   it 'should show subcommands on "?"' do
     puts '---- should show subcommands on "?"'
-    out = catch_out_err{Yggdrasil.command %w{?}}
+    out = catch_out{Yggdrasil.command %w{?}}
     out.should == show_subcommands
   end
 
   it 'should be unknown subcommand on "hoge"' do
     puts '---- should be unknown subcommand on "hoge"'
-    out = catch_out_err do
+    err = catch_err do
       lambda{Yggdrasil.command(%w{hoge})}.should raise_error(SystemExit)
     end
-    out.should == "#{File.basename($0)} error: Unknown subcommand: 'hoge'\n\n"
+    err.should == "#{File.basename($0)} error: Unknown subcommand: 'hoge'\n\n"
   end
 
   help_help = <<"EOS"
@@ -67,21 +67,21 @@ EOS
 
   it 'should show help_help' do
     puts '---- should show help_help'
-    out = catch_out_err{Yggdrasil.command %w{help help}}
+    out = catch_out{Yggdrasil.command %w{help help}}
     out.should == help_help
   end
 
   it 'should error too many arguments' do
     puts '---- should error too many arguments'
-    out = catch_out_err do
+    err = catch_err do
       lambda{Yggdrasil.command(%w{help help help})}.should raise_error(SystemExit)
     end
-    out.should == "#{File.basename($0)} error: too many arguments.\n\n"
+    err.should == "#{File.basename($0)} error: too many arguments.\n\n"
   end
 
   it 'should show help of version' do
     puts '---- should show help of version'
-    out = catch_out_err{Yggdrasil.command %w{help version}}
+    out = catch_out{Yggdrasil.command %w{help version}}
     out.should == <<"EOS"
 version: See the program version
 usage: #{File.basename($0)} version
@@ -91,7 +91,7 @@ EOS
 
   it 'should show help of init' do
     puts '---- should show help of init'
-    out = catch_out_err{Yggdrasil.command %w{help init}}
+    out = catch_out{Yggdrasil.command %w{help init}}
     out.should == <<"EOS"
 init: Check environment and initialize configuration.
 usage: #{File.basename($0)} init [OPTIONS...]
@@ -106,7 +106,7 @@ EOS
 
   it 'should show help of add' do
     puts '---- should show help of add'
-    out = catch_out_err{Yggdrasil.command %w{help add}}
+    out = catch_out{Yggdrasil.command %w{help add}}
     out.should == <<"EOS"
 add: Add files to management list (add to subversion)
 usage #{File.basename($0)} add [FILES...]
@@ -116,7 +116,7 @@ EOS
 
   it 'should show help of commit' do
     puts '---- should show help of commit'
-    out = catch_out_err{Yggdrasil.command %w{help commit}}
+    out = catch_out{Yggdrasil.command %w{help commit}}
     out.should == <<"EOS"
 commit (ci): Send changes from your local file to the repository.
 usage: #{File.basename($0)} commit [OPTIONS...] [FILES...]
@@ -132,7 +132,7 @@ EOS
 
   it 'should show help of cleanup' do
     puts '---- should show help of cleanup'
-    out = catch_out_err{Yggdrasil.command %w{help cleanup}}
+    out = catch_out{Yggdrasil.command %w{help cleanup}}
     out.should == <<"EOS"
 cleanup: clean up the working copy
 usage: #{File.basename($0)} cleanup [OPTIONS...]
@@ -146,7 +146,7 @@ EOS
 
   it 'should show help of diff' do
     puts '---- should show help of diff'
-    out = catch_out_err{Yggdrasil.command %w{help diff}}
+    out = catch_out{Yggdrasil.command %w{help diff}}
     out.should == <<"EOS"
 diff (di): Display the differences between two revisions or paths.
 usage: #{File.basename($0)} diff [OPTIONS...] [PATH...]
@@ -168,7 +168,7 @@ EOS
 
   it 'should show help of list' do
     puts '---- should show help of list'
-    out = catch_out_err{Yggdrasil.command %w{help list}}
+    out = catch_out{Yggdrasil.command %w{help list}}
     out.should == <<"EOS"
 list (ls): List directory entries in the repository.
 usage: #{File.basename($0)} list [OPTIONS...] [PATH...]
@@ -191,7 +191,7 @@ EOS
 
   it 'should show help of log' do
     puts '---- should show help of log'
-    out = catch_out_err{Yggdrasil.command %w{help log}}
+    out = catch_out{Yggdrasil.command %w{help log}}
     out.should == <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
 usage: #{File.basename($0)} log [OPTIONS...] [PATH]
@@ -213,7 +213,7 @@ EOS
 
   it 'should show help of status' do
     puts '---- should show help of status'
-    out = catch_out_err{Yggdrasil.command %w{help status}}
+    out = catch_out{Yggdrasil.command %w{help status}}
     out.should == <<"EOS"
 status (stat, st): Print the status of managed files and directories.
 usage: #{File.basename($0)} status [OPTIONS...] [PATH...]
@@ -227,7 +227,7 @@ EOS
 
   it 'should show help of update' do
     puts '---- should show help of update'
-    out = catch_out_err{Yggdrasil.command %w{help update}}
+    out = catch_out{Yggdrasil.command %w{help update}}
     out.should == <<"EOS"
 update (up): Bring changes from the repository into the local files.
 usage: #{File.basename($0)} update [PATH...]
@@ -250,7 +250,7 @@ EOS
 
   it 'should show help of revert' do
     puts '---- should show help of revert'
-    out = catch_out_err{Yggdrasil.command %w{help revert}}
+    out = catch_out{Yggdrasil.command %w{help revert}}
     out.should == <<"EOS"
 revert: Restore pristine working copy file (undo most local edits).
 usage: #{File.basename($0)} revert [PATH...]

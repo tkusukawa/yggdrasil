@@ -8,20 +8,44 @@ describe Yggdrasil, "init" do
 
   it 'should error: "Not enough arguments provided"' do
     puts '---- should error: "Not enough arguments provided"'
-    out = catch_out_err do
+    err = catch_err do
       lambda{Yggdrasil.command(%w{init --repo})}.should raise_error(SystemExit)
     end
-    out.should == "#{File.basename($0)} error: Not enough arguments provided: --repo\n\n"
+    err.should == "#{File.basename($0)} error: Not enough arguments provided: --repo\n\n"
   end
 
   it 'should error: can not access to SVN server' do
     puts '---- should error: can not access to SVN server'
     `rm -rf /tmp/yggdrasil-test/.yggdrasil`
-    out = catch_out_err do
+    err = catch_err do
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/hoge --username hoge --password foo}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
-    out.should == "SVN access test...\nSVN error: can not access to 'file:///tmp/yggdrasil-test/hoge'.\n"
+    err.should == "#{File.basename($0)} error: can not access to 'file:///tmp/yggdrasil-test/hoge'.\n\n"
+  end
+
+  it 'should error: need username' do
+    puts '---- should error: need username'
+
+    err = catch_err do
+      cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
+          %w{--non-interactive}
+      lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
+    end
+    err.should ==
+        "#{File.basename($0)} error: Can't get username or password\n\n"
+  end
+
+  it 'should error: need password' do
+    puts '---- should error: need password'
+
+    err = catch_err do
+      cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
+          %w{--non-interactive --username hoge }
+      lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
+    end
+    err.should ==
+        "#{File.basename($0)} error: Can't get username or password\n\n"
   end
 
   it 'should error: no valid repository' do
@@ -29,10 +53,11 @@ describe Yggdrasil, "init" do
     `rm -rf /tmp/yggdrasil-test/.yggdrasil`
     `rm -rf /tmp/yggdrasil-test/svn-repo`
 
-    catch_out_err do # > /dev/null
+    err = catch_err do
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/ --username hoge --password foo}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
+    err.should == "#{File.basename($0)} error: can not access to 'file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name'.\n\n"
   end
 
   it 'should success: create config file' do
@@ -68,7 +93,7 @@ EOS
     end
     `svnserve -d`
 
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{init},
           "svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/\n"\
           "hoge\n"\

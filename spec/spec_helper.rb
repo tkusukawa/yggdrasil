@@ -49,11 +49,20 @@ def init_yggdrasil
                     %w{--username hoge --password foo}
 end
 
-def catch_out_err
+def catch_out
   exit 1 unless block_given?
   tmp_out = $stdout
   $stdout = StringIO.new
   yield
   $stdout, tmp_out = tmp_out, $stdout
   tmp_out.string
+end
+
+def catch_err
+  exit 1 unless block_given?
+  tmp_err = $stdout
+  $stderr = StringIO.new
+  yield
+  $stderr, tmp_err = tmp_err, $stderr
+  tmp_err.string
 end

@@ -2,10 +2,10 @@ class Yggdrasil
 
   # @param [Array] args
   def log(args)
-    args, options = parse_options(args,
-                                  {'--username'=>:username, '--password'=>:password,
-                                   '-r'=>:revision, '--revision'=>:revision})
-    options = input_user_pass(options)
+    args = parse_options(args,
+                         {'--username'=>:username, '--password'=>:password,
+                          '-r'=>:revision, '--revision'=>:revision})
+    input_user_pass
 
     if args.size == 0
       dir = @mirror_dir + @current_dir
@@ -22,9 +22,9 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn log --verbose --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
-    if options.has_key?(:revision)
-      cmd_arg += " -r #{options[:revision]}"
+    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}"
+    if @options.has_key?(:revision)
+      cmd_arg += " -r #{@options[:revision]}"
     else
       cmd_arg += " -r HEAD:1"
     end

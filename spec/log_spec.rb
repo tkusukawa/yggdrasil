@@ -9,7 +9,7 @@ describe Yggdrasil, "log" do
 
   it 'should show log (absolute path)' do
     puts '---- should show log (absolute path)'
-    out = catch_out_err{Yggdrasil.command(%w{log /tmp} +
+    out = catch_out{Yggdrasil.command(%w{log /tmp} +
                                          %w{--username hoge --password foo})}
     out.gsub!(%r{20..-..-.. .*20..\)}, '')
     out.should == <<"EOS"
@@ -35,7 +35,7 @@ EOS
 
   it 'should show log (relative path)' do
     puts '---- should show log (relative path)'
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp" do
         Yggdrasil.command %w{log yggdrasil-test}+
                           %w{--username hoge --password foo}
@@ -65,7 +65,7 @@ EOS
 
   it 'should show log (no path)' do
     puts '---- should show log (no path)'
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{log} +
                           %w{--username hoge --password foo}
@@ -95,7 +95,7 @@ EOS
 
   it 'should show log (with options)' do
     puts '---- should show log (with options)'
-    out = catch_out_err{Yggdrasil.command(%w{log --revision 2 /tmp} +
+    out = catch_out{Yggdrasil.command(%w{log --revision 2 /tmp} +
                                          %w{--username hoge --password foo})}
     out.sub!(%r{20..-..-.. .*20..\)}, '')
     out.should == <<"EOS"

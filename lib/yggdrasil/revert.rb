@@ -2,19 +2,19 @@ class Yggdrasil
 
   # @param [Array] args
   def revert(args)
-    target_paths, options = parse_options(args,
-                                  {'--username'=>:username, '--password'=>:password,
-                                   '--non-interactive'=>:non_interactive?})
-    options = input_user_pass(options)
+    target_paths = parse_options(args,
+                                 {'--username'=>:username, '--password'=>:password,
+                                  '--non-interactive'=>:non_interactive?})
+    input_user_pass
 
-    updates = sync_mirror(options)
+    updates = sync_mirror
     matched_updates = select_updates(updates, target_paths)
     if matched_updates.size == 0
       puts "\nno files."
       return
     end
 
-    confirmed_updates = confirm_updates(matched_updates,options) do |relative_path|
+    confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
         puts system3("#@svn diff --no-auth-cache --non-interactive #{relative_path}")
       end
@@ -28,7 +28,7 @@ class Yggdrasil
 
       # make ls hash
       out = system3("#@svn ls -R #@repo --no-auth-cache --non-interactive"\
-                           " --username '#{options[:username]}' --password '#{options[:password]}'")
+                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
       ls_hash = Hash.new
       out.split(/\n/).each {|relative| ls_hash[relative]=true}
 

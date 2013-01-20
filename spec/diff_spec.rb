@@ -13,7 +13,7 @@ describe Yggdrasil, "diff" do
 
   it 'should success diff (absolute/relative path)' do
     puts "---- should success diff (absolute/relative path)"
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command(%w{diff /tmp/yggdrasil-test/A B --username hoge --password foo})
       end
@@ -40,7 +40,7 @@ EOS
 
   it 'should success (no path)' do
     puts "---- should success (no path)"
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff --username hoge --password foo}
       end
@@ -67,7 +67,7 @@ EOS
 
   it 'should success (-r)' do
     puts "---- should success (-r)"
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff -r 2:3 A --username hoge --password foo}
       end
@@ -85,7 +85,7 @@ EOS
 
   it 'should success (--revision)' do
     puts "---- should success (--revision)"
-    out = catch_out_err do
+    out = catch_out do
       FileUtils.cd "/tmp/yggdrasil-test" do
         Yggdrasil.command %w{diff --revision 3 A --username hoge --password foo}
       end
@@ -106,16 +106,14 @@ EOS
     puts "---- should error: diff with incorrect option"
     cmd = %w{diff --hoge --username hoge --password foo}
 
-    tmp_err = $stderr
-    $stderr = StringIO.new
-    FileUtils.cd "/" do
-      lambda{Yggdrasil.command cmd}.should raise_error(SystemExit)
+    err = catch_err do
+      FileUtils.cd "/" do
+        lambda{Yggdrasil.command cmd}.should raise_error(SystemExit)
+      end
     end
-    out = $stderr.string
-    $stderr = tmp_err
-    out.sub!(%r{/\S*svn}, 'svn')
-    out.should == <<"EOS"
-rspec error: command failure: svn diff --no-auth-cache --non-interactive --username hoge --password foo --hoge
+    err.sub!(%r{/\S*svn}, 'svn')
+    err.should == <<"EOS"
+#{File.basename($0)} error: command failure: svn diff --no-auth-cache --non-interactive --username hoge --password foo --hoge
 command output:
 svn: invalid option: --hoge
 Type 'svn help' for usage.

@@ -2,11 +2,11 @@ class Yggdrasil
 
   # @param [Array] args
   def status(args)
-    args, options = parse_options(args,
-        {'--username'=>:username, '--password'=>:password})
-    options = input_user_pass(options)
+    args = parse_options(args,
+                         {'--username'=>:username, '--password'=>:password})
+    input_user_pass
 
-    sync_mirror options
+    sync_mirror
 
     paths = String.new
     if args.size == 0
@@ -19,7 +19,7 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn status#{paths} -qu --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
+    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}"
     FileUtils.cd @mirror_dir do
       out = system3(cmd_arg)
       print out.gsub(/^Status against revision:.*\n/, '')

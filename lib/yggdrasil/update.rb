@@ -2,17 +2,17 @@ class Yggdrasil
 
   # @param [Array] args
   def update(args)
-    target_paths, options = parse_options(args,
-                                  {'--username'=>:username, '--password'=>:password,
-                                   '-r'=>:revision, '--revision'=>:revision,
-                                   '--non-interactive'=>:non_interactive?})
-    options = input_user_pass(options)
-    sync_mirror options
+    target_paths = parse_options(args,
+                                 {'--username'=>:username, '--password'=>:password,
+                                  '-r'=>:revision, '--revision'=>:revision,
+                                  '--non-interactive'=>:non_interactive?})
+    input_user_pass
+    sync_mirror
 
     updates = Array.new
     FileUtils.cd @mirror_dir do
       out = system3("#@svn status -qu --no-auth-cache --non-interactive" +
-                      " --username '#{options[:username]}' --password '#{options[:password]}'")
+                      " --username '#{@options[:username]}' --password '#{@options[:password]}'")
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\*.*\s(\S+)\s*$/ =~ line
       end
@@ -24,13 +24,13 @@ class Yggdrasil
       return
     end
 
-    confirmed_updates = confirm_updates(matched_updates,options) do |relative_path|
+    confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
         cmd = "#@svn diff"
         cmd += " --no-auth-cache --non-interactive"
-        cmd += " --username #{options[:username]} --password #{options[:password]}"
-        if options.has_key?(:revision)
-          cmd += " --old=#{relative_path} --new=#{relative_path}@#{options[:revision]}"
+        cmd += " --username #{@options[:username]} --password #{@options[:password]}"
+        if @options.has_key?(:revision)
+          cmd += " --old=#{relative_path} --new=#{relative_path}@#{@options[:revision]}"
         else
           cmd += " --old=#{relative_path} --new=#{relative_path}@HEAD"
         end
@@ -43,9 +43,9 @@ class Yggdrasil
     return if confirmed_updates == 0 # no files to update
 
     cmd_arg = "#@svn update --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{options[:username]} --password #{options[:password]}"
-    if options.has_key?(:revision)
-      cmd_arg += " -r #{options[:revision]}"
+    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}"
+    if @options.has_key?(:revision)
+      cmd_arg += " -r #{@options[:revision]}"
     else
       cmd_arg += " -r HEAD"
     end

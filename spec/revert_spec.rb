@@ -22,7 +22,7 @@ describe Yggdrasil, "revert" do
     end
 
     puts "\n-- check revert file (add)"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
@@ -40,7 +40,7 @@ describe Yggdrasil, "revert" do
                       "0\nY\n"
 
     puts "\n-- check revert file (modify)"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
@@ -56,7 +56,7 @@ describe Yggdrasil, "revert" do
                       "foo\nY\n" # interactive input: password, Y/n
 
     puts "\n-- check revert file"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
@@ -74,7 +74,7 @@ describe Yggdrasil, "revert" do
                       "0\nY\n"
 
     puts "\n-- check revert file"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
@@ -92,7 +92,7 @@ describe Yggdrasil, "revert" do
                       "0\nn\n"
 
     puts "\n-- check status"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end
@@ -116,7 +116,7 @@ describe Yggdrasil, "revert" do
                       "0\nY\n"
 
     puts "\n-- check status"
-    out = catch_out_err do
+    out = catch_out do
       Yggdrasil.command %w{status /tmp/yggdrasil-test} +
                             %w{--username hoge --password foo}
     end

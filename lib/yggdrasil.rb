@@ -71,13 +71,14 @@ class Yggdrasil
   protected
   # @param [String] msg
   def Yggdrasil.error(msg)
-    puts "#{CMD} error: #{msg}"
-    puts
+    $stderr.puts "#{CMD} error: #{msg}"
+    $stderr.puts
     exit 1
   end
 
-  def Yggdrasil.parse_options(args, valid_params)
-    options = Hash.new
+  def parse_options(args, valid_params)
+    valid_params['--debug'] = :debug? # common
+    @options ||= Hash.new
     pos = 0
     while args.size > pos
       if valid_params.has_key?(args[pos])
@@ -85,36 +86,37 @@ class Yggdrasil
         option_key = valid_params[option_note]
         args = args[0...pos]+args[pos+1..-1]
         if option_key.to_s[-1] == '?'
-          options[option_key] = true
+          @options[option_key] = true
         else
           error "Not enough arguments provided: #{option_note}" unless args.size > pos
           option_value = args[pos].dup
           args = args[0...pos]+args[pos+1..-1]
-          options[option_key] = option_value
+          @options[option_key] = option_value
         end
         next
       end
       pos += 1
     end
-    return args, options
+    args
   end
 
-  def Yggdrasil.input_user_pass(options)
-    until options.has_key?(:username) do
+  def input_user_pass
+    until @options.has_key?(:username) do
+      error "Can't get username or password" if @options.has_key?(:non_interactive?)
       print "Input svn username: "
       input = $stdin.gets
-      options[:username] = input.chomp
+      @options[:username] = input.chomp
     end
-    until options.has_key?(:password) do
+    until @options.has_key?(:password) do
+      error "Can't get username or password" if @options.has_key?(:non_interactive?)
       print "Input svn password: "
       #input = `sh -c 'read -s hoge;echo $hoge'`
       system3 'stty -echo', false
       input = $stdin.gets
       system3 'stty echo', false
       puts
-      options[:password] = input.chomp
+      @options[:password] = input.chomp
     end
-    return options
   end
 
   def initialize(exist_config = true)
@@ -142,26 +144,24 @@ class Yggdrasil
           if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
             configs[$1.to_sym] = $2
           else
-            puts "#{CMD} error: syntax error. :#@config_file(#{l})"
-            exit 1
+            error "syntax error. :#@config_file(#{l})"
           end
         end
       end
     rescue
-      puts "#{CMD} error: can not open config file: #@config_file"
-      exit 1
+      error "can not open config file: #@config_file"
     end
     configs
   end
 
-  def sync_mirror(options)
+  def sync_mirror
     updates = Array.new
     FileUtils.cd @mirror_dir do
       out = system3("#@svn ls #@repo -R --no-auth-cache --non-interactive" +
-                           " --username '#{options[:username]}' --password '#{options[:password]}'")
+                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
       files = out.split(/\n/)
       out = system3("#@svn status -q --no-auth-cache --non-interactive" +
-                           " --username '#{options[:username]}' --password '#{options[:password]}'")
+                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
       out.split(/\n/).each do |line|
         files << $1 if /^.*\s(\S+)\s*$/ =~ line
       end
@@ -179,7 +179,7 @@ class Yggdrasil
         end
       end
       out = system3("#@svn status -q --no-auth-cache --non-interactive" +
-                        " --username '#{options[:username]}' --password '#{options[:password]}'")
+                        " --username '#{@options[:username]}' --password '#{@options[:password]}'")
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\s(\S+)\s*$/ =~ line
       end
@@ -220,8 +220,8 @@ class Yggdrasil
     matched_updates.sort.uniq
   end
 
-  def confirm_updates(updates, options)
-    until options.has_key?(:non_interactive?)
+  def confirm_updates(updates)
+    until @options.has_key?(:non_interactive?)
       puts
       (0...updates.size).each do |i|
         puts "#{i}:#{updates[i]}"
