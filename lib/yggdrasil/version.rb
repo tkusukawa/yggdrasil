@@ -1,5 +1,5 @@
 class Yggdrasil
-  VERSION = "0.0.4"
+  VERSION = "0.0.5"
   CMD = File::basename($0)
 
   def Yggdrasil.version

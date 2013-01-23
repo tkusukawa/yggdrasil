@@ -12,7 +12,7 @@ class Yggdrasil
     system3 "rm -rf #@mirror_dir"
 
     cmd = "#@svn checkout --no-auth-cache --non-interactive #@repo #@mirror_dir"
-    cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @annon_access
+    cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
     system3 cmd
   end
 end
