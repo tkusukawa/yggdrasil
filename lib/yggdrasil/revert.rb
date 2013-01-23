@@ -5,7 +5,7 @@ class Yggdrasil
     target_paths = parse_options(args,
                                  {'--username'=>:username, '--password'=>:password,
                                   '--non-interactive'=>:non_interactive?})
-    input_user_pass
+    input_user_pass unless @anon_access
 
     updates = sync_mirror
     matched_updates = select_updates(updates, target_paths)
@@ -16,7 +16,9 @@ class Yggdrasil
 
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
-        puts system3("#@svn diff --no-auth-cache --non-interactive #{relative_path}")
+        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+        cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+        puts system3(cmd)
       end
     end
 
@@ -24,11 +26,15 @@ class Yggdrasil
     return if confirmed_updates.size == 0
 
     FileUtils.cd @mirror_dir do
-      system3 "#@svn revert #{confirmed_updates.reverse.join(' ')}"
+      cmd = "#@svn revert #{confirmed_updates.reverse.join(' ')}"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      system3 cmd
 
       # make ls hash
-      out = system3("#@svn ls -R #@repo --no-auth-cache --non-interactive"\
-                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
+      cmd = "#@svn ls -R #@repo --no-auth-cache --non-interactive"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      out = system3(cmd)
+
       ls_hash = Hash.new
       out.split(/\n/).each {|relative| ls_hash[relative]=true}
 

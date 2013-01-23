@@ -130,6 +130,7 @@ class Yggdrasil
     ENV["PATH"] = configs[:path]
     @svn = configs[:svn]
     @repo = configs[:repo]
+    @anon_access = (configs[:anon_access] == 'read')
   end
 
   # load config value from config file
@@ -142,7 +143,9 @@ class Yggdrasil
           l += 1
           next if /^\s*#.*$/ =~ line  # comment line
           if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
-            configs[$1.to_sym] = $2
+            key, val = $1, $2
+            key.gsub!(/-/, '_')
+            configs[key.to_sym] = val
           else
             error "syntax error. :#@config_file(#{l})"
           end
@@ -157,11 +160,13 @@ class Yggdrasil
   def sync_mirror
     updates = Array.new
     FileUtils.cd @mirror_dir do
-      out = system3("#@svn ls #@repo -R --no-auth-cache --non-interactive" +
-                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
+      cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      out = system3(cmd)
       files = out.split(/\n/)
-      out = system3("#@svn status -q --no-auth-cache --non-interactive" +
-                           " --username '#{@options[:username]}' --password '#{@options[:password]}'")
+      cmd = "#@svn status -q --no-auth-cache --non-interactive"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      out = system3(cmd)
       out.split(/\n/).each do |line|
         files << $1 if /^.*\s(\S+)\s*$/ =~ line
       end
@@ -173,13 +178,16 @@ class Yggdrasil
                       " --no-auth-cache --non-interactive"
         elsif File.file?("/#{file}")
           if !File.exist?("#@mirror_dir/#{file}")
-            system3 "#@svn revert #{file}"
+            cmd = "#@svn revert #{file}"
+            cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+            system3 cmd
           end
           FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
         end
       end
-      out = system3("#@svn status -q --no-auth-cache --non-interactive" +
-                        " --username '#{@options[:username]}' --password '#{@options[:password]}'")
+      cmd = "#@svn status -q --no-auth-cache --non-interactive"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      out = system3(cmd)
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\s(\S+)\s*$/ =~ line
       end

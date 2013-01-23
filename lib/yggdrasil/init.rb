@@ -32,20 +32,27 @@ class Yggdrasil
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
 
-    input_user_pass
-
     puts "SVN access test..."
     url_parts = @options[:repo].split('/')
     url_parts_num = url_parts.size
+    anon_access = true
     loop do
+      if url_parts_num < 3
+        if anon_access
+          anon_access = false
+          url_parts_num = url_parts.size
+          input_user_pass
+        else
+          error "can not access to '#{@options[:repo]}'."
+        end
+      end
       puts "url_parts_num=#{url_parts_num}" if @options[:debug?]
-      error "can not access to '#{@options[:repo]}'." if url_parts_num < 3
 
       url = url_parts[0...url_parts_num].join('/')
       puts "try url=#{url}" if @options[:debug?]
-      ret = system3("#{svn} ls --no-auth-cache --non-interactive" +
-                        " --username '#{@options[:username]}' --password '#{@options[:password]}'" +
-                        " #{url}", false)
+      cmd = "#{svn} ls --no-auth-cache --non-interactive #{url}"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless anon_access
+      ret = system3(cmd, false)
       unless ret.nil?
         puts "SVN access OK: #{url}"
         break
@@ -58,7 +65,9 @@ class Yggdrasil
 
     if url_parts_num != url_parts.size
       until @options[:parents?]
-        puts "not exist directory(s): #{url_parts[url_parts_num...url_parts.size].join('/')}"
+        msg = "not exist directory(s): #{url_parts[url_parts_num...url_parts.size].join('/')}"
+        error msg if @options[:non_interactive?]
+        puts msg
         print "make directory(s)? [Yn]: "
         input = $stdin.gets
         error "can not gets $stdin" if input.nil?
@@ -66,6 +75,7 @@ class Yggdrasil
         return if input == 'n'
         break if input == 'Y'
       end
+      input_user_pass
       `rm -rf #@mirror_dir`
       system3 "#{svn} checkout --no-auth-cache --non-interactive" +
                   " --username '#{@options[:username]}' --password '#{@options[:password]}'" +
@@ -89,13 +99,13 @@ class Yggdrasil
       f.write "path=#{ENV['PATH']}\n"\
               "svn=#{svn}\n"\
               "svn_version=#{svn_version}\n"\
-              "repo=#{@options[:repo]}\n"
-    end
+              "repo=#{@options[:repo]}\n"\
+              "anon-access=#{anon_access ? 'read' : 'none'}\n"
+      end
 
     `rm -rf #@mirror_dir`
-    system3 "#{svn} checkout"\
-            " --no-auth-cache --non-interactive"\
-            " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
-            " #{@options[:repo]} #@mirror_dir"
+    cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #@mirror_dir"
+    cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless anon_access
+    system3 cmd
   end
 end

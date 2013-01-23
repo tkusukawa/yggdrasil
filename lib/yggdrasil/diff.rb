@@ -4,7 +4,8 @@ class Yggdrasil
   def diff(args)
     args = parse_options(args,
         {'--username'=>:username, '--password'=>:password, '-r'=>:revision, '--revision'=>:revision})
-    input_user_pass
+
+    input_user_pass unless @anon_access
 
     sync_mirror
 
@@ -19,7 +20,7 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn diff --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}"
+    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
     cmd_arg += " -r #{@options[:revision]}" if @options.has_key?(:revision)
     cmd_arg += ' '+paths.join(' ')
     FileUtils.cd @mirror_dir do

@@ -33,7 +33,7 @@ describe Yggdrasil, "init" do
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
     err.should ==
-        "#{File.basename($0)} error: Can't get username or password\n\n"
+        "#{File.basename($0)} error: not exist directory(s): mng-repo/host-name\n\n"
   end
 
   it 'should error: need password' do
@@ -41,7 +41,7 @@ describe Yggdrasil, "init" do
 
     err = catch_err do
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
-          %w{--non-interactive --username hoge }
+          %w{--non-interactive --parents --username hoge }
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
     err.should ==
@@ -102,9 +102,9 @@ EOS
       end
     out.should == \
       "Input svn repo URL: "\
+      "SVN access test...\n"\
       "Input svn username: "\
       "Input svn password: \n"\
-      "SVN access test...\n"\
       "SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo\n"\
       "not exist directory(s): mng-repo/host-name\n"\
       "make directory(s)? [Yn]: "

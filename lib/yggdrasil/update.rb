@@ -6,13 +6,14 @@ class Yggdrasil
                                  {'--username'=>:username, '--password'=>:password,
                                   '-r'=>:revision, '--revision'=>:revision,
                                   '--non-interactive'=>:non_interactive?})
-    input_user_pass
+    input_user_pass unless @anon_access
     sync_mirror
 
     updates = Array.new
     FileUtils.cd @mirror_dir do
-      out = system3("#@svn status -qu --no-auth-cache --non-interactive" +
-                      " --username '#{@options[:username]}' --password '#{@options[:password]}'")
+      cmd = "#@svn status -qu --no-auth-cache --non-interactive"
+      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      out = system3(cmd)
       out.split(/\n/).each do |line|
         updates << $1 if /^.*\*.*\s(\S+)\s*$/ =~ line
       end
@@ -28,7 +29,7 @@ class Yggdrasil
       FileUtils.cd @mirror_dir do
         cmd = "#@svn diff"
         cmd += " --no-auth-cache --non-interactive"
-        cmd += " --username #{@options[:username]} --password #{@options[:password]}"
+        cmd += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
         if @options.has_key?(:revision)
           cmd += " --old=#{relative_path} --new=#{relative_path}@#{@options[:revision]}"
         else
@@ -43,7 +44,7 @@ class Yggdrasil
     return if confirmed_updates == 0 # no files to update
 
     cmd_arg = "#@svn update --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}"
+    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
     if @options.has_key?(:revision)
       cmd_arg += " -r #{@options[:revision]}"
     else
