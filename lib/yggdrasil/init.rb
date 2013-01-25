@@ -32,7 +32,7 @@ class Yggdrasil
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
 
-    puts "SVN access test..."
+    puts "check SVN access..."
     url_parts = @options[:repo].split('/')
     url_parts_num = url_parts.size
     anon_access = true

@@ -5,7 +5,7 @@ class Yggdrasil
     target_paths = parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '-m'=>:message, '--message'=>:message, '--non-interactive'=>:non_interactive?})
-    input_user_pass
+    input_user_pass unless @anon_access
 
     updates = sync_mirror
     matched_updates = select_updates(updates, target_paths)
@@ -28,6 +28,7 @@ class Yggdrasil
       @options[:message] = input.chomp
     end
 
+    input_user_pass
     FileUtils.cd @mirror_dir do
       puts system3 "#@svn commit -m '#{@options[:message]}'"\
                    " --no-auth-cache --non-interactive"\

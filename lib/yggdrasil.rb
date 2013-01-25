@@ -85,7 +85,7 @@ class Yggdrasil
         option_note = args[pos]
         option_key = valid_params[option_note]
         args = args[0...pos]+args[pos+1..-1]
-        if option_key.to_s[-1] == '?'
+        if option_key.to_s[-1,1] == '?'
           @options[option_key] = true
         else
           error "Not enough arguments provided: #{option_note}" unless args.size > pos

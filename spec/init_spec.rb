@@ -102,7 +102,7 @@ EOS
       end
     out.should == \
       "Input svn repo URL: "\
-      "SVN access test...\n"\
+      "check SVN access...\n"\
       "Input svn username: "\
       "Input svn password: \n"\
       "SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo\n"\
