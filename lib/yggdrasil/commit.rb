@@ -22,10 +22,21 @@ class Yggdrasil
     return unless confirmed_updates
     return if confirmed_updates.size == 0
 
+    message = ''
+    print "Input log message: "
     until @options.has_key?(:message) do
-      print "Input log message: "
       input = $stdin.gets
-      @options[:message] = input.chomp
+      if  input && input.chomp!
+        if input =~ /^(.*)\\$/
+          message += $1+"\n"
+          next
+        else
+          message += input
+        end
+      else
+        error "can not input log message"
+      end
+      @options[:message] = message
     end
 
     input_user_pass

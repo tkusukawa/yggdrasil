@@ -52,6 +52,22 @@ describe Yggdrasil, "commit" do
     res.should == "hoge\nhoge\n"
   end
 
+  it 'should commit with multi line comment' do
+    puts "---- should commit with multi line comment"
+    puts "-- modify"
+    `echo foo >> /tmp/yggdrasil-test/B`
+
+    puts "-- commit"
+    Yggdrasil.command %w{commit / --username hoge --password foo},
+                      "Y\ntest commit\\\nmodify B\n"
+
+    puts "\n-- check commit message"
+    res = `svn log -r HEAD --xml file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name`
+    puts res
+    res =~ /<msg>(.*)<\/msg>/m
+    $1.should == "test commit\nmodify B"
+  end
+
   it 'should accept password interactive' do
     puts "---- should accept password interactive"
     `echo A >> /tmp/yggdrasil-test/A`
@@ -77,7 +93,7 @@ describe Yggdrasil, "commit" do
     puts "\n-- check committed file 'tmp/yggdrasil-test/B'"
     res = `svn cat file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test/B`
     puts res
-    res.should == "foo\nB\n"
+    res.should == "foo\nfoo\nB\n"
   end
 
   it 'should not commit deleted file' do
@@ -108,7 +124,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit all files at once' do
-    puts "---- should revert all files at once"
+    puts "---- should commit all files at once"
 
     `echo HOGE >> /tmp/yggdrasil-test/A`
     `rm -f /tmp/yggdrasil-test/B`
