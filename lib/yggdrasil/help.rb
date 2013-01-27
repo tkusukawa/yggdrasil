@@ -7,6 +7,7 @@ Type '#{CMD} help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
+   check (c)
    cleanup
    commit (ci)
    diff (di)
@@ -19,7 +20,7 @@ Available subcommands:
    update
    version
 
-Yggdrasil is a configuration management tool by Subversion.
+Yggdrasil is a subversion wrapper to manage server configurations and conditions.
 You should type 'yggdrasil init' at first.
 
 EOS
@@ -36,6 +37,25 @@ EOS
           puts <<"EOS"
 add: Add files to management list (add to subversion)
 usage #{CMD} add [FILES...]
+
+EOS
+        when 'check', 'c'
+          puts <<"EOS"
+check (c): check updating of managed files and the execution output of a commands.
+usage: #{CMD} check [OPTIONS...]
+
+  This subcommand execute the executable files in ~/.yggdrasil/checker/, and
+  the outputs are checked difference to repository with other managed files.
+  For example, mount status, number of specific process and etc. can be checked
+  by setting up executable files in ~/.yggdrasil/checker/
+
+  (((following behavior is under construction)))
+  if the server is registered, the yggdrasil server receive and record the results.
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  --non-interactive        : do no interactive prompting
 
 EOS
         when 'cleanup'
@@ -145,7 +165,7 @@ EOS
         when 'revert'
           puts <<"EOS"
 revert: Restore pristine working copy file (undo most local edits).
-usage: #{CMD} revert [PATH...]
+usage: #{CMD} revert [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -156,7 +176,7 @@ EOS
         when 'update'
           puts <<"EOS"
 update (up): Bring changes from the repository into the local files.
-usage: #{CMD} update [PATH...]
+usage: #{CMD} update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG

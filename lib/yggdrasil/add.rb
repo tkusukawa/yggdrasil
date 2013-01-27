@@ -13,7 +13,7 @@ class Yggdrasil
       file_path_parts.each do |part|
         mirror_path += "/#{part}"
         next if File.exist?(mirror_path)
-        if part.equal?(file_path_parts[-1])
+        if part.equal?(file_path_parts[-1]) && File.file?(file_path)
           FileUtils.copy file_path, mirror_path
         else
           Dir.mkdir mirror_path

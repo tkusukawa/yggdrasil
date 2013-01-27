@@ -95,6 +95,7 @@ class Yggdrasil
       system3 "rm -rf #@mirror_dir"
     end
 
+    # make config file
     File.open(@config_file, "w") do |f|
       f.write "path=#{ENV['PATH']}\n"\
               "svn=#{svn}\n"\
@@ -103,9 +104,17 @@ class Yggdrasil
               "anon-access=#{anon_access ? 'read' : 'none'}\n"
       end
 
+    # make mirror dir
     `rm -rf #@mirror_dir`
     cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #@mirror_dir"
     cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless anon_access
     system3 cmd
+
+    # make checker dir and checker example
+    Dir.mkdir @checker_dir, 0755 unless File.exist?(@checker_dir)
+    FileUtils.cd @checker_dir do
+      `echo 'gem list' > gem_list`
+      `chmod +x gem_list`
+    end
   end
 end

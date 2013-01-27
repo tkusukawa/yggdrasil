@@ -109,4 +109,13 @@ EOS
       "not exist directory(s): mng-repo/host-name\n"\
       "make directory(s)? [Yn]: "
   end
+
+  it 'should make checker example at init' do
+    puts "\n---- should make checker example at init"
+    dir = "/tmp/yggdrasil-test/.yggdrasil/checker"
+    File.directory?(dir).should be_true
+
+    example_checker = dir + "/gem_list"
+    File.executable?(example_checker).should be_true
+  end
 end

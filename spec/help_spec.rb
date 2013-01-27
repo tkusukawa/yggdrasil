@@ -10,6 +10,7 @@ Type '#{File.basename($0)} help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
+   check (c)
    cleanup
    commit (ci)
    diff (di)
@@ -22,7 +23,7 @@ Available subcommands:
    update
    version
 
-Yggdrasil is a configuration management tool by Subversion.
+Yggdrasil is a subversion wrapper to manage server configurations and conditions.
 You should type 'yggdrasil init' at first.
 
 EOS
@@ -230,7 +231,7 @@ EOS
     out = catch_out{Yggdrasil.command %w{help update}}
     out.should == <<"EOS"
 update (up): Bring changes from the repository into the local files.
-usage: #{File.basename($0)} update [PATH...]
+usage: #{File.basename($0)} update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -253,7 +254,29 @@ EOS
     out = catch_out{Yggdrasil.command %w{help revert}}
     out.should == <<"EOS"
 revert: Restore pristine working copy file (undo most local edits).
-usage: #{File.basename($0)} revert [PATH...]
+usage: #{File.basename($0)} revert [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+  --non-interactive        : do no interactive prompting
+
+EOS
+  end
+
+  it 'should show help of check' do
+    puts '---- should show help of check'
+    out = catch_out{Yggdrasil.command %w{help check}}
+    out.should == <<"EOS"
+check (c): check updating of managed files and the execution output of a commands.
+usage: #{File.basename($0)} check [OPTIONS...]
+
+  This subcommand execute the executable files in ~/.yggdrasil/checker/, and
+  the outputs are checked difference to repository with other managed files.
+  For example, mount status, number of specific process and etc. can be checked
+  by setting up executable files in ~/.yggdrasil/checker/
+
+  if the server is registered, the yggdrasil server receive and record the results.
 
 Valid options:
   --username ARG           : specify a username ARG

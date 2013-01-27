@@ -1,6 +1,6 @@
 # Yggdrasil
 
-Yggdrasil is a subversion wrapper to manage configuration files.
+Yggdrasil is a subversion wrapper to manage server configurations and conditions.
 
 ## Installation
 

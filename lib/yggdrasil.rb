@@ -12,6 +12,7 @@ require "yggdrasil/log"
 require "yggdrasil/status"
 require "yggdrasil/update"
 require "yggdrasil/revert"
+require "yggdrasil/check"
 
 class Yggdrasil
 
@@ -26,6 +27,8 @@ class Yggdrasil
     case args[0]
       when 'add'
         new.add(args[1..-1])
+      when 'check', 'c'
+        new.check(args[1..-1])
       when 'cleanup'
         new.cleanup(args[1..-1])
       when 'commit', 'ci'
@@ -124,6 +127,8 @@ class Yggdrasil
     @config_dir = "#{ENV["HOME"]}/.yggdrasil"
     @config_file = "#@config_dir/config"
     @mirror_dir = "#@config_dir/mirror"
+    @checker_dir = "#@config_dir/checker"
+    @checker_result_dir = "#@config_dir/checker_result"
 
     return unless exist_config
     configs = read_config
