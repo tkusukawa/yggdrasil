@@ -1,5 +1,8 @@
 require 'fileutils'
-require "open3"
+
+require "yggdrasil_common"
+require "yggdrasil_server"
+
 require "yggdrasil/version"
 require "yggdrasil/help"
 require "yggdrasil/init"
@@ -21,7 +24,7 @@ class Yggdrasil
     ENV['LANG'] = 'en_US.UTF-8'
 
     if args.size == 0
-      Yggdrasil::help([])
+      new(false).help([])
       return
     end
     case args[0]
@@ -36,131 +39,54 @@ class Yggdrasil
       when 'diff', 'di'
         new.diff(args[1..-1])
       when 'help', 'h', '?'
-        help(args[1..-1])
+        new(false).help(args[1..-1])
       when 'init'
         new(false).init(args[1..-1])
+      when 'init-server'
+        YggdrasilServer.new(false).init_server(args[1..-1])
       when 'list', 'ls'
         new.list(args[1..-1])
       when 'log'
         new.log(args[1..-1])
-      when 'status', 'stat', 'st'
-        new.status(args[1..-1])
+      when 'results'
+        YggdrasilServer.new.results(args[1..-1])
       when 'revert'
         new.revert(args[1..-1])
+      when 'server'
+        YggdrasilServer.new.server(args[1..-1])
+      when 'status', 'stat', 'st'
+        new.status(args[1..-1])
       when 'update'
         new.update(args[1..-1])
       when 'version', '--version'
-        version
+        new(false).version
       else
-        error "Unknown subcommand: '#{args[0]}'"
-    end
-  end
-
-  # @param [String] cmd
-  def Yggdrasil.system3(cmd, err_exit=true)
-    out = `#{cmd} 2>&1`
-    stat = $?
-
-    unless stat.success?
-      return nil unless err_exit
-      $stderr.puts "#{CMD} error: command failure: #{cmd}"
-      $stderr.puts "command output:"
-      $stderr.puts out
-      exit stat.exitstatus
-    end
-    return out
-  end
-
-  protected
-  # @param [String] msg
-  def Yggdrasil.error(msg)
-    $stderr.puts "#{CMD} error: #{msg}"
-    $stderr.puts
-    exit 1
-  end
-
-  def parse_options(args, valid_params)
-    valid_params['--debug'] = :debug? # common
-    @options ||= Hash.new
-    pos = 0
-    while args.size > pos
-      if valid_params.has_key?(args[pos])
-        option_note = args[pos]
-        option_key = valid_params[option_note]
-        args = args[0...pos]+args[pos+1..-1]
-        if option_key.to_s[-1,1] == '?'
-          @options[option_key] = true
-        else
-          error "Not enough arguments provided: #{option_note}" unless args.size > pos
-          option_value = args[pos].dup
-          args = args[0...pos]+args[pos+1..-1]
-          @options[option_key] = option_value
-        end
-        next
-      end
-      pos += 1
-    end
-    args
-  end
-
-  def input_user_pass
-    until @options.has_key?(:username) do
-      error "Can't get username or password" if @options.has_key?(:non_interactive?)
-      print "Input svn username: "
-      input = $stdin.gets
-      @options[:username] = input.chomp
-    end
-    until @options.has_key?(:password) do
-      error "Can't get username or password" if @options.has_key?(:non_interactive?)
-      print "Input svn password: "
-      #input = `sh -c 'read -s hoge;echo $hoge'`
-      system3 'stty -echo', false
-      input = $stdin.gets
-      system3 'stty echo', false
-      puts
-      @options[:password] = input.chomp
+        $stderr .puts "Unknown subcommand: '#{args[0]}'"
+        exit 1
     end
   end
 
   def initialize(exist_config = true)
+    @base_cmd = File::basename($0)
     @current_dir = `readlink -f .`.chomp
     @config_dir = "#{ENV["HOME"]}/.yggdrasil"
     @config_file = "#@config_dir/config"
     @mirror_dir = "#@config_dir/mirror"
     @checker_dir = "#@config_dir/checker"
     @checker_result_dir = "#@config_dir/checker_result"
+    @server_config_file = "#@config_dir/server_config"
 
     return unless exist_config
-    configs = read_config
-    ENV["PATH"] = configs[:path]
-    @svn = configs[:svn]
-    @repo = configs[:repo]
+    configs = read_config(@config_file)
+    error "need 'path' in config file" unless (ENV["PATH"] = configs[:path])
+    error "need 'svn' in config file" unless (@svn = configs[:svn])
+    error "need 'repo' in config file" unless (@repo = configs[:repo])
     @anon_access = (configs[:anon_access] == 'read')
   end
 
-  # load config value from config file
-  def read_config
-    configs = Hash.new
-    begin
-      File.open(@config_file) do |file|
-        l = 0
-        while (line = file.gets)
-          l += 1
-          next if /^\s*#.*$/ =~ line  # comment line
-          if /^\s*(\S+)\s*=\s*(\S+).*$/ =~ line
-            key, val = $1, $2
-            key.gsub!(/-/, '_')
-            configs[key.to_sym] = val
-          else
-            error "syntax error. :#@config_file(#{l})"
-          end
-        end
-      end
-    rescue
-      error "can not open config file: #@config_file"
-    end
-    configs
-  end
+
+  protected
+  include YggdrasilCommon
 
   def sync_mirror
     updates = Array.new
@@ -252,9 +178,5 @@ class Yggdrasil
     end
     # res == 'Y'
     updates
-  end
-
-  def method_missing(action, *args)
-    Yggdrasil.__send__ action, *args
   end
 end

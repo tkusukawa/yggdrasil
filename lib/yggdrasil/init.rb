@@ -22,8 +22,9 @@ class Yggdrasil
     until @options.has_key?(:repo) do
       print "Input svn repo URL: "
       input = $stdin.gets
+      error "can not input svn repo URL" unless input
 
-      unless /^(http:|file:|svn:)/ =~ input
+      unless %r{^(http://|https://|file://|svn://|private)} =~ input
         puts "ERROR: Invalid URL."
         redo
       end
@@ -31,6 +32,12 @@ class Yggdrasil
     end
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
+    if @options[:repo] == "private"
+      Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
+      repo_dir = "#@config_dir/private_repo"
+      system3 "svnadmin create #{repo_dir}"
+      @options[:repo] = "file://#{repo_dir}"
+    end
 
     puts "check SVN access..."
     url_parts = @options[:repo].split('/')
@@ -102,7 +109,7 @@ class Yggdrasil
               "svn_version=#{svn_version}\n"\
               "repo=#{@options[:repo]}\n"\
               "anon-access=#{anon_access ? 'read' : 'none'}\n"
-      end
+    end
 
     # make mirror dir
     `rm -rf #@mirror_dir`

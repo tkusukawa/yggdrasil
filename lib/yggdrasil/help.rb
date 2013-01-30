@@ -1,9 +1,13 @@
 class Yggdrasil
 
-  HELP_SUBCOMMANDS = <<EOS
-usage: #{CMD} <subcommand> [options] [args]
+
+  # @param [Array] args
+  def help(args)
+    if args.size == 0 then
+      puts <<EOS
+usage: #@base_cmd <subcommand> [options] [args]
 Yggdrasil version #{VERSION}
-Type '#{CMD} help <subcommand>' for help on a specific subcommand.
+Type '#@base_cmd help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
@@ -13,10 +17,13 @@ Available subcommands:
    diff (di)
    help (?, h)
    init
+   init-server
    list (ls)
    log
-   status (stat, st)
+   results
    revert
+   server
+   status (stat, st)
    update
    version
 
@@ -24,11 +31,6 @@ Yggdrasil is a subversion wrapper to manage server configurations and conditions
 You should type 'yggdrasil init' at first.
 
 EOS
-
-  # @param [Array] args
-  def Yggdrasil.help(args)
-    if args.size == 0 then
-      puts HELP_SUBCOMMANDS
     elsif args.size != 1 then
       error "too many arguments."
     else
@@ -36,20 +38,19 @@ EOS
         when 'add'
           puts <<"EOS"
 add: Add files to management list (add to subversion)
-usage #{CMD} add [FILES...]
+usage #@base_cmd add [FILES...]
 
 EOS
         when 'check', 'c'
           puts <<"EOS"
 check (c): check updating of managed files and the execution output of a commands.
-usage: #{CMD} check [OPTIONS...]
+usage: #@base_cmd check [OPTIONS...]
 
   This subcommand execute the executable files in ~/.yggdrasil/checker/, and
   the outputs are checked difference to repository with other managed files.
   For example, mount status, number of specific process and etc. can be checked
   by setting up executable files in ~/.yggdrasil/checker/
 
-  (((following behavior is under construction)))
   if the server is registered, the yggdrasil server receive and record the results.
 
 Valid options:
@@ -61,7 +62,7 @@ EOS
         when 'cleanup'
           puts <<"EOS"
 cleanup: clean up the working copy
-usage: #{CMD} cleanup [OPTIONS...]
+usage: #@base_cmd cleanup [OPTIONS...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -71,7 +72,7 @@ EOS
         when 'commit', 'ci'
           puts <<"EOS"
 commit (ci): Send changes from your local file to the repository.
-usage: #{CMD} commit [OPTIONS...] [FILES...]
+usage: #@base_cmd commit [OPTIONS...] [FILES...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -83,7 +84,7 @@ EOS
         when 'diff', 'di'
           puts <<"EOS"
 diff (di): Display the differences between two revisions or paths.
-usage: #{CMD} diff [OPTIONS...] [PATH...]
+usage: #@base_cmd diff [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -101,24 +102,43 @@ EOS
         when 'help', '?', 'h'
           puts <<"EOS"
 help (?,h): Describe the usage of this program or its subcommands.
-usage: #{CMD} help [SUBCOMMAND]
+usage: #@base_cmd help [SUBCOMMAND]
 
 EOS
         when 'init'
           puts <<"EOS"
 init: Check environment and initialize configuration.
-usage: #{CMD} init [OPTIONS...]
+usage: #@base_cmd init [OPTIONS...]
 
 Valid options:
-  --repo ARG               : specify svn repository
+  --repo ARG               : specify svn repository URL
+                             ARG could be any of the following:
+                             file:///*   : local repository
+                             svn://*     : svn access repository
+                             http(s)://* : http access repository
+                             private     : make local repository in ~/.yggdrasil
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+
+EOS
+        when 'init-server'
+          puts <<"EOS"
+init-server: setup server configuration.
+usage: #@base_cmd init-server [OPTIONS...]
+
+Valid options:
+  --port ARG               : specify a TCP port number ARG
+  --repo ARG               : URL of subversion repository
+                             ARG could be include {HOST} and it replace by client hostname
+                             e.g. svn://192.168.3.5/servers/{HOST}/ygg
+  --ro-username ARG        : specify a username ARG for read only
+  --ro-password ARG        : specify a password ARG for read only
 
 EOS
         when 'list', 'ls'
           puts <<"EOS"
 list (ls): List directory entries in the repository.
-usage: #{CMD} list [OPTIONS...] [PATH...]
+usage: #@base_cmd list [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -137,7 +157,7 @@ EOS
         when 'log'
           puts <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
-usage: #{CMD} log [OPTIONS...] [PATH]
+usage: #@base_cmd log [OPTIONS...] [PATH]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -152,20 +172,19 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
 
 EOS
-        when 'status', 'stat', 'st'
+        when 'results'
           puts <<"EOS"
-status (stat, st): Print the status of managed files and directories.
-usage: #{CMD} status [OPTIONS...] [PATH...]
+results: display the result of yggdrasil check command.
+usage: #@base_cmd results [OPTIONS...]
 
 Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
+  --limit ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
         when 'revert'
           puts <<"EOS"
 revert: Restore pristine working copy file (undo most local edits).
-usage: #{CMD} revert [OPTIONS...] [PATH...]
+usage: #@base_cmd revert [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -173,10 +192,29 @@ Valid options:
   --non-interactive        : do no interactive prompting
 
 EOS
+        when 'server'
+          puts <<"EOS"
+server: receive tcp connection in order to unify the setup and to record check results.
+usage: #@base_cmd server [OPTIONS...]
+
+Valid options:
+  --daemon                 : daemon mode
+
+EOS
+        when 'status', 'stat', 'st'
+          puts <<"EOS"
+status (stat, st): Print the status of managed files and directories.
+usage: #@base_cmd status [OPTIONS...] [PATH...]
+
+Valid options:
+  --username ARG           : specify a username ARG
+  --password ARG           : specify a password ARG
+
+EOS
         when 'update'
           puts <<"EOS"
 update (up): Bring changes from the repository into the local files.
-usage: #{CMD} update [OPTIONS...] [PATH...]
+usage: #@base_cmd update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -195,7 +233,7 @@ EOS
         when 'version', '--version'
           puts <<"EOS"
 version: See the program version
-usage: #{CMD} version
+usage: #@base_cmd version
 
 EOS
         else

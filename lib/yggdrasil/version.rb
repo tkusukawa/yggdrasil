@@ -1,10 +1,9 @@
 class Yggdrasil
   VERSION = "0.0.5"
-  CMD = File::basename($0)
 
-  def Yggdrasil.version
+  def version
     puts <<"EOS"
-#{CMD}, version #{VERSION}
+#@base_cmd, version #{VERSION}
 
 Copyright (C) 2012-2013 Tomohisa Kusukawa.
 Yggdrasil is open source software, see https://github.com/tkusukawa/yggdrasil/

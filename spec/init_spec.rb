@@ -72,6 +72,17 @@ describe Yggdrasil, "init" do
                       "Y\n"
   end
 
+  it 'should success: create config file (private)' do
+    puts '---- should success: create config file (private)'
+    `rm -rf /tmp/yggdrasil-test/.yggdrasil`
+    `rm -rf /tmp/yggdrasil-test/svn-repo`
+
+    Yggdrasil.command %w{init --debug} +
+                          %w{--repo private}
+
+    File.exist?("/tmp/yggdrasil-test/.yggdrasil/config").should be_true
+  end
+
   it 'should success: create config file (interactive)' do
     puts '---- should success: create config file (interactive)'
     `pkill svnserve`

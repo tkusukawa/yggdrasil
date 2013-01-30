@@ -74,6 +74,6 @@ EOS
 
   it 'should setup with server' do
     puts "\n---- should setup with server"
-    pending("not yet")
+    pending("under construction")
   end
 end
