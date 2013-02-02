@@ -26,8 +26,8 @@ class YggdrasilServer
     configs = read_config(@server_config_file)
     error "need 'port' in config file" unless (@port = configs[:port])
     error "need 'repo' in config file" unless (@repo = configs[:repo])
-    @ro_username = configs[:ro_username]
-    @ro_password = configs[:ro_password]
+    @ro_username = configs[:ro_username] if configs.has_key?(:ro_username)
+    @ro_password = configs[:ro_password] if configs.has_key?(:ro_password)
   end
 
   def server(args)
@@ -37,6 +37,7 @@ class YggdrasilServer
     end
 
     puts "Start: yggdrasil server (port:#@port)"
+    TCPServer.do_not_reverse_lookup = true
     s0 = TCPServer.open(@port.to_i)
     loop do
       sock = s0.accept
@@ -45,19 +46,21 @@ class YggdrasilServer
         msg.chomp!
         puts "RCV: #{msg}"
         msg_parts = msg.split
-        msg_cmd = msg_parts[0]
-        part_names = MESSAGES[msg_cmd.to_sym]
-        if (msg_parts.size - 1) == part_names.size
-          # make hash of args
-          msg_arg_hash = Hash.new
-          (0...part_names.size).each do |i|
-            msg_arg_hash[part_names[i]] = msg_parts[i+1]
-          end
+        if msg_parts.size != 0
+          msg_cmd = msg_parts[0]
+          part_names = MESSAGES[msg_cmd.to_sym]
+          if (msg_parts.size - 1) == part_names.size
+            # make hash of args
+            msg_arg_hash = Hash.new
+            (0...part_names.size).each do |i|
+              msg_arg_hash[part_names[i]] = msg_parts[i+1]
+            end
 
-          # execute request (msg_cmd == method name)
-          send msg_cmd, sock, msg_arg_hash
-        else
-          puts "fail: number of arguments is mismatch: #{msg}"
+            # execute request (msg_cmd == method name)
+            send msg_cmd, sock, msg_arg_hash
+          else
+            puts "fail: number of arguments is mismatch: #{msg}"
+          end
         end
       end
       sock.close

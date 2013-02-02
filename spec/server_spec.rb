@@ -119,4 +119,40 @@ EOS
 
     Process.waitall
   end
+
+  it "should not response get_ro_id_pw" do
+    puts "---- should not response get_ro_id_pw"
+    prepare_environment
+    Yggdrasil.command %w{init-server} +
+                          %w{--port 4000} +
+                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/},
+                      "\n\n"
+
+    fork do
+      sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("\n")
+      no_res = sock.gets
+      no_res.should be_nil
+      sock.close
+
+      sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("get_ro_id_pw")
+      username = sock.gets
+      username.should be_nil
+      sock.close
+
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("quit")
+      sock.close
+      exit
+    end
+
+    timeout 5 do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    Process.waitall
+  end
 end

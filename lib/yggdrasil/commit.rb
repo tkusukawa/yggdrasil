@@ -5,7 +5,7 @@ class Yggdrasil
     target_paths = parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '-m'=>:message, '--message'=>:message, '--non-interactive'=>:non_interactive?})
-    input_user_pass unless @anon_access
+    get_user_pass_if_need_to_read_repo
 
     updates = sync_mirror
     matched_updates = select_updates(updates, target_paths)
@@ -16,7 +16,9 @@ class Yggdrasil
 
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
-        puts system3("#@svn diff --no-auth-cache --non-interactive #{relative_path}")
+        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+        cmd += username_password_options_to_read_repo
+        puts system3(cmd)
       end
     end
     return unless confirmed_updates

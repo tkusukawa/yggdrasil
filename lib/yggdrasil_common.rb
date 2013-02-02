@@ -62,7 +62,7 @@ module YggdrasilCommon
       error "can not input username" unless input
       input.chomp!
       return if input.size == 0
-      @options[:username] = input
+      @options[:username] = @options[:ro_username] = input
     end
     until @options.has_key?(:password) do
       error "Can't get username or password" if @options.has_key?(:non_interactive?)
@@ -74,7 +74,7 @@ module YggdrasilCommon
       puts
       error "can not input password" unless input
       input.chomp!
-      @options[:password] = input
+      @options[:password] = @options[:ro_password] = input
     end
   end
 

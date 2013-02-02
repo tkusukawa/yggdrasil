@@ -7,8 +7,7 @@ class Yggdrasil
          '-r'=>:revision, '--revision'=>:revision,
          '-R'=>:recursive?, '--recursive'=>:recursive?})
 
-    input_user_pass unless @anon_access
-
+    get_user_pass_if_need_to_read_repo
     sync_mirror
 
     repos = Array.new
@@ -22,7 +21,7 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn list --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
+    cmd_arg += username_password_options_to_read_repo
     cmd_arg += " -r #{@options[:revision]}" if @options.has_key?(:revision)
     cmd_arg += " -R" if @options.has_key?(:recursive?)
     cmd_arg += ' ' + repos.join(' ')

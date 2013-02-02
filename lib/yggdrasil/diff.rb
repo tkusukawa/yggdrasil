@@ -5,8 +5,7 @@ class Yggdrasil
     args = parse_options(args,
         {'--username'=>:username, '--password'=>:password, '-r'=>:revision, '--revision'=>:revision})
 
-    input_user_pass unless @anon_access
-
+    get_user_pass_if_need_to_read_repo
     sync_mirror
 
     paths = Array.new
@@ -20,7 +19,7 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn diff --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
+    cmd_arg += username_password_options_to_read_repo
     cmd_arg += " -r #{@options[:revision]}" if @options.has_key?(:revision)
     cmd_arg += ' '+paths.join(' ')
     FileUtils.cd @mirror_dir do

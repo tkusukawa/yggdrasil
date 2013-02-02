@@ -129,4 +129,29 @@ EOS
     example_checker = dir + "/gem_list"
     File.executable?(example_checker).should be_true
   end
+
+  it 'should success init subcommand with server option' do
+    puts '---- should success init subcommand with server option'
+    prepare_environment
+
+    Yggdrasil.command %w{init-server} +
+                          %w{--port 4000} +
+                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/} +
+                          %w{--ro-username hoge} +
+                          %w{--ro-password foo}
+    fork do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    sleep 1
+    Yggdrasil.command %w{init --debug --server localhost:4000},
+                      "Y\nhoge\nfoo\n"
+
+    File.exist?("/tmp/yggdrasil-test/.yggdrasil/config").should be_true
+
+    sock = TCPSocket.open("localhost", 4000)
+    sock.puts("quit")
+    sock.close
+    Process.waitall
+  end
 end

@@ -5,7 +5,12 @@ class Yggdrasil
 
     args = parse_options(args,
         {'--username'=>:username, '--password'=>:password,
-         '--repo'=>:repo, '--parents'=>:parents?, '--non-interactive'=>:non_interactive?})
+         '--repo'=>:repo, '--parents'=>:parents?,
+         '--non-interactive'=>:non_interactive?,
+         '--server'=>:server })
+    @options[:ro_username] = @options[:username] if @options.has_key?(:username)
+    @options[:ro_password] = @options[:password] if @options.has_key?(:password)
+
     if args.size != 0
       error "invalid arguments: #{args.join(',')}"
     end
@@ -19,19 +24,13 @@ class Yggdrasil
 
     error "already exist config file: #@config_file" if File.exist?(@config_file)
 
-    until @options.has_key?(:repo) do
-      print "Input svn repo URL: "
-      input = $stdin.gets
-      error "can not input svn repo URL" unless input
+    get_server_config(true) if @options.has_key?(:server)
 
-      unless %r{^(http://|https://|file://|svn://|private)} =~ input
-        puts "ERROR: Invalid URL."
-        redo
-      end
-      @options[:repo] = input
-    end
+    init_get_repo_interactive unless @options.has_key?(:repo)
+
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
+    @options[:repo].gsub!(/\{HOST\}/, Socket.gethostname)
     if @options[:repo] == "private"
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
       repo_dir = "#@config_dir/private_repo"
@@ -40,15 +39,19 @@ class Yggdrasil
     end
 
     puts "check SVN access..."
+    if @options.has_key?(:ro_username)
+      anon_access = false
+    else
+      anon_access = true
+    end
     url_parts = @options[:repo].split('/')
     url_parts_num = url_parts.size
-    anon_access = true
     loop do
       if url_parts_num < 3
         if anon_access
           anon_access = false
           url_parts_num = url_parts.size
-          input_user_pass
+          get_user_pass_if_need_to_read_repo
         else
           error "can not access to '#{@options[:repo]}'."
         end
@@ -58,7 +61,7 @@ class Yggdrasil
       url = url_parts[0...url_parts_num].join('/')
       puts "try url=#{url}" if @options[:debug?]
       cmd = "#{svn} ls --no-auth-cache --non-interactive #{url}"
-      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless anon_access
+      cmd += username_password_options_to_read_repo
       ret = system3(cmd, false)
       unless ret.nil?
         puts "SVN access OK: #{url}"
@@ -104,11 +107,12 @@ class Yggdrasil
 
     # make config file
     File.open(@config_file, "w") do |f|
-      f.write "path=#{ENV['PATH']}\n"\
-              "svn=#{svn}\n"\
-              "svn_version=#{svn_version}\n"\
-              "repo=#{@options[:repo]}\n"\
-              "anon-access=#{anon_access ? 'read' : 'none'}\n"
+      f.puts "path=#{ENV['PATH']}\n"\
+             "svn=#{svn}\n"\
+             "svn_version=#{svn_version}\n"\
+             "repo=#{@options[:repo]}\n"\
+             "anon-access=#{anon_access ? 'read' : 'none'}\n"
+      f.puts "server=#{@options[:server]}\n" if @options.has_key?(:server)
     end
 
     # make mirror dir
@@ -122,6 +126,22 @@ class Yggdrasil
     FileUtils.cd @checker_dir do
       `echo 'gem list' > gem_list`
       `chmod +x gem_list`
+    end
+  end
+
+
+  def init_get_repo_interactive
+    loop do
+      print "Input svn repo URL: "
+      input = $stdin.gets
+      error "can not input svn repo URL" unless input
+
+      if %r{^(http://|https://|file://|svn://|private)} =~ input
+        @options[:repo] = input
+        break
+      end
+
+      puts "ERROR: Invalid URL."
     end
   end
 end

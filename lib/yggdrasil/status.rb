@@ -4,7 +4,7 @@ class Yggdrasil
   def status(args)
     args = parse_options(args,
                          {'--username'=>:username, '--password'=>:password})
-    input_user_pass unless @anon_access
+    get_user_pass_if_need_to_read_repo
 
     sync_mirror
 
@@ -19,7 +19,7 @@ class Yggdrasil
     end
 
     cmd_arg = "#@svn status#{paths} -qu --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
+    cmd_arg += username_password_options_to_read_repo
     FileUtils.cd @mirror_dir do
       out = system3(cmd_arg)
       print out.gsub(/^Status against revision:.*\n/, '')

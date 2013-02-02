@@ -30,11 +30,11 @@ class Yggdrasil
     add result_files
     $stdout = stdout
 
-    input_user_pass unless @anon_access
+    get_user_pass_if_need_to_read_repo
     sync_mirror
 
     cmd_arg = "#@svn status -qu --no-auth-cache --non-interactive"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
+    cmd_arg += username_password_options_to_read_repo
     FileUtils.cd @mirror_dir do
       out = system3(cmd_arg)
       puts out.gsub(/^Status against revision:.*\n/, '')
@@ -42,7 +42,7 @@ class Yggdrasil
     puts
 
     cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
-    cmd_arg += " --username #{@options[:username]} --password #{@options[:password]}" unless @anon_access
+    cmd_arg += username_password_options_to_read_repo
     FileUtils.cd @mirror_dir do
       out = system3(cmd_arg)
       puts out

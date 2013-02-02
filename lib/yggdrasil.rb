@@ -84,7 +84,6 @@ class Yggdrasil
     @anon_access = (configs[:anon_access] == 'read')
   end
 
-
   protected
   include YggdrasilCommon
 
@@ -92,11 +91,11 @@ class Yggdrasil
     updates = Array.new
     FileUtils.cd @mirror_dir do
       cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"
-      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      cmd += username_password_options_to_read_repo
       out = system3(cmd)
       files = out.split(/\n/)
       cmd = "#@svn status -q --no-auth-cache --non-interactive"
-      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      cmd += username_password_options_to_read_repo
       out = system3(cmd)
       out.split(/\n/).each do |line|
         files << $1 if /^.*\s(\S+)\s*$/ =~ line
@@ -110,17 +109,20 @@ class Yggdrasil
         elsif File.file?("/#{file}")
           if !File.exist?("#@mirror_dir/#{file}")
             cmd = "#@svn revert #{file}"
-            cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+            cmd += username_password_options_to_read_repo
             system3 cmd
           end
           FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
         end
       end
-      cmd = "#@svn status -q --no-auth-cache --non-interactive"
-      cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless @anon_access
+      cmd = "#@svn status -qu --no-auth-cache --non-interactive"
+      cmd += username_password_options_to_read_repo
       out = system3(cmd)
       out.split(/\n/).each do |line|
-        updates << $1 if /^.*\s(\S+)\s*$/ =~ line
+        next if /^Status against revision/ =~ line
+        if /^(.).*\s(\S+)\s*$/ =~ line
+          updates << [$1, $2]
+        end
       end
     end
     updates
@@ -145,14 +147,14 @@ class Yggdrasil
     cond = '^'+target_relatives.join('|^') # make reg exp
     matched_updates = Array.new
     updates.each do |update|
-      matched_updates << update if update.match(cond)
+      matched_updates << update if update[1].match(cond)
     end
 
     # search parent updates of matched updates
     parents = Array.new
     updates.each do |update|
       matched_updates.each do |matched_update|
-        parents << update if matched_update.match("^#{update}/")
+        parents << update if matched_update[1].match("^#{update[1]}/")
       end
     end
     matched_updates += parents
@@ -163,7 +165,7 @@ class Yggdrasil
     until @options.has_key?(:non_interactive?)
       puts
       (0...updates.size).each do |i|
-        puts "#{i}:#{updates[i]}"
+        puts "#{i}:#{updates[i][0]} #{updates[i][1]}"
       end
       print "OK? [Y|n|<num to diff>]:"
       res = $stdin.gets
@@ -173,10 +175,64 @@ class Yggdrasil
       break if res == 'Y'
       next unless updates[res.to_i]
       if /^\d+$/ =~ res
-        yield updates[res.to_i]
+        yield updates[res.to_i][1]
       end
     end
     # res == 'Y'
-    updates
+    confirmed_updates = Array.new
+    updates.each do |e|
+      confirmed_updates << e[1]
+    end
+    confirmed_updates.sort.uniq
+  end
+
+  def username_password_options_to_read_repo
+    if @options.has_key?(:ro_password)
+      " --username #{@options[:ro_username]} --password #{@options[:ro_password]}"
+    else
+      ""
+    end
+  end
+
+  def get_user_pass_if_need_to_read_repo
+    unless @anon_access
+      get_server_config if !@options.has_key?(:ro_username) && @options.has_key?(:server)
+      input_user_pass unless @options.has_key?(:ro_password)
+    end
+    @options[:ro_username] = @options[:username] if @options.has_key?(:username)
+    @options[:ro_password] = @options[:password] if @options.has_key?(:password)
+  end
+
+  def get_server_config(need_repo = false)
+    if /^(.+):(\d+)$/ =~ @options[:server]
+      host = $1
+      port = $2
+
+      if need_repo
+        # get repo
+        sock = TCPSocket.open(host, port)
+        error "can not connect to server: #{host}:#{port}" if sock.nil?
+        sock.puts "get_repo"
+        rcv = sock.gets
+        error "can not get repo from server" if rcv.nil?
+        @options[:repo] = rcv.chomp
+        sock.close
+      end
+
+      #get read-only username/password
+      sock = TCPSocket.open(host, port)
+      error "can not connect to server: #{host}:#{port}" if sock.nil?
+      sock.puts("get_ro_id_pw")
+      username = sock.gets
+      unless username.nil?
+        @options[:ro_username] = username.chomp
+        password = sock.gets
+        error "can not get ro_password" if password.nil?
+        @options[:ro_password] = password.chomp
+      end
+      sock.close
+    else
+      error "invalid host:port '#{@options[:server]}'"
+    end
   end
 end

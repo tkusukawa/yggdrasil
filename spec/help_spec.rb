@@ -109,6 +109,8 @@ Valid options:
                              private     : make local repository in ~/.yggdrasil
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
+  --server ARG             : specify a server address and port
+                             e.g. 192.168.1.35:4000
 
 EOS
   end

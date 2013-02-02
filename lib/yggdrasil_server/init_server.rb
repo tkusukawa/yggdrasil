@@ -5,12 +5,12 @@ class YggdrasilServer
 
     args = parse_options(args,
                          {'--port'=>:port, '--repo'=>:repo,
-                          '--ro-username'=>:username, '--ro-password'=>:password})
+                          '--ro-username'=>:ro_username, '--ro-password'=>:ro_password})
     if args.size != 0
       error "invalid arguments: #{args.join(',')}"
     end
 
-    if !@options.has_key?(:username) && @options.has_key?(:password)
+    if !@options.has_key?(:ro_username) && @options.has_key?(:ro_password)
       error "--ro-password option need --ro-username, too."
     end
 
@@ -41,7 +41,7 @@ class YggdrasilServer
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
 
-    unless @options.has_key?(:username)
+    unless @options.has_key?(:ro_password)
       puts "Input read-only username/password (clients use this to read repo)."
       puts "ATTENTION! username/password are stored to disk unencrypted!"
       input_user_pass
@@ -52,9 +52,9 @@ class YggdrasilServer
     File.open(@server_config_file, "w") do |f|
       f.write "port=#{@options[:port]}\n"\
               "repo=#{@options[:repo]}\n"
-      if @options.has_key?(:username)
-        f.write "ro_username=#{@options[:username]}\n"\
-                "ro_password=#{@options[:password]}\n"
+      if @options.has_key?(:ro_password)
+        f.write "ro_username=#{@options[:ro_username]}\n"\
+                "ro_password=#{@options[:ro_password]}\n"
       end
     end
   end
