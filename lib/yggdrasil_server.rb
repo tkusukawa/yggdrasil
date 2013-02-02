@@ -4,12 +4,15 @@ require "yggdrasil_common"
 
 require "yggdrasil_server/init_server"
 require "yggdrasil_server/get_repo"
+require "yggdrasil_server/get_ro_id_pw"
+require "yggdrasil_server/put_result"
 
 class YggdrasilServer
+  MESSAGE_QUIT = 'quit'
   MESSAGES = {
-      "get_repo" => [],
-      "get_ro_id_pw" => [],
-      "put_result" => [:hostname]
+      :get_repo => [],
+      :get_ro_id_pw => [],
+      :put_result => [:hostname],
   }
 
   def initialize(exist_config = true)
@@ -28,24 +31,23 @@ class YggdrasilServer
   end
 
   def server(args)
+    args = parse_options(args, {'--debug'=>:debug?})
     if args.size != 0
       error "invalid arguments: #{args.join(',')}"
     end
 
-    puts "Start: yggdrasil server (port:#{@port})"
+    puts "Start: yggdrasil server (port:#@port)"
     s0 = TCPServer.open(@port.to_i)
     loop do
       sock = s0.accept
       msg = sock.gets # first line
-      if msg
+      if msg && msg.chomp! != MESSAGE_QUIT
         msg.chomp!
         puts "RCV: #{msg}"
         msg_parts = msg.split
         msg_cmd = msg_parts[0]
-        part_names = MESSAGES[msg_cmd]
-        unless (msg_parts.size - 1) == part_names.size
-          puts "fail: number of arguments is mismatch: #{msg}"
-        else
+        part_names = MESSAGES[msg_cmd.to_sym]
+        if (msg_parts.size - 1) == part_names.size
           # make hash of args
           msg_arg_hash = Hash.new
           (0...part_names.size).each do |i|
@@ -54,15 +56,17 @@ class YggdrasilServer
 
           # execute request (msg_cmd == method name)
           send msg_cmd, sock, msg_arg_hash
+        else
+          puts "fail: number of arguments is mismatch: #{msg}"
         end
       end
       sock.close
+      break if @options.has_key?(:debug?) && msg == MESSAGE_QUIT
     end
-    s0.close # never enter here
+    s0.close # MESSAGE_QUIT
   end
 
   protected
   include YggdrasilCommon
-
 end
 

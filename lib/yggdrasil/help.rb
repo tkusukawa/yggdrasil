@@ -3,7 +3,7 @@ class Yggdrasil
 
   # @param [Array] args
   def help(args)
-    if args.size == 0 then
+    if args.size == 0
       puts <<EOS
 usage: #@base_cmd <subcommand> [options] [args]
 Yggdrasil version #{VERSION}

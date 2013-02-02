@@ -90,7 +90,7 @@ module YggdrasilCommon
       $stderr.puts out
       exit stat.exitstatus
     end
-    return out
+    out
   end
 
   # @param [String] msg

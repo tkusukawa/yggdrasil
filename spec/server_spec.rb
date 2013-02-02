@@ -1,8 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require 'timeout'
 require 'socket'
 
 describe Yggdrasil, "server" do
-  pid = 0
+
   before(:all) do
     puts '-------- server'
     prepare_environment
@@ -13,40 +14,109 @@ describe Yggdrasil, "server" do
                           %w{--ro-password foo}
   end
 
-  it "should make server" do
-    puts "---- should make server"
+  it "should quit server on debug mode" do
+    puts "---- should quit server on debug mode"
 
-    pid = fork do
-      Yggdrasil.command %w{server}
+    fork do
+      # client behavior
+      sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("quit")
+      sock.close
       exit
     end
-    pid.should_not be_nil
-  end
 
-  it "should alive" do
-    puts "---- should make server"
-    sleep 3
-    res = Process.waitpid(pid,  Process::WNOHANG | Process::WUNTRACED)
-    res.should be_nil
+    timeout 5 do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    Process.waitall
   end
 
   it "should response repository URL" do
-    sock = TCPSocket.open("localhost", 4000)
-    sock.write("get_repo")
-    rcv = sock.gets
-    rcv.should_not be_nil
-    rcv.should == "svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}"
-    sock.close
-  end
+    puts "---- should response repository URL"
 
-  it do
-    pending("under construction")
-  end
-
-  after(:all) do
-    while (res = Process.waitpid(pid,  Process::WNOHANG | Process::WUNTRACED)).nil?
-      Process.kill 9, pid
+    fork do
       sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("get_repo")
+      rcv = sock.gets
+      rcv.should_not be_nil
+      rcv.chomp!
+      rcv.should == "svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}"
+      sock.close
+
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("quit")
+      sock.close
+      exit
     end
+
+    timeout 5 do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    Process.waitall
+  end
+
+  it "should response get_ro_id_pw" do
+    puts "---- should response get_ro_id_pw"
+
+    fork do
+      sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("get_ro_id_pw")
+      username = sock.gets
+      username.should_not be_nil
+      username.chomp.should == "hoge"
+
+      password = sock.gets
+      password.should_not be_nil
+      password.chomp.should == "foo"
+      sock.close
+
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("quit")
+      sock.close
+      exit
+    end
+
+    timeout 5 do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    Process.waitall
+  end
+
+  it "should write file of check result to results directory" do
+    puts "---- should write file of check result to results directory"
+
+    fork do
+      sleep 1
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("put_result HOSTNAME")
+      sock.puts <<"EOS"
+CHECK RESULTS................1
+CHECK RESULTS................2
+EOS
+      sock.close
+
+      sock = TCPSocket.open("localhost", 4000)
+      sock.puts("quit")
+      sock.close
+      exit
+    end
+
+    timeout 5 do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    File.exist?("/tmp/yggdrasil-test/.yggdrasil/results/HOSTNAME_127.0.0.1").should be_true
+    `cat /tmp/yggdrasil-test/.yggdrasil/results/HOSTNAME_127.0.0.1`.should == <<"EOS"
+CHECK RESULTS................1
+CHECK RESULTS................2
+EOS
+
+    Process.waitall
   end
 end
