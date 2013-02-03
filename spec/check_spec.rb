@@ -72,8 +72,74 @@ Committed revision 5.
 EOS
   end
 
-  it 'should setup with server' do
-    puts "\n---- should setup with server"
-    pending("under construction")
+  it 'should record check result by yggdrasil server' do
+    puts "\n---- should record check result by yggdrasil server"
+
+    prepare_environment
+
+    sock = 0
+    begin
+      sock = TCPSocket.open("localhost", 4000)
+    rescue
+      puts "OK. no server"
+    else
+      puts "NG. zombie server. try quit"
+      sock.puts("quit")
+      sock.close
+    end
+
+    Yggdrasil.command %w{init-server} +
+                          %w{--port 4000} +
+                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/}+
+                          %w{--ro-username hoge --ro-password foo},
+                      "\n\n"
+    fork do
+      Yggdrasil.command %w{server --debug}
+    end
+
+    sleep 1
+    Yggdrasil.command %w{init --debug --server localhost:4000} +
+                          %w{--username hoge --password foo},
+                      "Y\nhoge\nfoo\n"
+    `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
+    Yggdrasil.command %w{check}
+
+    sleep 1
+    File.exist?("/tmp/yggdrasil-test/.yggdrasil/results").should be_true
+    files = Dir.entries("/tmp/yggdrasil-test/.yggdrasil/results")
+    result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
+    result_files.size.should == 1
+    `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
+A                0   tmp/yggdrasil-test
+A                0   tmp/yggdrasil-test/.yggdrasil
+A                0   tmp/yggdrasil-test/.yggdrasil/checker_result
+A                0   tmp
+
+EOS
+
+    `echo hoge > /tmp/yggdrasil-test/A`
+    Yggdrasil.command %w{add /tmp/yggdrasil-test/A}
+    Yggdrasil.command %w{commit --username hoge --password foo /},
+                      "Y\nHOGE\n"
+
+    `echo foo >> /tmp/yggdrasil-test/A`
+    Yggdrasil.command %w{check}
+
+    `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
+M                2   tmp/yggdrasil-test/A
+
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A	(revision 2)
++++ tmp/yggdrasil-test/A	(working copy)
+@@ -1 +1,2 @@
+ hoge
++foo
+EOS
+
+    sock = TCPSocket.open("localhost", 4000)
+    sock.puts("quit")
+    sock.close
+    Process.waitall
   end
 end

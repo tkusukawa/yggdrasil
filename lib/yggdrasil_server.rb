@@ -3,6 +3,8 @@ require 'socket'
 require "yggdrasil_common"
 
 require "yggdrasil_server/init_server"
+require "yggdrasil_server/results"
+
 require "yggdrasil_server/get_repo"
 require "yggdrasil_server/get_ro_id_pw"
 require "yggdrasil_server/put_result"

@@ -35,17 +35,31 @@ class Yggdrasil
 
     cmd_arg = "#@svn status -qu --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
+    check_result = String.new
     FileUtils.cd @mirror_dir do
-      out = system3(cmd_arg)
-      puts out.gsub(/^Status against revision:.*\n/, '')
+      check_result = system3(cmd_arg)
     end
-    puts
+    check_result.gsub!(/^Status against revision:.*\n/, '')
+    check_result.chomp!
+    if check_result != ""
+      check_result << "\n\n"
+      cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
+      cmd_arg += username_password_options_to_read_repo
+      FileUtils.cd @mirror_dir do
+        check_result << system3(cmd_arg)
+      end
+    end
+    puts check_result
 
-    cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
-    cmd_arg += username_password_options_to_read_repo
-    FileUtils.cd @mirror_dir do
-      out = system3(cmd_arg)
-      puts out
+    if /^(.+):(\d+)$/ =~ @options[:server]
+      host = $1
+      port = $2
+      # put check_result to server
+      sock = TCPSocket.open(host, port)
+      error "can not connect to server: #{host}:#{port}" if sock.nil?
+      sock.puts "put_result #{Socket.gethostname}"
+      sock.puts check_result
+      sock.close
     end
   end
 end

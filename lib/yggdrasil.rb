@@ -74,7 +74,6 @@ class Yggdrasil
     @mirror_dir = "#@config_dir/mirror"
     @checker_dir = "#@config_dir/checker"
     @checker_result_dir = "#@config_dir/checker_result"
-    @server_config_file = "#@config_dir/server_config"
 
     return unless exist_config
     configs = read_config(@config_file)
@@ -82,6 +81,8 @@ class Yggdrasil
     error "need 'svn' in config file" unless (@svn = configs[:svn])
     error "need 'repo' in config file" unless (@repo = configs[:repo])
     @anon_access = (configs[:anon_access] == 'read')
+    @options ||= Hash.new
+    @options[:server] = configs[:server] if configs.has_key?(:server)
   end
 
   protected

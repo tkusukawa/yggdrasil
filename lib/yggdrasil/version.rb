@@ -1,5 +1,5 @@
 class Yggdrasil
-  VERSION = "0.0.5"
+  VERSION = "0.0.6"
 
   def version
     puts <<"EOS"
