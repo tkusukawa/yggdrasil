@@ -25,34 +25,56 @@ describe Yggdrasil, "results" do
       Yggdrasil.command %w{server --debug}
     end
     sleep 1
+  end
+
+  it 'should show nothing if no change' do
     Yggdrasil.command %w{init --debug --server localhost:4000} +
                           %w{--username hoge --password foo},
                       "Y\nhoge\nfoo\n"
     `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
+
+    `echo hoge > /tmp/yggdrasil-test/A`
+    Yggdrasil.command %w{add /tmp/yggdrasil-test/A}
+    Yggdrasil.command %w{check}
+    Yggdrasil.command %w{commit -m '1st' --username hoge --password foo /},
+                      "Y\n"
+
     Yggdrasil.command %w{check}
     sleep 1
+    out = catch_out do
+      Yggdrasil.command %w{results --limit 30}
+    end
+    out.should == ""
   end
 
   it 'should show results' do
     puts '---- should show results'
 
+    `echo foo >> /tmp/yggdrasil-test/A`
+    Yggdrasil.command %w{check}
+
     `echo hoge > /tmp/yggdrasil-test/.yggdrasil/results/hoge-old`
     File.utime Time.local(2001, 5, 22, 23, 59, 59),
                Time.local(2001, 5, 1, 0, 0, 0),
                "/tmp/yggdrasil-test/.yggdrasil/results/hoge-old"
+    sleep 1
 
     out = catch_out do
-      Yggdrasil.command %w{results --limit 30}
+      lambda{Yggdrasil.command(%w{results --limit 30})}.should raise_error(SystemExit)
     end
 
     out.should == <<"EOS"
-######## hoge-old TOO OLD: 2001-05-01 00:00:00 +0900
+######## hoge-old: last check is too old: 2001-05-01 00:00:00 +0900
 ######## centos6_127.0.0.1 Mismatch:
-A                0   tmp/yggdrasil-test
-A                0   tmp/yggdrasil-test/.yggdrasil
-A                0   tmp/yggdrasil-test/.yggdrasil/checker_result
-A                0   tmp
+M                2   tmp/yggdrasil-test/A
 
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A	(revision 2)
++++ tmp/yggdrasil-test/A	(working copy)
+@@ -1 +1,2 @@
+ hoge
++foo
 EOS
   end
 

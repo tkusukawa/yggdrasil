@@ -31,6 +31,7 @@ class Yggdrasil
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
     @options[:repo].gsub!(/\{HOST\}/, Socket.gethostname)
+    @options[:repo].gsub!(/\{host\}/, Socket.gethostname.split('.')[0])
     if @options[:repo] == "private"
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
       repo_dir = "#@config_dir/private_repo"
