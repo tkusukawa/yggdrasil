@@ -13,11 +13,13 @@ class Yggdrasil
     # execute checker
     `rm -rf #@checker_result_dir`
     Dir.mkdir @checker_result_dir, 0755
-    Find.find(@checker_dir).each do |file|
-      if File.file?(file) && File.executable?(file)
-        if file =~ %r{^#@checker_dir(.*)$}
-          file_body = $1
-          system3("#{file} > #@checker_result_dir#{file_body}")
+    if File.exist?(@checker_dir)
+      Find.find(@checker_dir).each do |file|
+        if File.file?(file) && File.executable?(file)
+          if file =~ %r{^#@checker_dir(.*)$}
+            file_body = $1
+            system3("#{file} > #@checker_result_dir#{file_body}")
+          end
         end
       end
     end
@@ -41,7 +43,7 @@ class Yggdrasil
     end
     check_result.gsub!(/^Status against revision:.*\n/, '')
     check_result.chomp!
-    if check_result != ""
+    if check_result != ''
       check_result << "\n\n"
       cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
       cmd_arg += username_password_options_to_read_repo

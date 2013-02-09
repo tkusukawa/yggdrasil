@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "list" do
+describe Yggdrasil, 'list' do
   it '-------- list' do
     puts '-------- list'
     prepare_environment
@@ -17,7 +17,7 @@ describe Yggdrasil, "list" do
   it 'should show list (relative path)' do
     puts '---- should show list (relative path)'
     out = catch_out do
-      FileUtils.cd "/tmp" do
+      FileUtils.cd '/tmp' do
         Yggdrasil.command %w{list yggdrasil-test}+
                           %w{--username hoge --password foo}
       end
@@ -28,7 +28,7 @@ describe Yggdrasil, "list" do
   it 'should show list (no path)' do
     puts '---- should show list (no path)'
     out = catch_out do
-      FileUtils.cd "/tmp/yggdrasil-test" do
+      FileUtils.cd '/tmp/yggdrasil-test' do
         Yggdrasil.command %w{list} +
                           %w{--username hoge --password foo}
       end

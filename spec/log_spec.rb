@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "log" do
+describe Yggdrasil, 'log' do
   it '-------- log' do
     puts '-------- log'
     prepare_environment
@@ -36,7 +36,7 @@ EOS
   it 'should show log (relative path)' do
     puts '---- should show log (relative path)'
     out = catch_out do
-      FileUtils.cd "/tmp" do
+      FileUtils.cd '/tmp' do
         Yggdrasil.command %w{log yggdrasil-test}+
                           %w{--username hoge --password foo}
       end
@@ -66,7 +66,7 @@ EOS
   it 'should show log (no path)' do
     puts '---- should show log (no path)'
     out = catch_out do
-      FileUtils.cd "/tmp/yggdrasil-test" do
+      FileUtils.cd '/tmp/yggdrasil-test' do
         Yggdrasil.command %w{log} +
                           %w{--username hoge --password foo}
       end

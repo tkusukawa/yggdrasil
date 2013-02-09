@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "update" do
+describe Yggdrasil, 'update' do
   it '-------- update' do
     puts '-------- update'
     prepare_environment

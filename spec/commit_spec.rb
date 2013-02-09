@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "commit" do
+describe Yggdrasil, 'commit' do
   it '-------- commit' do
     puts '-------- commit'
     prepare_environment
@@ -15,12 +15,12 @@ describe Yggdrasil, "commit" do
     puts '---- should commit added files'
     `echo hoge > /tmp/yggdrasil-test/A`
     `echo foo > /tmp/yggdrasil-test/B`
-    FileUtils.cd "/tmp/yggdrasil-test" do
+    FileUtils.cd '/tmp/yggdrasil-test' do
       puts '-- add'
       Yggdrasil.command %w{add A /tmp/yggdrasil-test/B}
     end
 
-    puts "-- commit"
+    puts '-- commit'
     FileUtils.cd '/tmp/yggdrasil-test' do
       Yggdrasil.command %w{commit --username hoge --password foo},
                         "0\nY\nadd A and B\n"
@@ -38,11 +38,11 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit modified file' do
-    puts "---- should commit modified file"
-    puts "-- modify"
+    puts '---- should commit modified file'
+    puts '-- modify'
     `echo hoge >> /tmp/yggdrasil-test/A`
 
-    puts "-- commit"
+    puts '-- commit'
     Yggdrasil.command %w{commit / --username hoge --password foo},
                       "0\nY\nmodify A\n"
 
@@ -53,11 +53,11 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit with multi line comment' do
-    puts "---- should commit with multi line comment"
-    puts "-- modify"
+    puts '---- should commit with multi line comment'
+    puts '-- modify'
     `echo foo >> /tmp/yggdrasil-test/B`
 
-    puts "-- commit"
+    puts '-- commit'
     Yggdrasil.command %w{commit / --username hoge --password foo},
                       "Y\ntest commit\\\nmodify B\n"
 
@@ -69,7 +69,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should accept password interactive' do
-    puts "---- should accept password interactive"
+    puts '---- should accept password interactive'
     `echo A >> /tmp/yggdrasil-test/A`
 
     Yggdrasil.command %w{commit /tmp --username hoge},
@@ -82,7 +82,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit specified file only' do
-    puts "---- should commit specified file only"
+    puts '---- should commit specified file only'
     `echo A >> /tmp/yggdrasil-test/A`
     `echo B >> /tmp/yggdrasil-test/B`
 
@@ -97,7 +97,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should not commit deleted file' do
-    puts "---- should not commit deleted file"
+    puts '---- should not commit deleted file'
     `rm -f /tmp/yggdrasil-test/A`
 
     Yggdrasil.command %w{commit --username hoge --password foo -m delete},
@@ -109,7 +109,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit deleted file' do
-    puts "---- should commit deleted file"
+    puts '---- should commit deleted file'
     `echo hoge > /tmp/yggdrasil-test/A`
     `rm -f /tmp/yggdrasil-test/B`
 
@@ -124,7 +124,7 @@ describe Yggdrasil, "commit" do
   end
 
   it 'should commit all files at once' do
-    puts "---- should commit all files at once"
+    puts '---- should commit all files at once'
 
     `echo HOGE >> /tmp/yggdrasil-test/A`
     `rm -f /tmp/yggdrasil-test/B`

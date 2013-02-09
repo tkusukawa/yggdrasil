@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "revert" do
+describe Yggdrasil, 'revert' do
   it '-------- revert' do
     puts '-------- revert'
     prepare_environment
@@ -12,11 +12,11 @@ describe Yggdrasil, "revert" do
     puts '---- should commit added files'
     `echo hoge > /tmp/yggdrasil-test/AA`
     `echo foo > /tmp/yggdrasil-test/BB`
-    FileUtils.cd "/tmp/yggdrasil-test" do
+    FileUtils.cd '/tmp/yggdrasil-test' do
       puts '-- add'
       Yggdrasil.command %w{add AA /tmp/yggdrasil-test/BB}
 
-      puts "-- revert"
+      puts '-- revert'
       Yggdrasil.command %w{revert --username hoge --password foo},
                         "0\nY\n"
     end
@@ -27,15 +27,15 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ""
+    out.should == ''
   end
 
   it 'should revert modified file' do
-    puts "---- should revert modified file"
-    puts "-- modify"
+    puts '---- should revert modified file'
+    puts '-- modify'
     `echo hoge >> /tmp/yggdrasil-test/A`
 
-    puts "-- revert"
+    puts '-- revert'
     Yggdrasil.command %w{revert / --username hoge --password foo},
                       "0\nY\n"
 
@@ -45,11 +45,11 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ""
+    out.should == ''
   end
 
   it 'should accept password interactive' do
-    puts "---- should accept password interactive"
+    puts '---- should accept password interactive'
     `echo A >> /tmp/yggdrasil-test/A`
 
     Yggdrasil.command %w{revert /tmp/yggdrasil-test/A --username hoge},
@@ -61,11 +61,11 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ""
+    out.should == ''
   end
 
   it 'should revert specified file only' do
-    puts "---- should revert specified file only"
+    puts '---- should revert specified file only'
     `echo A >> /tmp/yggdrasil-test/A`
     `echo B >> /tmp/yggdrasil-test/B`
 
@@ -84,7 +84,7 @@ describe Yggdrasil, "revert" do
   end
 
   it 'should not revert deleted file' do
-    puts "---- should not revert deleted file"
+    puts '---- should not revert deleted file'
     `rm -f /tmp/yggdrasil-test/A`
 
     Yggdrasil.command %w{revert /} +
@@ -99,11 +99,11 @@ describe Yggdrasil, "revert" do
     out.chomp!
     puts out
     out.gsub!(%r{\s+},' ')
-    out.should == "D 3 tmp/yggdrasil-test/A"
+    out.should == 'D 3 tmp/yggdrasil-test/A'
   end
 
   it 'should revert all files at once' do
-    puts "---- should revert all files at once"
+    puts '---- should revert all files at once'
 
     `echo HOGE >> /tmp/yggdrasil-test/A`
     `rm -f /tmp/yggdrasil-test/B`
@@ -121,6 +121,6 @@ describe Yggdrasil, "revert" do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ""
+    out.should == ''
   end
 end

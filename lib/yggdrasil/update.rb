@@ -30,7 +30,7 @@ class Yggdrasil
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
         cmd = "#@svn diff"
-        cmd += " --no-auth-cache --non-interactive"
+        cmd += ' --no-auth-cache --non-interactive'
         cmd += username_password_options_to_read_repo
         if @options.has_key?(:revision)
           cmd += " --old=#{relative_path} --new=#{relative_path}@#{@options[:revision]}"
@@ -50,7 +50,7 @@ class Yggdrasil
     if @options.has_key?(:revision)
       cmd_arg += " -r #{@options[:revision]}"
     else
-      cmd_arg += " -r HEAD"
+      cmd_arg += ' -r HEAD'
     end
     cmd_arg += ' ' + confirmed_updates.join(' ')
     FileUtils.cd @mirror_dir do

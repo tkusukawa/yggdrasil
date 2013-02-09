@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "help" do
+describe Yggdrasil, 'help' do
   puts '-------- help'
 
   show_subcommands = <<"EOS"
@@ -16,18 +16,15 @@ Available subcommands:
    diff (di)
    help (?, h)
    init
-   init-server
    list (ls)
    log
-   results
    revert
-   server
    status (stat, st)
    update
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
-You should type 'yggdrasil init' at first.
+At first, you should type '#{File.basename($0)} init' to create config file.
 
 EOS
 
@@ -286,32 +283,15 @@ usage: #{File.basename($0)} check [OPTIONS...]
   For example, mount status, number of specific process and etc. can be checked
   by setting up executable files in ~/.yggdrasil/checker/
 
-  if the server is registered, the yggdrasil server receive and record the results.
+  If the yggdrasil server is registered,
+  this subcommand send the result to yggdrasil server
+  and yggdrasil server record the results of all managed servers.
+  Type 'yggserver help', if you need to know about yggdrasil server.
 
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
   --non-interactive        : do no interactive prompting
-
-EOS
-  end
-
-  it 'should show help of init-server' do
-    puts '---- should show help of init-server'
-    out = catch_out{Yggdrasil.command %w{help init-server}}
-    out.should == <<"EOS"
-init-server: setup server configuration.
-usage: #{File.basename($0)} init-server [OPTIONS...]
-
-Valid options:
-  --port ARG               : specify a TCP port number ARG
-  --repo ARG               : URL of subversion repository
-                             ARG can contain {HOST} or a {host}
-                             {HOST} is replaced by client hostname with domain
-                             {host} is replaced by client hostname without domain
-                             e.g. svn://192.168.3.5/servers/{host}/ygg
-  --ro-username ARG        : specify a username ARG for read only
-  --ro-password ARG        : specify a password ARG for read only
 
 EOS
   end
@@ -325,19 +305,6 @@ usage: #{File.basename($0)} server [OPTIONS...]
 
 Valid options:
   --daemon                 : daemon mode
-
-EOS
-  end
-
-  it 'should show help of results' do
-    puts '---- should show help of results'
-    out = catch_out{Yggdrasil.command %w{help results}}
-    out.should == <<"EOS"
-results: display the result of yggdrasil check command.
-usage: #{File.basename($0)} results [OPTIONS...]
-
-Valid options:
-  --limit ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
   end

@@ -56,23 +56,23 @@ module YggdrasilCommon
 
   def input_user_pass
     until @options.has_key?(:username) do
-      error "Can't get username or password" if @options.has_key?(:non_interactive?)
-      print "Input svn username: "
+      error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
+      print 'Input svn username: '
       input = $stdin.gets
-      error "can not input username" unless input
+      error 'can not input username' unless input
       input.chomp!
       return if input.size == 0
       @options[:username] = @options[:ro_username] = input
     end
     until @options.has_key?(:password) do
-      error "Can't get username or password" if @options.has_key?(:non_interactive?)
-      print "Input svn password: "
+      error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
+      print 'Input svn password: '
       #input = `sh -c 'read -s hoge;echo $hoge'`
       system3 'stty -echo', false
       input = $stdin.gets
       system3 'stty echo', false
       puts
-      error "can not input password" unless input
+      error 'can not input password' unless input
       input.chomp!
       @options[:password] = @options[:ro_password] = input
     end
@@ -86,7 +86,7 @@ module YggdrasilCommon
     unless stat.success?
       return nil unless err_exit
       $stderr.puts "#@base_cmd error: command failure: #{cmd}"
-      $stderr.puts "command output:"
+      $stderr.puts 'command output:'
       $stderr.puts out
       exit stat.exitstatus
     end

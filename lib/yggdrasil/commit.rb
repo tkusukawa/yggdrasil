@@ -26,10 +26,10 @@ class Yggdrasil
 
     message = ''
     unless @options.has_key?(:message)
-      print "Input log message: "
+      print 'Input log message: '
       loop do
         input = $stdin.gets
-        error "can not input log message" unless input
+        error 'can not input log message' unless input
         input.chomp!
         if input =~ /^(.*)\\$/
           message += $1+"\n"
@@ -44,7 +44,7 @@ class Yggdrasil
     input_user_pass
     FileUtils.cd @mirror_dir do
       puts system3 "#@svn commit -m '#{@options[:message]}'"\
-                   " --no-auth-cache --non-interactive"\
+                   ' --no-auth-cache --non-interactive'\
                    " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
                    " #{confirmed_updates.join(' ')}"
     end

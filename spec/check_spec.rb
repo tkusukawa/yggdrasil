@@ -1,7 +1,8 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require 'yggdrasil_server'
 
-describe Yggdrasil, "check" do
-  it '-------- check' do
+describe Yggdrasil, 'check' do
+  before(:all) do
     puts '-------- check'
     prepare_environment
     init_yggdrasil
@@ -79,22 +80,22 @@ EOS
 
     sock = 0
     begin
-      sock = TCPSocket.open("localhost", 4000)
+      sock = TCPSocket.open('localhost', 4000)
     rescue
-      puts "OK. no server"
+      puts 'OK. no server'
     else
-      puts "NG. zombie server. try quit"
-      sock.puts("quit")
+      puts 'NG. zombie server. try quit'
+      sock.puts('quit')
       sock.close
     end
 
-    Yggdrasil.command %w{init-server} +
+    YggdrasilServer.command %w{init} +
                           %w{--port 4000} +
                           %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/}+
                           %w{--ro-username hoge --ro-password foo},
                       "\n\n"
     fork do
-      Yggdrasil.command %w{server --debug}
+      YggdrasilServer.command %w{debug}
     end
 
     sleep 1
@@ -105,8 +106,8 @@ EOS
     Yggdrasil.command %w{check}
 
     sleep 1
-    File.exist?("/tmp/yggdrasil-test/.yggdrasil/results").should be_true
-    files = Dir.entries("/tmp/yggdrasil-test/.yggdrasil/results")
+    File.exist?('/tmp/yggdrasil-test/.yggdrasil/results').should be_true
+    files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
     result_files.size.should == 1
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
@@ -137,8 +138,8 @@ Index: tmp/yggdrasil-test/A
 +foo
 EOS
 
-    sock = TCPSocket.open("localhost", 4000)
-    sock.puts("quit")
+    sock = TCPSocket.open('localhost', 4000)
+    sock.puts('quit')
     sock.close
     Process.waitall
   end

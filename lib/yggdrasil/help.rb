@@ -1,6 +1,5 @@
 class Yggdrasil
 
-
   # @param [Array] args
   def help(args)
     if args.size == 0
@@ -17,22 +16,19 @@ Available subcommands:
    diff (di)
    help (?, h)
    init
-   init-server
    list (ls)
    log
-   results
    revert
-   server
    status (stat, st)
    update
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
-You should type 'yggdrasil init' at first.
+At first, you should type '#@base_cmd init' to create config file.
 
 EOS
     elsif args.size != 1 then
-      error "too many arguments."
+      error 'too many arguments.'
     else
       case args[0]
         when 'add'
@@ -51,7 +47,10 @@ usage: #@base_cmd check [OPTIONS...]
   For example, mount status, number of specific process and etc. can be checked
   by setting up executable files in ~/.yggdrasil/checker/
 
-  if the server is registered, the yggdrasil server receive and record the results.
+  If the yggdrasil server is registered,
+  this subcommand send the result to yggdrasil server
+  and yggdrasil server record the results of all managed servers.
+  Type 'yggserver help', if you need to know about yggdrasil server.
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -123,22 +122,6 @@ Valid options:
                              e.g. 192.168.1.35:4000
 
 EOS
-        when 'init-server'
-          puts <<"EOS"
-init-server: setup server configuration.
-usage: #@base_cmd init-server [OPTIONS...]
-
-Valid options:
-  --port ARG               : specify a TCP port number ARG
-  --repo ARG               : URL of subversion repository
-                             ARG can contain {HOST} or a {host}
-                             {HOST} is replaced by client hostname with domain
-                             {host} is replaced by client hostname without domain
-                             e.g. svn://192.168.3.5/servers/{host}/ygg
-  --ro-username ARG        : specify a username ARG for read only
-  --ro-password ARG        : specify a password ARG for read only
-
-EOS
         when 'list', 'ls'
           puts <<"EOS"
 list (ls): List directory entries in the repository.
@@ -174,15 +157,6 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
-
-EOS
-        when 'results'
-          puts <<"EOS"
-results: display the result of yggdrasil check command.
-usage: #@base_cmd results [OPTIONS...]
-
-Valid options:
-  --limit ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
         when 'revert'
@@ -241,7 +215,7 @@ usage: #@base_cmd version
 
 EOS
         else
-          error "Unknown subcommand: '#{subcommand}'"
+          error "Unknown subcommand: '#{args[0]}'"
       end
     end
   end

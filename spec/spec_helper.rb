@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../lib/yggdrasil'
 
 def prepare_environment
-  puts "---- prepare environment"
+  puts '---- prepare environment'
 
   `pkill svnserve`
   `rm -rf /tmp/yggdrasil-test`
@@ -13,10 +13,10 @@ def prepare_environment
 
   puts '-- launch svnserve'
 
-  File.open("/tmp/yggdrasil-test/svn-repo/conf/passwd", "w") do |f|
+  File.open('/tmp/yggdrasil-test/svn-repo/conf/passwd', 'w') do |f|
     f.write "[users]\nhoge = foo"
   end
-  File.open("/tmp/yggdrasil-test/svn-repo/conf/svnserve.conf", "w") do |f|
+  File.open('/tmp/yggdrasil-test/svn-repo/conf/svnserve.conf', 'w') do |f|
     f.write <<"EOS"
 [general]
 anon-access = none

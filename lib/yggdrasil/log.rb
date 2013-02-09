@@ -9,7 +9,7 @@ class Yggdrasil
 
     if args.size == 0
       dir = @mirror_dir + @current_dir
-      error "current directory is not managed." unless File.exist?(dir)
+      error 'current directory is not managed.' unless File.exist?(dir)
       args << dir
     else
       args.collect! do |arg|
@@ -26,7 +26,7 @@ class Yggdrasil
     if @options.has_key?(:revision)
       cmd_arg += " -r #{@options[:revision]}"
     else
-      cmd_arg += " -r HEAD:1"
+      cmd_arg += ' -r HEAD:1'
     end
     cmd_arg += ' ' + args.join(' ')
     puts system3(cmd_arg)

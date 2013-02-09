@@ -6,7 +6,7 @@ Yggdrasil is a subversion wrapper to manage server configurations and conditions
 
     $ gem install yggdrasil
 
-And you have to install subversion:
+subversion needs to be installed:
 
     (e.g.)$ sudo yum install subversion
 
@@ -15,7 +15,7 @@ And you have to install subversion:
 Prepare subversion repository and initialize Yggdrasil:
 
     (e.g.)$ svnadmin create ~/svn-repo
-    $ yggdrasil init --repo file://$HOME/svn-repo
+    $ ygg init --repo file://$HOME/svn-repo
 
   You should use svn-server if you have.
   In that case, the configuration files of
@@ -23,15 +23,15 @@ Prepare subversion repository and initialize Yggdrasil:
 
 Add configuration files:
 
-    $ yggdrasil add /etc/hosts /etc/fstab   ..etc
+    $ ygg add /etc/hosts /etc/fstab   ..etc
 
 Check modify and/or delete:
 
-    $ yggdrasil status /
+    $ ygg check /
 
 Refer Help:
 
-    $ yggdrasil help
+    $ ygg help
 
 ## Environment
 

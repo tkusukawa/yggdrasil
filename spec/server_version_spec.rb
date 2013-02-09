@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require 'yggdrasil_server'
 
-describe Yggdrasil, 'version' do
+describe YggdrasilServer, 'version' do
 
   show_version = <<"EOS"
 #{File.basename($0)}, version #{Yggdrasil::VERSION}
@@ -12,13 +13,13 @@ EOS
 
   it 'should show version on "version"' do
     puts '---- should show version on "version"'
-    out = catch_out{Yggdrasil.command %w{version}}
+    out = catch_out{YggdrasilServer.command %w{version}}
     out.should == show_version
   end
 
   it 'should show version on "--version"' do
     puts '---- should show version on "--version"'
-    out = catch_out{Yggdrasil.command %w{--version}}
+    out = catch_out{YggdrasilServer.command %w{--version}}
     out.should == show_version
   end
 end

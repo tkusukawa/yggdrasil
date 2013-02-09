@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Yggdrasil, "status" do
+describe Yggdrasil, 'status' do
   it '-------- status' do
     puts '-------- status'
     prepare_environment
@@ -15,9 +15,9 @@ describe Yggdrasil, "status" do
   end
 
   it 'should show status(absolute and relative)' do
-    puts "---- should show status(absolute and relative)"
+    puts '---- should show status(absolute and relative)'
     out = catch_out do
-      FileUtils.cd "/tmp/yggdrasil-test" do
+      FileUtils.cd '/tmp/yggdrasil-test' do
         Yggdrasil.command %w{status /tmp/yggdrasil-test/A B --username hoge --password foo}
       end
     end
@@ -29,9 +29,9 @@ EOS
   end
 
   it 'should show status(/)' do
-    puts "---- should show status(/)"
+    puts '---- should show status(/)'
     out = catch_out do
-      FileUtils.cd "/tmp/yggdrasil-test" do
+      FileUtils.cd '/tmp/yggdrasil-test' do
         Yggdrasil.command %w{status / --username hoge --password foo}
       end
     end
@@ -45,9 +45,9 @@ EOS
   end
 
   it 'should show status (no path)' do
-    puts "---- should show status (no path)"
+    puts '---- should show status (no path)'
     out = catch_out do
-      FileUtils.cd "/tmp/yggdrasil-test" do
+      FileUtils.cd '/tmp/yggdrasil-test' do
         Yggdrasil.command %w{status --username hoge --password foo}
       end
     end

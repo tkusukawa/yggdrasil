@@ -1,3 +1,5 @@
+require 'socket'
+
 class Yggdrasil
 
   # @param [Array] args
@@ -19,7 +21,7 @@ class Yggdrasil
     svn = out.chomp
 
     out = system3 'svn --version'
-    error "can not find version string: svn --version" unless /version (\d+\.\d+\.\d+) / =~ out
+    error 'can not find version string: svn --version' unless /version (\d+\.\d+\.\d+) / =~ out
     svn_version=$1
 
     error "already exist config file: #@config_file" if File.exist?(@config_file)
@@ -32,14 +34,14 @@ class Yggdrasil
     @options[:repo].chomp!('/')
     @options[:repo].gsub!(/\{HOST\}/, Socket.gethostname)
     @options[:repo].gsub!(/\{host\}/, Socket.gethostname.split('.')[0])
-    if @options[:repo] == "private"
+    if @options[:repo] == 'private'
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
       repo_dir = "#@config_dir/private_repo"
       system3 "svnadmin create #{repo_dir}"
       @options[:repo] = "file://#{repo_dir}"
     end
 
-    puts "check SVN access..."
+    puts 'check SVN access...'
     if @options.has_key?(:ro_username)
       anon_access = false
     else
@@ -79,9 +81,9 @@ class Yggdrasil
         msg = "not exist directory(s): #{url_parts[url_parts_num...url_parts.size].join('/')}"
         error msg if @options[:non_interactive?]
         puts msg
-        print "make directory(s)? [Yn]: "
+        print 'make directory(s)? [Yn]: '
         input = $stdin.gets
-        error "can not gets $stdin" if input.nil?
+        error 'can not gets $stdin' if input.nil?
         input.chomp!
         return if input == 'n'
         break if input == 'Y'
@@ -107,7 +109,7 @@ class Yggdrasil
     end
 
     # make config file
-    File.open(@config_file, "w") do |f|
+    File.open(@config_file, 'w') do |f|
       f.puts "path=#{ENV['PATH']}\n"\
              "svn=#{svn}\n"\
              "svn_version=#{svn_version}\n"\
@@ -133,16 +135,16 @@ class Yggdrasil
 
   def init_get_repo_interactive
     loop do
-      print "Input svn repo URL: "
+      print 'Input svn repo URL: '
       input = $stdin.gets
-      error "can not input svn repo URL" unless input
+      error 'can not input svn repo URL' unless input
 
       if %r{^(http://|https://|file://|svn://|private)} =~ input
         @options[:repo] = input
         break
       end
 
-      puts "ERROR: Invalid URL."
+      puts 'ERROR: Invalid URL.'
     end
   end
 end

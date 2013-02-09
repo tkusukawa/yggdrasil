@@ -1,21 +1,20 @@
 require 'fileutils'
 
-require "yggdrasil_common"
-require "yggdrasil_server"
+require 'yggdrasil_common'
 
-require "yggdrasil/version"
-require "yggdrasil/help"
-require "yggdrasil/init"
-require "yggdrasil/add"
-require "yggdrasil/commit"
-require "yggdrasil/cleanup"
-require "yggdrasil/diff"
-require "yggdrasil/list"
-require "yggdrasil/log"
-require "yggdrasil/status"
-require "yggdrasil/update"
-require "yggdrasil/revert"
-require "yggdrasil/check"
+require 'yggdrasil/version'
+require 'yggdrasil/help'
+require 'yggdrasil/init'
+require 'yggdrasil/add'
+require 'yggdrasil/commit'
+require 'yggdrasil/cleanup'
+require 'yggdrasil/diff'
+require 'yggdrasil/list'
+require 'yggdrasil/log'
+require 'yggdrasil/status'
+require 'yggdrasil/update'
+require 'yggdrasil/revert'
+require 'yggdrasil/check'
 
 class Yggdrasil
 
@@ -42,18 +41,12 @@ class Yggdrasil
         new(false).help(args[1..-1])
       when 'init'
         new(false).init(args[1..-1])
-      when 'init-server'
-        YggdrasilServer.new(false).init_server(args[1..-1])
       when 'list', 'ls'
         new.list(args[1..-1])
       when 'log'
         new.log(args[1..-1])
-      when 'results'
-        YggdrasilServer.new.results(args[1..-1])
       when 'revert'
         new.revert(args[1..-1])
-      when 'server'
-        YggdrasilServer.new.server(args[1..-1])
       when 'status', 'stat', 'st'
         new.status(args[1..-1])
       when 'update'
@@ -69,7 +62,7 @@ class Yggdrasil
   def initialize(exist_config = true)
     @base_cmd = File::basename($0)
     @current_dir = `readlink -f .`.chomp
-    @config_dir = "#{ENV["HOME"]}/.yggdrasil"
+    @config_dir = "#{ENV['HOME']}/.yggdrasil"
     @config_file = "#@config_dir/config"
     @mirror_dir = "#@config_dir/mirror"
     @checker_dir = "#@config_dir/checker"
@@ -77,9 +70,9 @@ class Yggdrasil
 
     return unless exist_config
     configs = read_config(@config_file)
-    error "need 'path' in config file" unless (ENV["PATH"] = configs[:path])
-    error "need 'svn' in config file" unless (@svn = configs[:svn])
-    error "need 'repo' in config file" unless (@repo = configs[:repo])
+    error 'need "path" in config file' unless (ENV['PATH'] = configs[:path])
+    error 'need "svn" in config file' unless (@svn = configs[:svn])
+    error 'need "repo" in config file' unless (@repo = configs[:repo])
     @anon_access = (configs[:anon_access] == 'read')
     @options ||= Hash.new
     @options[:server] = configs[:server] if configs.has_key?(:server)
@@ -106,7 +99,7 @@ class Yggdrasil
       files.each do |file|
         if !File.exist?("/#{file}")
           system3 "#@svn delete #{file} --force" +
-                      " --no-auth-cache --non-interactive"
+                      ' --no-auth-cache --non-interactive'
         elsif File.file?("/#{file}")
           if !File.exist?("#@mirror_dir/#{file}")
             cmd = "#@svn revert #{file}"
@@ -168,7 +161,7 @@ class Yggdrasil
       (0...updates.size).each do |i|
         puts "#{i}:#{updates[i][0]} #{updates[i][1]}"
       end
-      print "OK? [Y|n|<num to diff>]:"
+      print 'OK? [Y|n|<num to diff>]:'
       res = $stdin.gets
       return nil unless res
       res.chomp!
@@ -191,7 +184,7 @@ class Yggdrasil
     if @options.has_key?(:ro_password)
       " --username #{@options[:ro_username]} --password #{@options[:ro_password]}"
     else
-      ""
+      ''
     end
   end
 
@@ -213,9 +206,9 @@ class Yggdrasil
         # get repo
         sock = TCPSocket.open(host, port)
         error "can not connect to server: #{host}:#{port}" if sock.nil?
-        sock.puts "get_repo"
+        sock.puts 'get_repo'
         rcv = sock.gets
-        error "can not get repo from server" if rcv.nil?
+        error 'can not get repo from server' if rcv.nil?
         @options[:repo] = rcv.chomp
         sock.close
       end
@@ -223,12 +216,12 @@ class Yggdrasil
       #get read-only username/password
       sock = TCPSocket.open(host, port)
       error "can not connect to server: #{host}:#{port}" if sock.nil?
-      sock.puts("get_ro_id_pw")
+      sock.puts('get_ro_id_pw')
       username = sock.gets
       unless username.nil?
         @options[:ro_username] = username.chomp
         password = sock.gets
-        error "can not get ro_password" if password.nil?
+        error 'can not get ro_password' if password.nil?
         @options[:ro_password] = password.chomp
       end
       sock.close
