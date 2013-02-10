@@ -37,7 +37,8 @@ add: Add files to management list (add to subversion)
 usage #@base_cmd add [FILES...]
 
 EOS
-        when 'check', 'c'
+
+        when 'check', 'c' ########################################### check (c)
           puts <<"EOS"
 check (c): check updating of managed files and the execution output of a commands.
 usage: #@base_cmd check [OPTIONS...]
@@ -58,7 +59,7 @@ Valid options:
   --non-interactive        : do no interactive prompting
 
 EOS
-        when 'cleanup'
+        when 'cleanup' ################################################ cleanup
           puts <<"EOS"
 cleanup: clean up the working copy
 usage: #@base_cmd cleanup [OPTIONS...]
@@ -68,7 +69,7 @@ Valid options:
   --password ARG           : specify a password ARG
 
 EOS
-        when 'commit', 'ci'
+        when 'commit', 'ci' ####################################### commit (ci)
           puts <<"EOS"
 commit (ci): Send changes from your local file to the repository.
 usage: #@base_cmd commit [OPTIONS...] [FILES...]
@@ -80,7 +81,7 @@ Valid options:
   --non-interactive        : do no interactive prompting
 
 EOS
-        when 'diff', 'di'
+        when 'diff', 'di' ########################################### diff (di)
           puts <<"EOS"
 diff (di): Display the differences between two revisions or paths.
 usage: #@base_cmd diff [OPTIONS...] [PATH...]
@@ -98,13 +99,13 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
 
 EOS
-        when 'help', '?', 'h'
+        when 'help', '--help', 'h', '-h', '?' ###################### help (?,h)
           puts <<"EOS"
 help (?,h): Describe the usage of this program or its subcommands.
 usage: #@base_cmd help [SUBCOMMAND]
 
 EOS
-        when 'init'
+        when 'init' ###################################################### init
           puts <<"EOS"
 init: Check environment and initialize configuration.
 usage: #@base_cmd init [OPTIONS...]
@@ -122,7 +123,7 @@ Valid options:
                              e.g. 192.168.1.35:4000
 
 EOS
-        when 'list', 'ls'
+        when 'list', 'ls' ########################################### list (ls)
           puts <<"EOS"
 list (ls): List directory entries in the repository.
 usage: #@base_cmd list [OPTIONS...] [PATH...]
@@ -141,7 +142,7 @@ Valid options:
   -R [--recursive]         : descend recursively
 
 EOS
-        when 'log'
+        when 'log' ######################################################## log
           puts <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
 usage: #@base_cmd log [OPTIONS...] [PATH]
@@ -159,7 +160,7 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
 
 EOS
-        when 'revert'
+        when 'revert' ################################################## revert
           puts <<"EOS"
 revert: Restore pristine working copy file (undo most local edits).
 usage: #@base_cmd revert [OPTIONS...] [PATH...]
@@ -170,16 +171,8 @@ Valid options:
   --non-interactive        : do no interactive prompting
 
 EOS
-        when 'server'
-          puts <<"EOS"
-server: receive tcp connection in order to unify the setup and to record check results.
-usage: #@base_cmd server [OPTIONS...]
 
-Valid options:
-  --daemon                 : daemon mode
-
-EOS
-        when 'status', 'stat', 'st'
+        when 'status', 'stat', 'st' ######################### status (stat, st)
           puts <<"EOS"
 status (stat, st): Print the status of managed files and directories.
 usage: #@base_cmd status [OPTIONS...] [PATH...]
@@ -189,7 +182,7 @@ Valid options:
   --password ARG           : specify a password ARG
 
 EOS
-        when 'update'
+        when 'update' ################################################## update
           puts <<"EOS"
 update (up): Bring changes from the repository into the local files.
 usage: #@base_cmd update [OPTIONS...] [PATH...]
@@ -208,7 +201,7 @@ Valid options:
   --non-interactive        : do no interactive prompting
 
 EOS
-        when 'version', '--version'
+        when 'version', '--version', '-v' ######################## version (-v)
           puts <<"EOS"
 version: See the program version
 usage: #@base_cmd version

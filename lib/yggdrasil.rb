@@ -37,7 +37,7 @@ class Yggdrasil
         new.commit(args[1..-1])
       when 'diff', 'di'
         new.diff(args[1..-1])
-      when 'help', '--help', 'h', '?'
+      when 'help', '--help', 'h', '-h', '?'
         new(false).help(args[1..-1])
       when 'init'
         new(false).init(args[1..-1])
@@ -51,7 +51,7 @@ class Yggdrasil
         new.status(args[1..-1])
       when 'update'
         new.update(args[1..-1])
-      when 'version', '--version'
+      when 'version', '--version', '-v'
         new(false).version
       else
         $stderr .puts "Unknown subcommand: '#{args[0]}'"

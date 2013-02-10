@@ -295,17 +295,4 @@ Valid options:
 
 EOS
   end
-
-  it 'should show help of server' do
-    puts '---- should show help of server'
-    out = catch_out{Yggdrasil.command %w{help server}}
-    out.should == <<"EOS"
-server: receive tcp connection in order to unify the setup and to record check results.
-usage: #{File.basename($0)} server [OPTIONS...]
-
-Valid options:
-  --daemon                 : daemon mode
-
-EOS
-  end
 end

@@ -28,25 +28,25 @@ EOS
       error 'too many arguments.'
     else
       case args[0]
-        when 'daemon'
+        when 'daemon', '-d' ####################################### daemon (-d)
           puts <<"EOS"
 daemon: launch TCP server by daemon mode.
 usage: #{File.basename($0)} daemon
 
 EOS
-        when 'debug'
+        when 'debug', '--debug' ######################################### debug
           puts <<"EOS"
 debug: launch TCP server by debug mode.
 usage: #{File.basename($0)} debug
 
 EOS
-        when 'help', '?', 'h'
+        when 'help', '--help', 'h', '-h', '?' ###################### help (h,?)
           puts <<"EOS"
 help (?,h): Describe the usage of this program or its subcommands.
 usage: #@base_cmd help [SUBCOMMAND]
 
 EOS
-        when 'init'
+        when 'init' ###################################################### init
           puts <<"EOS"
 init: setup yggdrasil server configuration.
 usage: #@base_cmd init [OPTIONS...]
@@ -62,7 +62,7 @@ Valid options:
   --ro-password ARG        : specify a password ARG for read only
 
 EOS
-        when 'results'
+        when 'results', 'res' ################################### results (res)
           puts <<"EOS"
 results: display the result of yggdrasil check command.
 usage: #@base_cmd results [OPTIONS...]
@@ -71,7 +71,7 @@ Valid options:
   --expire ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
-        when 'version', '--version'
+        when 'version', '--version', '-v' ######################## version (-v)
           puts <<"EOS"
 version: See the program version
 usage: #@base_cmd version
