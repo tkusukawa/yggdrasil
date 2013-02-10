@@ -85,7 +85,12 @@ module YggdrasilCommon
 
     unless stat.success?
       return nil unless err_exit
-      $stderr.puts "#@base_cmd error: command failure: #{cmd}"
+      if @options[:debug?]
+        cmd_disp = cmd
+      else
+        cmd_disp = (cmd.split)[0]+' ...'
+      end
+      $stderr.puts "#@base_cmd error: command failure: #{cmd_disp}"
       $stderr.puts 'command output:'
       $stderr.puts out
       exit stat.exitstatus

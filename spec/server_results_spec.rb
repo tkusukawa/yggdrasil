@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require 'yggdrasil_server'
 
-describe Yggdrasil, 'results' do
+describe YggdrasilServer, 'results' do
   before(:all) do
     puts '-------- results'
     prepare_environment
@@ -42,7 +43,7 @@ describe Yggdrasil, 'results' do
     Yggdrasil.command %w{check}
     sleep 1
     out = catch_out do
-      YggdrasilServer.command %w{results --limit 30}
+      YggdrasilServer.command %w{results --expire 30}
     end
     out.should == ''
   end
@@ -60,12 +61,12 @@ describe Yggdrasil, 'results' do
     sleep 1
 
     out = catch_out do
-      lambda{YggdrasilServer.command(%w{results --limit 30})}.should raise_error(SystemExit)
+      lambda{YggdrasilServer.command(%w{results --expire 30})}.should raise_error(SystemExit)
     end
 
     out.should == <<"EOS"
 ######## hoge-old: last check is too old: 2001-05-01 00:00:00 +0900
-######## centos6_127.0.0.1 Mismatch:
+######## #{Socket.gethostname}_127.0.0.1 Mismatch:
 M                2   tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A

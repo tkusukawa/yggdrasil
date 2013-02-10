@@ -68,7 +68,7 @@ results: display the result of yggdrasil check command.
 usage: #@base_cmd results [OPTIONS...]
 
 Valid options:
-  --limit ARG              : minutes from the final report, to judge the host not be alive
+  --expire ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
         when 'version', '--version'

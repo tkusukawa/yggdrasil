@@ -37,7 +37,7 @@ class Yggdrasil
         new.commit(args[1..-1])
       when 'diff', 'di'
         new.diff(args[1..-1])
-      when 'help', 'h', '?'
+      when 'help', '--help', 'h', '?'
         new(false).help(args[1..-1])
       when 'init'
         new(false).init(args[1..-1])

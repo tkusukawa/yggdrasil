@@ -10,28 +10,65 @@ subversion needs to be installed:
 
     (e.g.)$ sudo yum install subversion
 
-## Usage
+## Usage: private use(stand alone)
 
 Prepare subversion repository and initialize Yggdrasil:
 
-    (e.g.)$ svnadmin create ~/svn-repo
-    $ ygg init --repo file://$HOME/svn-repo
+    $ ygg init --repo private
 
   You should use svn-server if you have.
   In that case, the configuration files of
   all the servers can be managed on the unification.
 
-Add configuration files:
+Add configuration files to manage:
 
     $ ygg add /etc/hosts /etc/fstab   ..etc
+    $ ygg check
+    $ ygg commit /
 
 Check modify and/or delete:
 
-    $ ygg check /
+    $ vi /etc/hosts ..etc
+    $ ygg check
+    $ ygg commit /etc/hosts ..etc
 
 Refer Help:
 
     $ ygg help
+
+## Usage: data center management (example)
+
+Prepare subversion repository and launch server on host:$YGG_SERVER:
+
+    (e.g. $YGG_REPO is anywhere you want)
+    $ svnadmin create $YGG_REPO
+    $ vi $YGG_REPO/conf/svnserve.conf
+    $ svnserve -d
+
+Prepare yggdrasil server on host:$YGG_SERVER:
+
+    $ yggserve init --repo svn://$YGG_SERVER/$YGG_REPO/{host} --port 4000
+    $ yggserve daemon
+
+Prepare yggdrasil client to manage config files:
+
+    $ ygg init --server $YGG_SERVER:4000
+    $ ls -al ~/.yggdrasil/checker
+    and add/modify executable script in "checker"
+    $ ygg add /etc/hosts /etc/fstab ..etc
+    $ ygg check
+    $ ygg commit /
+
+Prepare yggdrasil client to report check results to yggdrasil server, every day:
+
+    $ crontab -e
+    add following line(you should check path by 'which ygg')
+    17 5 * * * $GEMPATH/ygg check
+
+Check updates of configurations/conditions on host:$YGG_SERVER:
+
+    $ yggserve results --expire 1440
+    CI tool(e.g.Jenkins) may execute this command automatically to daily report/record.
 
 ## Environment
 

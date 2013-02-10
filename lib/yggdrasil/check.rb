@@ -43,15 +43,17 @@ class Yggdrasil
     end
     check_result.gsub!(/^Status against revision:.*\n/, '')
     check_result.chomp!
-    if check_result != ''
+    if check_result == ''
+      puts 'yggdrasil check: OK!'
+    else
       check_result << "\n\n"
       cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
       cmd_arg += username_password_options_to_read_repo
       FileUtils.cd @mirror_dir do
         check_result << system3(cmd_arg)
       end
+      puts check_result
     end
-    puts check_result
 
     if /^(.+):(\d+)$/ =~ @options[:server]
       host = $1

@@ -2,7 +2,7 @@ class YggdrasilServer
 
   # @param [Array] args
   def results(args)
-    args = parse_options(args, {'--limit'=>:limit})
+    args = parse_options(args, {'--expire'=>:expire})
 
     if args.size != 0
       error "invalid arguments: #{args.join(',')}"
@@ -14,9 +14,9 @@ class YggdrasilServer
     files.each do |file|
       next if /^\./ =~ file
       absolute = "#@results_dir/#{file}"
-      if @options.has_key?(:limit)
+      if @options.has_key?(:expire)
         stat = File.stat(absolute)
-        if stat.mtime < (Time.now - @options[:limit].to_i * 60)
+        if stat.mtime < (Time.now - @options[:expire].to_i * 60)
           alert = true
           puts "######## #{file}: last check is too old: #{stat.mtime.to_s}"
           next

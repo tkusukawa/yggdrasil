@@ -135,7 +135,7 @@ results: display the result of yggdrasil check command.
 usage: #{File.basename($0)} results [OPTIONS...]
 
 Valid options:
-  --limit ARG              : minutes from the final report, to judge the host not be alive
+  --expire ARG              : minutes from the final report, to judge the host not be alive
 
 EOS
   end

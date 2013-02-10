@@ -285,8 +285,8 @@ usage: #{File.basename($0)} check [OPTIONS...]
 
   If the yggdrasil server is registered,
   this subcommand send the result to yggdrasil server
-  and yggdrasil server record the results of all managed servers.
-  Type 'yggserver help', if you need to know about yggdrasil server.
+  and yggdrasil server record the results for all managed servers.
+  Type 'yggserve help', if you need to know about yggdrasil server.
 
 Valid options:
   --username ARG           : specify a username ARG

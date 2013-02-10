@@ -113,7 +113,7 @@ EOS
     end
     err.sub!(%r{/\S*svn}, 'svn')
     err.should == <<"EOS"
-#{File.basename($0)} error: command failure: svn diff --no-auth-cache --non-interactive --username hoge --password foo --hoge
+#{File.basename($0)} error: command failure: svn ...
 command output:
 svn: invalid option: --hoge
 Type 'svn help' for usage.

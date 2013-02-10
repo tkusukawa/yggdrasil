@@ -34,7 +34,7 @@ class YggdrasilServer
       when 'debug'
         args << '--debug'
         YggdrasilServer.new.server(args[1..-1])
-      when 'help', 'h', '?'
+      when 'help', '--help', 'h', '?'
         new(false).help(args[1..-1])
       when 'init'
         new(false).init_server(args[1..-1])
@@ -75,9 +75,11 @@ class YggdrasilServer
     loop do
       sock = s0.accept
       msg = sock.gets # first line
+      ctime = Time.now
       if msg && msg.chomp! != MESSAGE_QUIT
         msg.chomp!
-        puts "RCV: #{msg}"
+        printf "RCV[%04d-%02d-%02d %02d:%02d:%02d.%03d](#{sock.peeraddr[3]}): #{msg}\n",
+               ctime.year, ctime.month, ctime.day, ctime.hour, ctime.min, ctime.sec, (ctime.usec/1000).round
         msg_parts = msg.split
         if msg_parts.size != 0
           msg_cmd = msg_parts[0]
