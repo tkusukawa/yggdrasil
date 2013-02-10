@@ -15,18 +15,10 @@ describe Yggdrasil, 'log' do
     out.should == <<"EOS"
 ------------------------------------------------------------------------
 r3 | hoge |  | 1 line
-Changed paths:
-   M /mng-repo/host-name/tmp/yggdrasil-test/A
-   M /mng-repo/host-name/tmp/yggdrasil-test/B
 
 modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
-Changed paths:
-   A /mng-repo/host-name/tmp
-   A /mng-repo/host-name/tmp/yggdrasil-test
-   A /mng-repo/host-name/tmp/yggdrasil-test/A
-   A /mng-repo/host-name/tmp/yggdrasil-test/B
 
 add files
 ------------------------------------------------------------------------
@@ -45,18 +37,10 @@ EOS
     out.should == <<"EOS"
 ------------------------------------------------------------------------
 r3 | hoge |  | 1 line
-Changed paths:
-   M /mng-repo/host-name/tmp/yggdrasil-test/A
-   M /mng-repo/host-name/tmp/yggdrasil-test/B
 
 modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
-Changed paths:
-   A /mng-repo/host-name/tmp
-   A /mng-repo/host-name/tmp/yggdrasil-test
-   A /mng-repo/host-name/tmp/yggdrasil-test/A
-   A /mng-repo/host-name/tmp/yggdrasil-test/B
 
 add files
 ------------------------------------------------------------------------
@@ -75,18 +59,10 @@ EOS
     out.should == <<"EOS"
 ------------------------------------------------------------------------
 r3 | hoge |  | 1 line
-Changed paths:
-   M /mng-repo/host-name/tmp/yggdrasil-test/A
-   M /mng-repo/host-name/tmp/yggdrasil-test/B
 
 modify
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
-Changed paths:
-   A /mng-repo/host-name/tmp
-   A /mng-repo/host-name/tmp/yggdrasil-test
-   A /mng-repo/host-name/tmp/yggdrasil-test/A
-   A /mng-repo/host-name/tmp/yggdrasil-test/B
 
 add files
 ------------------------------------------------------------------------
@@ -101,11 +77,6 @@ EOS
     out.should == <<"EOS"
 ------------------------------------------------------------------------
 r2 | hoge |  | 1 line
-Changed paths:
-   A /mng-repo/host-name/tmp
-   A /mng-repo/host-name/tmp/yggdrasil-test
-   A /mng-repo/host-name/tmp/yggdrasil-test/A
-   A /mng-repo/host-name/tmp/yggdrasil-test/B
 
 add files
 ------------------------------------------------------------------------

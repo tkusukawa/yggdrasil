@@ -91,7 +91,7 @@ class Yggdrasil
       input_user_pass
       `rm -rf #@mirror_dir`
       system3 "#{svn} checkout --no-auth-cache --non-interactive" +
-                  " --username '#{@options[:username]}' --password '#{@options[:password]}'" +
+                  " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" +
                   " #{url_parts[0...url_parts_num].join('/')} #@mirror_dir"
       add_paths = Array.new
       path = @mirror_dir
@@ -121,7 +121,7 @@ class Yggdrasil
     # make mirror dir
     `rm -rf #@mirror_dir`
     cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #@mirror_dir"
-    cmd += " --username '#{@options[:username]}' --password '#{@options[:password]}'" unless anon_access
+    cmd += " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" unless anon_access
     system3 cmd
 
     # make checker dir and checker example

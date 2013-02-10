@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require 'yggdrasil_server'
 
 describe Yggdrasil, 'init' do
   it '-------- init' do
@@ -136,7 +137,7 @@ EOS
 
     YggdrasilServer.command %w{init} +
                           %w{--port 4000} +
-                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/} +
+                          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{host}/} +
                           %w{--ro-username hoge} +
                           %w{--ro-password foo}
     fork do
@@ -148,7 +149,19 @@ EOS
                       "Y\nhoge\nfoo\n"
 
     File.exist?('/tmp/yggdrasil-test/.yggdrasil/config').should be_true
+  end
 
+  it 'should success init subcommand with server option AGAIN' do
+    puts '---- should success init subcommand with server option AGAIN'
+    `rm -rf /tmp/yggdrasil-test/.yggdrasil/config`
+
+    sleep 1
+    Yggdrasil.command %w{init --debug --server localhost:4000}
+
+    File.exist?('/tmp/yggdrasil-test/.yggdrasil/config').should be_true
+  end
+
+  after(:all) do
     sock = TCPSocket.open('localhost', 4000)
     sock.puts('quit')
     sock.close

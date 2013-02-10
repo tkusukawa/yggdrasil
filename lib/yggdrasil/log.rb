@@ -21,7 +21,7 @@ class Yggdrasil
       end
     end
 
-    cmd_arg = "#@svn log --verbose --no-auth-cache --non-interactive"
+    cmd_arg = "#@svn log --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
     if @options.has_key?(:revision)
       cmd_arg += " -r #{@options[:revision]}"

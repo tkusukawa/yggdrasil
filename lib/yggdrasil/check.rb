@@ -14,7 +14,7 @@ class Yggdrasil
     `rm -rf #@checker_result_dir`
     Dir.mkdir @checker_result_dir, 0755
     if File.exist?(@checker_dir)
-      Find.find(@checker_dir).each do |file|
+      Find.find(@checker_dir) do |file|
         if File.file?(file) && File.executable?(file)
           if file =~ %r{^#@checker_dir(.*)$}
             file_body = $1
