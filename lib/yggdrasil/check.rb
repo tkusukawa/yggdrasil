@@ -1,4 +1,5 @@
 require 'find'
+require 'stringio'
 
 class Yggdrasil
 
