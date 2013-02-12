@@ -8,7 +8,6 @@ class Yggdrasil
          '-R'=>:recursive?, '--recursive'=>:recursive?})
 
     get_user_pass_if_need_to_read_repo
-    sync_mirror
 
     repos = Array.new
     if args.size == 0

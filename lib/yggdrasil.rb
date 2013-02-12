@@ -106,7 +106,8 @@ class Yggdrasil
             cmd += username_password_options_to_read_repo
             system3 cmd
           end
-          FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
+          #FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
+          `cp -fd /#{file} #@mirror_dir/#{file}`
         end
       end
       cmd = "#@svn status -qu --no-auth-cache --non-interactive"
