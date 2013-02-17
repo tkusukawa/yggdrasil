@@ -63,7 +63,7 @@ Prepare yggdrasil client to report check results to yggdrasil server, every day:
 
     $ crontab -e
     add following line(you should check path by 'which ygg')
-    17 5 * * * $GEMPATH/ygg check
+    17 5 * * * $GEMPATH/ygg check --non-interactive
 
 Check updates of configurations/conditions on host:$YGG_SERVER:
 
