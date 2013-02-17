@@ -23,11 +23,11 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check revert file (add)"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ''
+    out.should == "no files.\n"
   end
 
   it 'should revert modified file' do
@@ -41,11 +41,11 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check revert file (modify)"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ''
+    out.should == "no files.\n"
   end
 
   it 'should accept password interactive' do
@@ -57,11 +57,11 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check revert file"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ''
+    out.should == "no files.\n"
   end
 
   it 'should revert specified file only' do
@@ -75,12 +75,23 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check revert file"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
     puts out
     out.gsub!(%r{ +}, ' ')
-    out.should == "M 3 tmp/yggdrasil-test/A\n"
+    out.should == <<"EOS"
+M 3 tmp/yggdrasil-test/A
+
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A	(revision 3)
++++ tmp/yggdrasil-test/A	(working copy)
+@@ -1,2 +1,3 @@
+ hoge
+ hoge
++A
+EOS
   end
 
   it 'should not revert deleted file' do
@@ -93,13 +104,22 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check status"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
-    out.chomp!
     puts out
-    out.gsub!(%r{\s+},' ')
-    out.should == 'D 3 tmp/yggdrasil-test/A'
+    out.gsub!(%r{ +},' ')
+    out.should == <<"EOS"
+D 3 tmp/yggdrasil-test/A
+
+Index: tmp/yggdrasil-test/A
+===================================================================
+--- tmp/yggdrasil-test/A	(revision 3)
++++ tmp/yggdrasil-test/A	(working copy)
+@@ -1,2 +0,0 @@
+-hoge
+-hoge
+EOS
   end
 
   it 'should revert all files at once' do
@@ -117,10 +137,10 @@ describe Yggdrasil, 'revert' do
 
     puts "\n-- check status"
     out = catch_out do
-      Yggdrasil.command %w{status /tmp/yggdrasil-test} +
+      Yggdrasil.command %w{check /tmp/yggdrasil-test --non-interactive} +
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == ''
+    out.should == "no files.\n"
   end
 end

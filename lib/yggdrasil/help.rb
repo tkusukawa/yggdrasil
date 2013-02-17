@@ -10,7 +10,7 @@ Type '#@base_cmd help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
-   check (c)
+   check (c, status, stat, st)
    cleanup
    commit (ci)
    diff (di)
@@ -18,9 +18,7 @@ Available subcommands:
    init
    list (ls)
    log
-   revert
-   status (stat, st)
-   update
+   update (up, revert)
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
@@ -38,9 +36,9 @@ usage #@base_cmd add [FILES...]
 
 EOS
 
-        when 'check', 'c' ########################################### check (c)
+        when 'check', 'c', 'status', 'stat', 'st' # check (c, status, stat, st)
           puts <<"EOS"
-check (c): check updating of managed files and the execution output of a commands.
+check (c, status, stat, st): check updating of managed files and the execution output of a commands.
 usage: #@base_cmd check [OPTIONS...]
 
   This subcommand execute the executable files in ~/.yggdrasil/checker/, and
@@ -158,49 +156,22 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
+  -q [--quiet]             : print nothing, or only summary information
+  -v [--verbose]           : print extra information
 
 EOS
-        when 'revert' ################################################## revert
+        when 'update', 'up', 'revert' ##################### update (up, revert)
           puts <<"EOS"
-revert: Restore pristine working copy file (undo most local edits).
-usage: #@base_cmd revert [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-  --non-interactive        : do no interactive prompting
-
-EOS
-
-        when 'status', 'stat', 'st' ######################### status (stat, st)
-          puts <<"EOS"
-status (stat, st): Print the status of managed files and directories.
-usage: #@base_cmd status [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-
-EOS
-        when 'update' ################################################## update
-          puts <<"EOS"
-update (up): Bring changes from the repository into the local files.
+update (up, revert): Set the files to the contents of the newest repository.
 usage: #@base_cmd update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
-  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
-                             A revision argument can be one of:
-                                NUMBER       revision number
-                                '{' DATE '}' revision at start of the date
-                                'HEAD'       latest in repository
-                                'BASE'       base rev of item's working copy
-                                'COMMITTED'  last commit at or before BASE
-                                'PREV'       revision just before COMMITTED
   --non-interactive        : do no interactive prompting
 
 EOS
+
         when 'version', '--version', '-v' ######################## version (-v)
           puts <<"EOS"
 version: See the program version

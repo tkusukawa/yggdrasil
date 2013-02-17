@@ -2,9 +2,9 @@ class Yggdrasil
 
   # @param [Array] args
   def cleanup(args)
-    args = parse_options(args, {'--username'=>:username, '--password'=>:password})
-    if args.size != 0
-      error "invalid arguments: #{args.join(',')}"
+    parse_options(args, {'--username'=>:username, '--password'=>:password})
+    if @arg_options.size+@arg_paths.size != 0
+      error "invalid arguments: #{(@arg_options+@arg_paths).join(', ')}"
     end
 
     get_user_pass_if_need_to_read_repo

@@ -2,44 +2,43 @@ class Yggdrasil
 
   # @param [Array] args
   def log(args)
-    args = parse_options(args,
+    parse_options(args,
                          {'--username'=>:username, '--password'=>:password,
                           '-r'=>:revision, '--revision'=>:revision})
+    @arg_paths << '/' if @arg_paths.size == 0
+
     get_user_pass_if_need_to_read_repo
 
-    ext_options = Array.new
     paths = Array.new
-    args.each do |arg|
-      if /^-/ =~ arg
-        ext_options << arg
+    err_paths = Array.new
+    @arg_paths.each do |path|
+      if %r{^/(.*)$} =~ path
+        mirror_file = $1
+        mirror_file = '.' if mirror_file == ''
       else
-        paths << arg
+        mirror_file = @current_dir.sub(/^\//,'') + '/' + path
+      end
+      if File.exist?(@mirror_dir+'/'+mirror_file)
+        paths << mirror_file
+      else
+        err_paths << mirror_file
       end
     end
-
-    if paths.size == 0
-      dir = @mirror_dir + @current_dir
-      error 'current directory is not managed.' unless File.exist?(dir)
-      paths << dir
-    else
-      paths.collect! do |path|
-        if %r{^/} =~ path
-          @mirror_dir + path
-        else
-          @mirror_dir + @current_dir + '/' + path
-        end
-      end
+    if err_paths.size != 0
+      error "following files are not managed.\n"+err_paths.join("\n")
     end
 
     cmd_arg = "#@svn log --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
-    cmd_arg += ' ' + ext_options.join(' ') if ext_options.size != 0
+    cmd_arg += ' ' + @arg_options.join(' ') if @arg_options.size != 0
     if @options.has_key?(:revision)
       cmd_arg += " -r #{@options[:revision]}"
     else
       cmd_arg += ' -r HEAD:1'
     end
     cmd_arg += ' ' + paths.join(' ')
-    puts system3(cmd_arg)
+    FileUtils.cd @mirror_dir do
+      puts system3(cmd_arg)
+    end
   end
 end

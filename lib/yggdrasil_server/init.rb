@@ -3,11 +3,11 @@ class YggdrasilServer
   # @param [Array] args
   def init_server(args)
 
-    args = parse_options(args,
-                         {'--port'=>:port, '--repo'=>:repo,
-                          '--ro-username'=>:ro_username, '--ro-password'=>:ro_password})
-    if args.size != 0
-      error "invalid arguments: #{args.join(',')}"
+    parse_options(args,
+                  {'--port'=>:port, '--repo'=>:repo,
+                   '--ro-username'=>:ro_username, '--ro-password'=>:ro_password})
+    if @arg_options.size+@arg_paths.size != 0
+      error "invalid arguments: #{(@arg_options+@arg_paths).join(', ')}"
     end
 
     if !@options.has_key?(:ro_username) && @options.has_key?(:ro_password)

@@ -1,9 +1,9 @@
 class YggdrasilServer
 
   def server(args)
-    args = parse_options(args, {'--debug'=>:debug?})
-    if args.size != 0
-      error "invalid arguments: #{args.join(',')}"
+    parse_options(args, {'--debug'=>:debug?})
+    if @arg_options.size+@arg_paths.size != 0
+      error "invalid arguments: #{(@arg_options+@arg_paths).join(', ')}"
     end
 
     puts "Start: yggdrasil server (port:#@port)"

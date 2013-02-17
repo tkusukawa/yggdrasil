@@ -11,9 +11,7 @@ require 'yggdrasil/cleanup'
 require 'yggdrasil/diff'
 require 'yggdrasil/list'
 require 'yggdrasil/log'
-require 'yggdrasil/status'
 require 'yggdrasil/update'
-require 'yggdrasil/revert'
 require 'yggdrasil/check'
 
 class Yggdrasil
@@ -29,7 +27,7 @@ class Yggdrasil
     case args[0]
       when 'add'
         new.add(args[1..-1])
-      when 'check', 'c'
+      when 'check', 'c', 'status', 'stat', 'st'
         new.check(args[1..-1])
       when 'cleanup'
         new.cleanup(args[1..-1])
@@ -45,11 +43,7 @@ class Yggdrasil
         new.list(args[1..-1])
       when 'log'
         new.log(args[1..-1])
-      when 'revert'
-        new.revert(args[1..-1])
-      when 'status', 'stat', 'st'
-        new.status(args[1..-1])
-      when 'update'
+      when 'update', 'up', 'revert'
         new.update(args[1..-1])
       when 'version', '--version', '-v'
         new(false).version
@@ -84,6 +78,9 @@ class Yggdrasil
   def sync_mirror
     updates = Array.new
     FileUtils.cd @mirror_dir do
+      cmd = "#@svn update --no-auth-cache --non-interactive"
+      cmd += username_password_options_to_read_repo
+      system3(cmd)
       cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"
       cmd += username_password_options_to_read_repo
       out = system3(cmd)
@@ -164,6 +161,7 @@ class Yggdrasil
       end
       print 'OK? [Y|n|<num to diff>]:'
       res = $stdin.gets
+      puts
       return nil unless res
       res.chomp!
       return nil if res == 'n'
@@ -229,5 +227,29 @@ class Yggdrasil
     else
       error "invalid host:port '#{@options[:server]}'"
     end
+  end
+
+  def exec_checker
+    # execute checker
+    `rm -rf #@checker_result_dir`
+    Dir.mkdir @checker_result_dir, 0755
+    if File.exist?(@checker_dir)
+      Find.find(@checker_dir) do |file|
+        if File.file?(file) && File.executable?(file)
+          if file =~ %r{^#@checker_dir(.*)$}
+            file_body = $1
+            system3("#{file} > #@checker_result_dir#{file_body}")
+          end
+        end
+      end
+    end
+
+    # add checker result
+    result_files = Array.new
+    Find.find(@checker_result_dir) {|f| result_files << f}
+    stdout = $stdout
+    $stdout = StringIO.new
+    self.class.new.add result_files
+    $stdout = stdout
   end
 end

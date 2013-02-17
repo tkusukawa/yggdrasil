@@ -2,7 +2,9 @@ class Yggdrasil
 
   # @param [Array] args
   def add(args)
-    while (arg = args.shift)
+    parse_options(args, {})
+    while (arg = @arg_paths.shift)
+
       file_path = system3("readlink -f #{arg}").chomp
       unless File.exist?(file_path)
         puts "no such file: #{file_path}"
@@ -18,7 +20,9 @@ class Yggdrasil
         else
           Dir.mkdir mirror_path
         end
-        puts system3("#@svn add #{mirror_path}")
+        cmd = "#@svn add #{mirror_path}"
+        cmd += ' ' + @arg_options.join(' ') if @arg_options.size != 0
+        puts system3(cmd)
       end
     end
   end

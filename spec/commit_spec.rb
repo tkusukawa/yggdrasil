@@ -22,7 +22,7 @@ describe Yggdrasil, 'commit' do
 
     puts '-- commit'
     FileUtils.cd '/tmp/yggdrasil-test' do
-      Yggdrasil.command %w{commit --username hoge --password foo},
+      Yggdrasil.command %w{commit --username hoge --password foo A B},
                         "0\nY\nadd A and B\n"
     end
 
@@ -105,7 +105,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check file exists on repo"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == "A\nB\n"
+    res.should == ".yggdrasil/\nA\nB\n"
   end
 
   it 'should commit deleted file' do
@@ -120,7 +120,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check committed delete file"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == "A\n"
+    res.should == ".yggdrasil/\nA\n"
   end
 
   it 'should commit all files at once' do
@@ -139,7 +139,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check committed delete file"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == "A\nc/\n"
+    res.should == ".yggdrasil/\nA\nc/\n"
   end
 
 end

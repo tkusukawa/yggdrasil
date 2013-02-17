@@ -4,54 +4,53 @@ require 'stringio'
 class Yggdrasil
 
   def check(args)
-    args = parse_options(args,
-                         {'--username'=>:username, '--password'=>:password,
-                          '--non-interactive'=>:non_interactive?})
-    if args.size != 0
-      error "invalid arguments: #{args.join(',')}"
+    parse_options(args,
+                  {'--username'=>:username, '--password'=>:password,
+                   '--non-interactive'=>:non_interactive?})
+    @arg_paths << '/' if @arg_paths.size == 0
+    get_user_pass_if_need_to_read_repo
+
+    exec_checker
+
+    updates = sync_mirror
+    matched_updates = select_updates(updates, @arg_paths)
+    if matched_updates.size == 0
+      puts 'no files.'
+      return
     end
 
-    # execute checker
-    `rm -rf #@checker_result_dir`
-    Dir.mkdir @checker_result_dir, 0755
-    if File.exist?(@checker_dir)
-      Find.find(@checker_dir) do |file|
-        if File.file?(file) && File.executable?(file)
-          if file =~ %r{^#@checker_dir(.*)$}
-            file_body = $1
-            system3("#{file} > #@checker_result_dir#{file_body}")
-          end
-        end
+    confirmed_updates = confirm_updates(matched_updates) do |relative_path|
+      FileUtils.cd @mirror_dir do
+        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+        cmd += username_password_options_to_read_repo
+        puts system3(cmd)
       end
     end
+    return unless confirmed_updates
+    return if confirmed_updates.size == 0
 
-    # add checker result
-    result_files = Array.new
-    Find.find(@checker_result_dir) {|f| result_files << f}
-    stdout = $stdout
-    $stdout = StringIO.new
-    add result_files
-    $stdout = stdout
-
-    get_user_pass_if_need_to_read_repo
-    sync_mirror
-
-    cmd_arg = "#@svn status -qu --no-auth-cache --non-interactive"
-    cmd_arg += username_password_options_to_read_repo
     check_result = String.new
     FileUtils.cd @mirror_dir do
-      check_result = system3(cmd_arg)
+      cmd = "#@svn status -quN --no-auth-cache --non-interactive"
+      cmd += username_password_options_to_read_repo
+      cmd += " #{confirmed_updates.join(' ')}"
+      check_result = system3(cmd)
     end
     check_result.gsub!(/^Status against revision:.*\n/, '')
     check_result.chomp!
+    result_array = check_result.split("\n")
+    result_array.sort!.uniq!
+    check_result = result_array.join("\n")
+
     if check_result == ''
       puts 'yggdrasil check: OK!'
     else
       check_result << "\n\n"
-      cmd_arg = "#@svn diff --no-auth-cache --non-interactive -r HEAD"
-      cmd_arg += username_password_options_to_read_repo
+      cmd = "#@svn diff --no-auth-cache --non-interactive"
+      cmd += username_password_options_to_read_repo
+      cmd += " #{confirmed_updates.join(' ')}"
       FileUtils.cd @mirror_dir do
-        check_result << system3(cmd_arg)
+        check_result << system3(cmd)
       end
       puts check_result
     end

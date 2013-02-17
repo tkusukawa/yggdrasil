@@ -33,6 +33,7 @@ def init_yggdrasil
   Yggdrasil.command %w{init} +
                     %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name/} +
                     %w{--username hoge --password foo --parents}
+  `rm /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
   puts '-- add'
   `echo hoge > /tmp/yggdrasil-test/A`
   `echo foo  > /tmp/yggdrasil-test/B`

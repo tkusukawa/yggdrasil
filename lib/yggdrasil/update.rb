@@ -2,66 +2,50 @@ class Yggdrasil
 
   # @param [Array] args
   def update(args)
-    target_paths = parse_options(args,
-                                 {'--username'=>:username, '--password'=>:password,
-                                  '-r'=>:revision, '--revision'=>:revision,
-                                  '--non-interactive'=>:non_interactive?})
+    parse_options(args,
+                  {'--username'=>:username, '--password'=>:password,
+                   '--non-interactive'=>:non_interactive?})
+    @arg_paths << '/' if @arg_paths.size == 0
     get_user_pass_if_need_to_read_repo
-    sync_mirror
 
-    updates = Array.new
-    FileUtils.cd @mirror_dir do
-      cmd = "#@svn status -qu --no-auth-cache --non-interactive"
-      cmd += username_password_options_to_read_repo
-      out = system3(cmd)
-      out.split(/\n/).each do |line|
-        if /^.*\*.*\s(\S+)\s*$/ =~ line
-          updates << ['', $1]
-        end
-      end
-    end
-
-    matched_updates = select_updates(updates, target_paths)
+    updates = sync_mirror
+    matched_updates = select_updates(updates, @arg_paths)
     if matched_updates.size == 0
-      puts "\nno files."
+      puts 'no files.'
       return
     end
 
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
-        cmd = "#@svn diff"
-        cmd += ' --no-auth-cache --non-interactive'
+        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
         cmd += username_password_options_to_read_repo
-        if @options.has_key?(:revision)
-          cmd += " --old=#{relative_path} --new=#{relative_path}@#{@options[:revision]}"
-        else
-          cmd += " --old=#{relative_path} --new=#{relative_path}@HEAD"
-        end
         puts system3(cmd)
       end
     end
-    # res == 'Y' or --non-interactive
-
     return unless confirmed_updates
-    return if confirmed_updates == 0 # no files to update
+    return if confirmed_updates.size == 0
 
-    cmd_arg = "#@svn update --no-auth-cache --non-interactive"
-    cmd_arg += username_password_options_to_read_repo
-    if @options.has_key?(:revision)
-      cmd_arg += " -r #{@options[:revision]}"
-    else
-      cmd_arg += ' -r HEAD'
-    end
-    cmd_arg += ' ' + confirmed_updates.join(' ')
     FileUtils.cd @mirror_dir do
-      puts system3(cmd_arg)
+      cmd = "#@svn revert #{confirmed_updates.reverse.join(' ')}"
+      cmd += username_password_options_to_read_repo
+      system3 cmd
+
+      # make ls hash
+      cmd = "#@svn ls -R #@repo --no-auth-cache --non-interactive"
+      cmd += username_password_options_to_read_repo
+      out = system3(cmd)
+
+      ls_hash = Hash.new
+      out.split(/\n/).each {|relative| ls_hash[relative]=true}
 
       # reflect mirror to real file
-      confirmed_updates.each do |update_file|
-        if File.exist?(update_file)
-          FileUtils.copy_file "#@mirror_dir/#{update_file}", "/#{update_file}"
+      confirmed_updates.each do |file|
+        if ls_hash.has_key?(file)
+          if File.file?("#@mirror_dir/#{file}")
+            FileUtils.copy_file "#@mirror_dir/#{file}", "/#{file}"
+          end
         else
-          system3 "rm -rf /#{update_file}"
+          system3 "rm -rf #{@mirror_dir + '/' + file}"
         end
       end
     end

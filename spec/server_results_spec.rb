@@ -52,7 +52,7 @@ describe YggdrasilServer, 'results' do
     puts '---- should show results'
 
     `echo foo >> /tmp/yggdrasil-test/A`
-    Yggdrasil.command %w{check}
+    Yggdrasil.command %w{check --non-interactive}
 
     `echo hoge > /tmp/yggdrasil-test/.yggdrasil/results/hoge-old`
     File.utime Time.local(2001, 5, 22, 23, 59, 59),

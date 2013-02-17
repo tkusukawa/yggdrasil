@@ -10,7 +10,7 @@ Type '#{File.basename($0)} help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
-   check (c)
+   check (c, status, stat, st)
    cleanup
    commit (ci)
    diff (di)
@@ -18,9 +18,7 @@ Available subcommands:
    init
    list (ls)
    log
-   revert
-   status (stat, st)
-   update
+   update (up, revert)
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
@@ -215,20 +213,8 @@ Valid options:
                                 'BASE'       base rev of item's working copy
                                 'COMMITTED'  last commit at or before BASE
                                 'PREV'       revision just before COMMITTED
-
-EOS
-  end
-
-  it 'should show help of status' do
-    puts '---- should show help of status'
-    out = catch_out{Yggdrasil.command %w{help status}}
-    out.should == <<"EOS"
-status (stat, st): Print the status of managed files and directories.
-usage: #{File.basename($0)} status [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
+  -q [--quiet]             : print nothing, or only summary information
+  -v [--verbose]           : print extra information
 
 EOS
   end
@@ -237,20 +223,12 @@ EOS
     puts '---- should show help of update'
     out = catch_out{Yggdrasil.command %w{help update}}
     out.should == <<"EOS"
-update (up): Bring changes from the repository into the local files.
+update (up, revert): Set the files to the contents of the newest repository.
 usage: #{File.basename($0)} update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
-  -r [--revision] ARG      : ARG (some commands also take ARG1:ARG2 range)
-                             A revision argument can be one of:
-                                NUMBER       revision number
-                                '{' DATE '}' revision at start of the date
-                                'HEAD'       latest in repository
-                                'BASE'       base rev of item's working copy
-                                'COMMITTED'  last commit at or before BASE
-                                'PREV'       revision just before COMMITTED
   --non-interactive        : do no interactive prompting
 
 EOS
@@ -260,8 +238,8 @@ EOS
     puts '---- should show help of revert'
     out = catch_out{Yggdrasil.command %w{help revert}}
     out.should == <<"EOS"
-revert: Restore pristine working copy file (undo most local edits).
-usage: #{File.basename($0)} revert [OPTIONS...] [PATH...]
+update (up, revert): Set the files to the contents of the newest repository.
+usage: #{File.basename($0)} update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -275,7 +253,7 @@ EOS
     puts '---- should show help of check'
     out = catch_out{Yggdrasil.command %w{help check}}
     out.should == <<"EOS"
-check (c): check updating of managed files and the execution output of a commands.
+check (c, status, stat, st): check updating of managed files and the execution output of a commands.
 usage: #{File.basename($0)} check [OPTIONS...]
 
   This subcommand execute the executable files in ~/.yggdrasil/checker/, and

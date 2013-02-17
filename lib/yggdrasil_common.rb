@@ -51,7 +51,16 @@ module YggdrasilCommon
       end
       pos += 1
     end
-    args
+    @arg_options = Array.new
+    @arg_paths = Array.new
+    args.each do |arg|
+      if /^-/ =~ arg
+        @arg_options << arg
+      else
+        @arg_paths << arg
+      end
+    end
+    nil
   end
 
   def input_user_pass
@@ -86,11 +95,11 @@ module YggdrasilCommon
     unless stat.success?
       return nil unless err_exit
       if @options[:debug?]
-        cmd_disp = cmd
+        cmd_display = cmd
       else
-        cmd_disp = (cmd.split)[0]+' ...'
+        cmd_display = (cmd.split)[0]+' ...'
       end
-      $stderr.puts "#@base_cmd error: command failure: #{cmd_disp}"
+      $stderr.puts "#@base_cmd error: command failure: #{cmd_display}"
       $stderr.puts 'command output:'
       $stderr.puts out
       exit stat.exitstatus

@@ -2,15 +2,18 @@ class Yggdrasil
 
   # @param [Array] args
   def commit(args)
-    target_paths = parse_options(args,
+    parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '-m'=>:message, '--message'=>:message, '--non-interactive'=>:non_interactive?})
+    @arg_paths << '/' if @arg_paths.size == 0
     get_user_pass_if_need_to_read_repo
 
+    exec_checker
+
     updates = sync_mirror
-    matched_updates = select_updates(updates, target_paths)
+    matched_updates = select_updates(updates, @arg_paths)
     if matched_updates.size == 0
-      puts "\nno files."
+      puts 'no files.'
       return
     end
 
@@ -43,10 +46,11 @@ class Yggdrasil
 
     input_user_pass
     FileUtils.cd @mirror_dir do
-      puts system3 "#@svn commit -m '#{@options[:message]}'"\
-                   ' --no-auth-cache --non-interactive'\
-                   " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
-                   " #{confirmed_updates.join(' ')}"
+      cmd = "#@svn commit -N -m '#{@options[:message]}'"\
+            ' --no-auth-cache --non-interactive'\
+            " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
+            " #{confirmed_updates.join(' ')}"
+      puts system3(cmd)
     end
   end
 end

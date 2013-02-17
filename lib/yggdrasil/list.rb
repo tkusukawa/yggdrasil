@@ -2,21 +2,20 @@ class Yggdrasil
 
   # @param [Array] args
   def list(args)
-    args = parse_options(args,
+    parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '-r'=>:revision, '--revision'=>:revision,
          '-R'=>:recursive?, '--recursive'=>:recursive?})
-
+    if @arg_paths.size == 0
+      @arg_paths << '/'
+      @options[:recursive?] = true
+    end
     get_user_pass_if_need_to_read_repo
 
     repos = Array.new
-    if args.size == 0
-      repos << @repo + @current_dir
-    else
-      args.each do |path|
-        path = "#@current_dir/#{path}" unless %r{^/} =~ path
-        repos << @repo+path
-      end
+    @arg_paths.each do |path|
+      path = "#@current_dir/#{path}" unless %r{^/} =~ path
+      repos << @repo+path
     end
 
     cmd_arg = "#@svn list --no-auth-cache --non-interactive"

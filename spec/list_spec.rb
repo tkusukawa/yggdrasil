@@ -22,7 +22,7 @@ describe Yggdrasil, 'list' do
                           %w{--username hoge --password foo}
       end
     end
-    out.should == "A\nB\n"
+    out.should == ".yggdrasil/\nA\nB\n"
   end
 
   it 'should show list (no path)' do
@@ -33,17 +33,39 @@ describe Yggdrasil, 'list' do
                           %w{--username hoge --password foo}
       end
     end
-    out.should == "A\nB\n"
+    out.should == <<"EOS"
+tmp/
+tmp/yggdrasil-test/
+tmp/yggdrasil-test/.yggdrasil/
+tmp/yggdrasil-test/.yggdrasil/checker_result/
+tmp/yggdrasil-test/A
+tmp/yggdrasil-test/B
+EOS
   end
 
-  it 'should show list (with options)' do
-    puts '---- should show list (with options)'
+  it 'should show list with options (1)' do
+    puts '---- should show list with options (1)'
     out = catch_out{Yggdrasil.command(%w{list -R --revision 2 /tmp} +
-                                             %w{--username hoge --password foo})}
-    out.should == "yggdrasil-test/\nyggdrasil-test/A\nyggdrasil-test/B\n"
+                                          %w{--username hoge --password foo})}
+    out.should == <<"EOS"
+yggdrasil-test/
+yggdrasil-test/.yggdrasil/
+yggdrasil-test/.yggdrasil/checker_result/
+yggdrasil-test/A
+yggdrasil-test/B
+EOS
+  end
 
+  it 'should show list with options (2)' do
+    puts '---- should show list with options (2)'
     out = catch_out{Yggdrasil.command(%w{list --revision 2 --recursive /tmp} +
                                           %w{--username hoge --password foo})}
-    out.should == "yggdrasil-test/\nyggdrasil-test/A\nyggdrasil-test/B\n"
+    out.should == <<"EOS"
+yggdrasil-test/
+yggdrasil-test/.yggdrasil/
+yggdrasil-test/.yggdrasil/checker_result/
+yggdrasil-test/A
+yggdrasil-test/B
+EOS
   end
 end

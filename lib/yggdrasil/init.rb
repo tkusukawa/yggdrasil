@@ -5,7 +5,7 @@ class Yggdrasil
   # @param [Array] args
   def init(args)
 
-    args = parse_options(args,
+    parse_options(args,
         {'--username'=>:username, '--password'=>:password,
          '--repo'=>:repo, '--parents'=>:parents?,
          '--non-interactive'=>:non_interactive?,
@@ -13,8 +13,8 @@ class Yggdrasil
     @options[:ro_username] = @options[:username] if @options.has_key?(:username)
     @options[:ro_password] = @options[:password] if @options.has_key?(:password)
 
-    if args.size != 0
-      error "invalid arguments: #{args.join(',')}"
+    if @arg_options.size+@arg_paths.size != 0
+      error "invalid arguments: #{(@arg_options+@arg_paths).join(', ')}"
     end
 
     out = system3 'which svn'
