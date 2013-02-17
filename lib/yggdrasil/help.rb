@@ -119,6 +119,7 @@ Valid options:
   --password ARG           : specify a password ARG
   --server ARG             : specify a server address and port
                              e.g. 192.168.1.35:4000
+                             see also 'yggserve help'
 
 EOS
         when 'list', 'ls' ########################################### list (ls)

@@ -95,6 +95,8 @@ Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 +++ tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(revision 0)
 @@ -0,0 +1 @@
 +hoge
+
+Yggdrasil check: NG!!!
 EOS
   end
 
@@ -127,6 +129,8 @@ Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 +++ tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(working copy)
 @@ -1 +0,0 @@
 -hoge
+
+Yggdrasil check: NG!!!
 EOS
   end
 
@@ -142,8 +146,8 @@ Committed revision 5.
 EOS
   end
 
-  it 'should record check result by yggdrasil server' do
-    puts "\n---- should record check result by yggdrasil server"
+  it 'should record check result by yggdrasil server (add)' do
+    puts "\n---- should record check result by yggdrasil server (add)"
 
     prepare_environment
 
@@ -186,6 +190,10 @@ A                0   tmp/yggdrasil-test/.yggdrasil
 A                0   tmp/yggdrasil-test/.yggdrasil/checker_result
 
 EOS
+  end
+
+  it 'should record check result by yggdrasil server (modify)' do
+    puts "\n---- should record check result by yggdrasil server (modify)"
 
     `echo hoge > /tmp/yggdrasil-test/A`
     Yggdrasil.command %w{add /tmp/yggdrasil-test/A}
@@ -195,6 +203,8 @@ EOS
     `echo foo >> /tmp/yggdrasil-test/A`
     Yggdrasil.command %w{check}, "Y\n"
 
+    files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
+    result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
 M                2   tmp/yggdrasil-test/A
 
@@ -206,7 +216,22 @@ Index: tmp/yggdrasil-test/A
  hoge
 +foo
 EOS
+  end
 
+  it 'should record check result by yggdrasil server (OK)' do
+    puts "\n---- should record check result by yggdrasil server (OK)"
+
+    Yggdrasil.command %w{commit --username hoge --password foo} +
+                          %w{-m HOGE --non-interactive}
+
+    Yggdrasil.command %w{check --non-interactive}
+
+    files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
+    result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
+    `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == "\n"
+  end
+
+  after(:all) do
     sock = TCPSocket.open('localhost', 4000)
     sock.puts('quit')
     sock.close

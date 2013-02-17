@@ -8,6 +8,19 @@ describe YggdrasilServer, 'server' do
   before(:all) do
     puts '-------- server'
     prepare_environment
+
+    sock = 0
+    begin
+      sock = TCPSocket.open('localhost', 4000)
+    rescue
+      puts 'OK. no server'
+    else
+      puts 'NG. zombie server. try quit'
+      sock.puts('quit')
+      sock.close
+      sleep 1
+    end
+
     YggdrasilServer.command %w{init} +
                           %w{--port 4000} +
                           %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/{HOST}/} +
