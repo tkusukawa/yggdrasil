@@ -86,8 +86,9 @@ EOS
 
     cmd = %w{check --username hoge --password foo --non-interactive}
     out = catch_out {Yggdrasil.command(cmd, "Y\n")}
+    out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
-A                0   tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+A 0 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 
 Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 ===================================================================
@@ -117,11 +118,12 @@ EOS
     `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
     cmd = %w{check --username hoge --password foo}
     out = catch_out {Yggdrasil.command(cmd, "Y\n")}
+    out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
 
 0:D tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 OK? [Y|n|<num to diff>]:
-D                4   tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+D 4 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 
 Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 ===================================================================
@@ -183,11 +185,13 @@ EOS
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
     result_files.size.should == 1
-    `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
-A                0   tmp
-A                0   tmp/yggdrasil-test
-A                0   tmp/yggdrasil-test/.yggdrasil
-A                0   tmp/yggdrasil-test/.yggdrasil/checker_result
+    out = `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`
+    out.gsub! /[ ]+/, ' '
+    out.should == <<"EOS"
+A 0 tmp
+A 0 tmp/yggdrasil-test
+A 0 tmp/yggdrasil-test/.yggdrasil
+A 0 tmp/yggdrasil-test/.yggdrasil/checker_result
 
 EOS
   end
@@ -205,8 +209,10 @@ EOS
 
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
-    `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == <<"EOS"
-M                2   tmp/yggdrasil-test/A
+    out = `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`
+    out.gsub! /[ ]+/, ' '
+    out.should == <<"EOS"
+M 2 tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A
 ===================================================================

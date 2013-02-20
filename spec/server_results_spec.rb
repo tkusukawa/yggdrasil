@@ -63,11 +63,12 @@ describe YggdrasilServer, 'results' do
     out = catch_out do
       lambda{YggdrasilServer.command(%w{results --expire 30})}.should raise_error(SystemExit)
     end
-
+    out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
 ######## hoge-old: last check is too old: 2001-05-01 00:00:00 +0900
+
 ######## #{Socket.gethostname}_127.0.0.1 Mismatch:
-M                2   tmp/yggdrasil-test/A
+M 2 tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A
 ===================================================================

@@ -100,7 +100,6 @@ class Yggdrasil
         elsif File.file?("/#{file}")
           if !File.exist?("#@mirror_dir/#{file}")
             cmd = "#@svn revert #{file}"
-            cmd += username_password_options_to_read_repo
             system3 cmd
           end
           #FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"

@@ -27,7 +27,6 @@ class Yggdrasil
 
     FileUtils.cd @mirror_dir do
       cmd = "#@svn revert #{confirmed_updates.reverse.join(' ')}"
-      cmd += username_password_options_to_read_repo
       system3 cmd
 
       # make ls hash

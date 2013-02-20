@@ -19,6 +19,7 @@ class YggdrasilServer
         if stat.mtime < (Time.now - @options[:expire].to_i * 60)
           alert = true
           puts "######## #{file}: last check is too old: #{stat.mtime.to_s}"
+          puts
           next
         end
       end
