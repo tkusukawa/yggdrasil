@@ -9,7 +9,7 @@ class Yggdrasil
         {'--username'=>:username, '--password'=>:password,
          '--repo'=>:repo, '--parents'=>:parents?,
          '--non-interactive'=>:non_interactive?,
-         '--server'=>:server })
+         '--force'=>:force?, '--server'=>:server })
     @options[:ro_username] = @options[:username] if @options.has_key?(:username)
     @options[:ro_password] = @options[:password] if @options.has_key?(:password)
 
@@ -24,7 +24,24 @@ class Yggdrasil
     error 'can not find version string: svn --version' unless /version (\d+\.\d+\.\d+) / =~ out
     svn_version=$1
 
-    error "already exist config file: #@config_file" if File.exist?(@config_file)
+    while File.exist?(@config_file)
+      if @options[:force?]
+        `rm -rf #@config_file`
+        break
+      end
+      puts "Already exist config file: #@config_file"
+      exit 1 if @options[:non_interactive?]
+      print "Overwrite? [Yn]:"
+      res = $stdin.gets
+      puts
+      return nil unless res
+      res.chomp!
+      return nil if res == 'n'
+      if res == 'Y'
+        `rm -rf #@config_file`
+        break
+      end
+    end
 
     get_server_config(true) if @options.has_key?(:server)
 
@@ -49,6 +66,7 @@ class Yggdrasil
     end
     url_parts = @options[:repo].split('/')
     url_parts_num = url_parts.size
+    url = ''
     loop do
       if url_parts_num < 3
         if anon_access
@@ -78,12 +96,14 @@ class Yggdrasil
 
     if url_parts_num != url_parts.size
       until @options[:parents?]
-        msg = "not exist directory(s): #{url_parts[url_parts_num...url_parts.size].join('/')}"
+        break if @options[:force?]
+        msg = "not exist directory(s) in repository: #{url_parts[url_parts_num...url_parts.size].join('/')}"
         error msg if @options[:non_interactive?]
         puts msg
-        print 'make directory(s)? [Yn]: '
+        print 'make directory(s)? [Yn]:'
         input = $stdin.gets
         error 'can not gets $stdin' if input.nil?
+        puts
         input.chomp!
         return if input == 'n'
         break if input == 'Y'
@@ -96,9 +116,11 @@ class Yggdrasil
       add_paths = Array.new
       path = @mirror_dir
       while url_parts_num < url_parts.size
+        url += '/' + url_parts[url_parts_num]
         path += '/' + url_parts[url_parts_num]
         Dir.mkdir path
         system3 "#{svn} add #{path}"
+        puts "add #{url}"
         add_paths << path
         url_parts_num += 1
       end
@@ -135,10 +157,10 @@ class Yggdrasil
 
   def init_get_repo_interactive
     loop do
-      print 'Input svn repo URL: '
+      print 'Input svn repo URL:'
       input = $stdin.gets
       error 'can not input svn repo URL' unless input
-
+      puts
       if %r{^(http://|https://|file://|svn://|private)} =~ input
         @options[:repo] = input
         break

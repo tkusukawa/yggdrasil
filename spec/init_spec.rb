@@ -33,8 +33,10 @@ describe Yggdrasil, 'init' do
           %w{--non-interactive}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
-    err.should ==
-        "#{File.basename($0)} error: not exist directory(s): mng-repo/host-name\n\n"
+    err.should == <<"EOS"
+#{File.basename($0)} error: not exist directory(s) in repository: mng-repo/host-name
+
+EOS
   end
 
   it 'should error: need password' do
@@ -112,14 +114,17 @@ EOS
           "foo\n"\
           "Y\n"
       end
-    out.should == \
-      'Input svn repo URL: '\
-      "check SVN access...\n"\
-      'Input svn username: '\
-      "Input svn password: \n"\
-      "SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo\n"\
-      "not exist directory(s): mng-repo/host-name\n"\
-      'make directory(s)? [Yn]: '
+    out.should == <<"EOS"
+Input svn repo URL:
+check SVN access...
+Input svn username:
+Input svn password:
+SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo
+not exist directory(s) in repository: mng-repo/host-name
+make directory(s)? [Yn]:
+add svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo
+add svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name
+EOS
   end
 
   it 'should make checker example at init' do
@@ -159,6 +164,71 @@ EOS
     Yggdrasil.command %w{init --debug --server localhost:4000}
 
     File.exist?('/tmp/yggdrasil-test/.yggdrasil/config').should be_true
+  end
+
+  it 'should alert and cancel: already exist config file' do
+    puts '---- should alert and cancel: already exist config file'
+    out = catch_out do
+      cmd_args = %w{init --repo file:///tmp/yggdrasil-test/hoge --username hoge --password foo}
+      Yggdrasil.command cmd_args, "n\n"
+    end
+    out.should == <<"EOS"
+Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
+Overwrite? [Yn]:
+EOS
+  end
+
+  it 'should alert and overwrite: already exist config file' do
+    puts '---- should alert and overwrite: already exist config file'
+    out = catch_out do
+      cmd_args = %w{init --repo private}
+      Yggdrasil.command cmd_args, "Y\n"
+    end
+    out.should == <<"EOS"
+Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
+Overwrite? [Yn]:
+check SVN access...
+SVN access OK: file:///tmp/yggdrasil-test/.yggdrasil/private_repo
+EOS
+    config = `cat /tmp/yggdrasil-test/.yggdrasil/config | grep repo=`
+    config.should == <<"EOS"
+repo=file:///tmp/yggdrasil-test/.yggdrasil/private_repo
+EOS
+  end
+
+  it 'should error --non-interactive: already exist config file' do
+    puts '---- should error --non-interactive: already exist config file'
+    out = catch_out do
+      cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo}+
+          %w{--username hoge --password foo} +
+          %w{--non-interactive}
+      lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
+    end
+    out.should == <<"EOS"
+Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
+EOS
+    config = `cat /tmp/yggdrasil-test/.yggdrasil/config | grep repo=`
+    config.should == <<"EOS"
+repo=file:///tmp/yggdrasil-test/.yggdrasil/private_repo
+EOS
+  end
+
+  it 'should do --force: already exist config file' do
+    puts '---- should do --force: already exist config file'
+    out = catch_out do
+      cmd_args = %w{init}+
+          %w{--repo svn://localhost/tmp/yggdrasil-test/svn-repo/servers/hoge/} +
+          %w{--username hoge --password foo}+
+          %w{--non-interactive --force}
+      Yggdrasil.command cmd_args
+    end
+    out.should == <<"EOS"
+check SVN access...
+SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo/servers
+add svn://localhost/tmp/yggdrasil-test/svn-repo/servers/hoge
+EOS
+    config = `cat /tmp/yggdrasil-test/.yggdrasil/config | grep repo=`
+    config.should == "repo=svn://localhost/tmp/yggdrasil-test/svn-repo/servers/hoge\n"
   end
 
   after(:all) do

@@ -107,6 +107,7 @@ Valid options:
   --server ARG             : specify a server address and port
                              e.g. 192.168.1.35:4000
                              see also 'yggserve help'
+  --force                  : force operation to run
 
 EOS
   end
