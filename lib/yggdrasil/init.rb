@@ -110,7 +110,7 @@ class Yggdrasil
       end
       input_user_pass
       `rm -rf #@mirror_dir`
-      system3 "#{svn} checkout --no-auth-cache --non-interactive" +
+      system3 "#{svn} checkout -N --no-auth-cache --non-interactive" +
                   " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" +
                   " #{url_parts[0...url_parts_num].join('/')} #@mirror_dir"
       add_paths = Array.new
