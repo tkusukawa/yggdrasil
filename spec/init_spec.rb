@@ -127,13 +127,10 @@ add svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name
 EOS
   end
 
-  it 'should make checker example at init' do
-    puts "\n---- should make checker example at init"
+  it 'should make checker directory at init' do
+    puts "\n---- should make checker directory at init"
     dir = '/tmp/yggdrasil-test/.yggdrasil/checker'
     File.directory?(dir).should be_true
-
-    example_checker = dir + '/gem_list'
-    File.executable?(example_checker).should be_true
   end
 
   it 'should success init subcommand with server option' do

@@ -22,7 +22,7 @@ describe Yggdrasil, 'list' do
                           %w{--username hoge --password foo}
       end
     end
-    out.should == ".yggdrasil/\nA\nB\n"
+    out.should == "A\nB\n"
   end
 
   it 'should show list (no path)' do
@@ -36,8 +36,6 @@ describe Yggdrasil, 'list' do
     out.should == <<"EOS"
 tmp/
 tmp/yggdrasil-test/
-tmp/yggdrasil-test/.yggdrasil/
-tmp/yggdrasil-test/.yggdrasil/checker_result/
 tmp/yggdrasil-test/A
 tmp/yggdrasil-test/B
 EOS
@@ -49,8 +47,6 @@ EOS
                                           %w{--username hoge --password foo})}
     out.should == <<"EOS"
 yggdrasil-test/
-yggdrasil-test/.yggdrasil/
-yggdrasil-test/.yggdrasil/checker_result/
 yggdrasil-test/A
 yggdrasil-test/B
 EOS
@@ -62,8 +58,6 @@ EOS
                                           %w{--username hoge --password foo})}
     out.should == <<"EOS"
 yggdrasil-test/
-yggdrasil-test/.yggdrasil/
-yggdrasil-test/.yggdrasil/checker_result/
 yggdrasil-test/A
 yggdrasil-test/B
 EOS

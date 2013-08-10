@@ -105,7 +105,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check file exists on repo"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == ".yggdrasil/\nA\nB\n"
+    res.should == "A\nB\n"
   end
 
   it 'should commit deleted file' do
@@ -120,7 +120,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check committed delete file"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == ".yggdrasil/\nA\n"
+    res.should == "A\n"
   end
 
   it 'should commit all files at once' do
@@ -139,7 +139,7 @@ describe Yggdrasil, 'commit' do
     puts "\n-- check committed delete file"
     res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
     puts res
-    res.should == ".yggdrasil/\nA\nc/\n"
+    res.should == "A\nc/\n"
   end
 
 end

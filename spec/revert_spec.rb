@@ -91,6 +91,7 @@ Index: tmp/yggdrasil-test/A
  hoge
  hoge
 +A
+
 EOS
   end
 
@@ -119,6 +120,7 @@ Index: tmp/yggdrasil-test/A
 @@ -1,2 +0,0 @@
 -hoge
 -hoge
+
 EOS
   end
 

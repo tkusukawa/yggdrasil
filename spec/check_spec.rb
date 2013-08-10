@@ -88,7 +88,24 @@ EOS
     out = catch_out {Yggdrasil.command(cmd, "Y\n")}
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
+A 0 tmp/yggdrasil-test/.yggdrasil
+A 0 tmp/yggdrasil-test/.yggdrasil/checker
+A 0 tmp/yggdrasil-test/.yggdrasil/checker/hoge
+A 0 tmp/yggdrasil-test/.yggdrasil/checker_result
 A 0 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+
+Index: tmp/yggdrasil-test/.yggdrasil/checker/hoge
+===================================================================
+--- tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
++++ tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
+@@ -0,0 +1 @@
++echo hoge
+
+Property changes on: tmp/yggdrasil-test/.yggdrasil/checker/hoge
+___________________________________________________________________
+Added: svn:executable
+ + *
+
 
 Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 ===================================================================
@@ -107,8 +124,12 @@ EOS
     out = catch_out {Yggdrasil.command cmd}
 
     out.should == <<"EOS"
+Adding         tmp/yggdrasil-test/.yggdrasil
+Adding         tmp/yggdrasil-test/.yggdrasil/checker
+Adding         tmp/yggdrasil-test/.yggdrasil/checker/hoge
+Adding         tmp/yggdrasil-test/.yggdrasil/checker_result
 Adding         tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
-Transmitting file data .
+Transmitting file data ..
 Committed revision 4.
 EOS
   end
@@ -121,9 +142,18 @@ EOS
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
 
-0:D tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+0:D tmp/yggdrasil-test/.yggdrasil/checker/hoge
+1:D tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 OK? [A|q|<num to diff>]:#{' '}
+D 4 tmp/yggdrasil-test/.yggdrasil/checker/hoge
 D 4 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+
+Index: tmp/yggdrasil-test/.yggdrasil/checker/hoge
+===================================================================
+--- tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 4)
++++ tmp/yggdrasil-test/.yggdrasil/checker/hoge	(working copy)
+@@ -1 +0,0 @@
+-echo hoge
 
 Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 ===================================================================
@@ -142,6 +172,7 @@ EOS
     out = catch_out {Yggdrasil.command cmd}
 
     out.should == <<"EOS"
+Deleting       tmp/yggdrasil-test/.yggdrasil/checker/hoge
 Deleting       tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 
 Committed revision 5.
@@ -177,7 +208,7 @@ EOS
     Yggdrasil.command %w{init --debug --server localhost:4000} +
                           %w{--username hoge --password foo},
                       "Y\nhoge\nfoo\n"
-    `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
+
     Yggdrasil.command %w{check --non-interactive}
 
     sleep 2
@@ -188,10 +219,6 @@ EOS
     out = `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
-A 0 tmp
-A 0 tmp/yggdrasil-test
-A 0 tmp/yggdrasil-test/.yggdrasil
-A 0 tmp/yggdrasil-test/.yggdrasil/checker_result
 
 EOS
   end
@@ -221,6 +248,7 @@ Index: tmp/yggdrasil-test/A
 @@ -1 +1,2 @@
  hoge
 +foo
+
 EOS
   end
 

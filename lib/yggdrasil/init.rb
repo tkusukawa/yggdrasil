@@ -146,12 +146,8 @@ class Yggdrasil
     cmd += " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" unless anon_access
     system3 cmd
 
-    # make checker dir and checker example
+    # make checker directory
     Dir.mkdir @checker_dir, 0755 unless File.exist?(@checker_dir)
-    FileUtils.cd @checker_dir do
-      `echo 'gem list' > gem_list`
-      `chmod +x gem_list`
-    end
   end
 
 

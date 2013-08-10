@@ -77,6 +77,7 @@ Index: tmp/yggdrasil-test/A
 @@ -1 +1,2 @@
  hoge
 +foo
+
 EOS
   end
 

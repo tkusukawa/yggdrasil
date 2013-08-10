@@ -244,12 +244,15 @@ class Yggdrasil
       end
     end
 
-    # add checker result
+    # add checker script and checker result
     result_files = Array.new
-    Find.find(@checker_result_dir) {|f| result_files << f}
-    stdout = $stdout
-    $stdout = StringIO.new
-    self.class.new.add result_files
-    $stdout = stdout
+    Find.find(@checker_dir) {|f| result_files << f unless f == @checker_dir}
+    Find.find(@checker_result_dir) {|f| result_files << f unless f == @checker_result_dir}
+    if result_files.size != 0
+      stdout = $stdout
+      $stdout = StringIO.new
+      self.class.new.add result_files
+      $stdout = stdout
+    end
   end
 end

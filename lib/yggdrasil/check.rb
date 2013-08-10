@@ -42,11 +42,17 @@ class Yggdrasil
       check_result << "\n\n"
 
       ##############  add diff information to check_result
-      cmd = "#@svn diff --no-auth-cache --non-interactive"
-      cmd += username_password_options_to_read_repo
-      cmd += " #{confirmed_updates.join(' ')}"
       FileUtils.cd @mirror_dir do
-        check_result << system3(cmd)
+        result_array.each do |result_line|
+          if result_line =~ /\s(\S+)$/
+            result_path = $1
+            next if File.directory?(result_path)
+            cmd = "#@svn diff --no-auth-cache --non-interactive"
+            cmd += username_password_options_to_read_repo
+            cmd += " "+result_path
+            check_result << system3(cmd) +"\n"
+          end
+        end
       end
     end
 
@@ -65,7 +71,7 @@ class Yggdrasil
         puts 'Yggdrasil check: OK.'
       else
         puts check_result
-        puts "\nYggdrasil check: NG!!!"
+        puts "Yggdrasil check: NG!!!"
       end
     else
       if check_result == ''
