@@ -156,10 +156,18 @@ class Yggdrasil
   end
 
   def confirm_updates(updates, yes_no=%w{Y n})
+    Signal.trap('INT') {
+      puts
+      exit 1
+    }
+    display_list = true
     until @options.has_key?(:non_interactive?)
       puts
-      (0...updates.size).each do |i|
-        puts "#{i}:#{updates[i][0]} #{updates[i][1]}"
+      if display_list
+        (0...updates.size).each do |i|
+          puts "#{i}:#{updates[i][0]} #{updates[i][1]}"
+        end
+        display_list = false
       end
       print "OK? [#{yes_no[0]}|#{yes_no[1]}|<num to diff>]: "
       res = $stdin.gets
@@ -168,9 +176,10 @@ class Yggdrasil
       res.chomp!
       break if res == yes_no[0]
       return nil if res == yes_no[1]
-      next unless updates[res.to_i]
-      if /^\d+$/ =~ res
+      if /^\d+$/ =~ res && updates[res.to_i]
         yield updates[res.to_i][1]
+      else
+        display_list = true
       end
     end
     # res == 'Y'
