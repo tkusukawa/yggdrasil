@@ -78,6 +78,22 @@ EOS
     `rm -f /tmp/yggdrasil-test/C`
   end
 
+  it 'should fail by spell miss of path' do
+    cmd = %w{st --username hoge --password foo /hoge}
+    err = catch_err do
+      lambda{Yggdrasil.command(cmd)}.should raise_error(SystemExit)
+    end
+    err.should == "#{File.basename($0)} error: no such file of directory:/hoge\n\n"
+  end
+
+  it 'should fail by spell miss of option' do
+    cmd = %w{st --username hoge --password foo --non-inteactive}
+    err = catch_err do
+      lambda{Yggdrasil.command(cmd)}.should raise_error(SystemExit)
+    end
+    err.should == "#{File.basename($0)} error: invalid options: --non-inteactive\n\n"
+  end
+
   it 'should execute checker and svn add the result' do
     puts "\n---- should execute checker and svn add the result"
     `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
@@ -234,6 +250,7 @@ EOS
     `echo foo >> /tmp/yggdrasil-test/A`
     Yggdrasil.command %w{check}, "A\n"
 
+    sleep 1
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
     out = `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`
@@ -260,6 +277,7 @@ EOS
 
     Yggdrasil.command %w{check --non-interactive}
 
+    sleep 1
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == "\n"

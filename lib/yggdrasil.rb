@@ -132,6 +132,8 @@ class Yggdrasil
         else
           target_relatives << @current_dir.sub(%r{^/*},'') + '/' + path
         end
+        f = '/'+target_relatives[-1]
+        error "no such file of directory:#{f}" unless File.exist?(f)
       end
     end
 

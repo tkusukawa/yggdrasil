@@ -7,6 +7,8 @@ class Yggdrasil
     parse_options(args,
                   {'--username'=>:username, '--password'=>:password,
                    '--non-interactive'=>:non_interactive?})
+    error "invalid options: #{(@arg_options).join(', ')}" if @arg_options.size != 0
+
     @arg_paths << '/' if @arg_paths.size == 0
     get_user_pass_if_need_to_read_repo
 
