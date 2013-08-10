@@ -79,6 +79,7 @@ class Yggdrasil
     updates = Array.new
     FileUtils.cd @mirror_dir do
       cmd = "#@svn update --no-auth-cache --non-interactive"
+      cmd += " -r #{@options[:revision]}" if @options.has_key?(:revision)
       cmd += username_password_options_to_read_repo
       system3(cmd)
       cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"

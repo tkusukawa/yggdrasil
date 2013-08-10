@@ -69,4 +69,20 @@ describe Yggdrasil, 'update' do
     `cat /tmp/yggdrasil-test/A`.should == "A:no path\n"
     `cat /tmp/yggdrasil-test/B`.should == "B:no path\n"
   end
+
+  it 'should success update with revision' do
+    puts '---- should success update with revision'
+    `echo A:hoge > /tmp/yggdrasil-test/A`
+    `echo B:hoge > /tmp/yggdrasil-test/B`
+    Yggdrasil.command %w{commit} +
+                      %w{-m hoge} +
+                      %w{--username hoge --password foo --non-interactive}
+
+    FileUtils.cd '/tmp' do
+      Yggdrasil.command %w{update} +
+                            %w{-r 4 --username hoge --password foo --non-interactive}
+    end
+    `cat /tmp/yggdrasil-test/A`.should == "A:related/absolute path\n"
+    `cat /tmp/yggdrasil-test/B`.should == "B:related/absolute path\n"
+  end
 end

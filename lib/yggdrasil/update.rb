@@ -4,6 +4,7 @@ class Yggdrasil
   def update(args)
     parse_options(args,
                   {'--username'=>:username, '--password'=>:password,
+                   '-r'=>:revision, '--revision'=>:revision,
                    '--non-interactive'=>:non_interactive?})
     @arg_paths << '/' if @arg_paths.size == 0
     get_user_pass_if_need_to_read_repo

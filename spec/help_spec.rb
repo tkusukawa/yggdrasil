@@ -232,6 +232,7 @@ Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
   --non-interactive        : do no interactive prompting
+  -r [--revision] ARG      : revision number
 
 EOS
   end
@@ -247,6 +248,7 @@ Valid options:
   --username ARG           : specify a username ARG
   --password ARG           : specify a password ARG
   --non-interactive        : do no interactive prompting
+  -r [--revision] ARG      : revision number
 
 EOS
   end

@@ -4,7 +4,7 @@ class Yggdrasil
   def diff(args)
     parse_options(args,
                   {'--username'=>:username, '--password'=>:password,
-                   '-r'=>:revision, '--revision'=>:revision})
+                   '-r'=>:diff_rev, '--revision'=>:diff_rev})
     @arg_paths << '/' if @arg_paths.size == 0
 
     get_user_pass_if_need_to_read_repo
@@ -33,7 +33,7 @@ class Yggdrasil
     cmd_arg = "#@svn diff --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
     cmd_arg += ' ' + @arg_options.join(' ') if @arg_options.size != 0
-    cmd_arg += " -r #{@options[:revision]}" if @options.has_key?(:revision)
+    cmd_arg += " -r #{@options[:diff_rev]}" if @options.has_key?(:diff_rev)
     cmd_arg += ' ' + paths.join(' ')
     FileUtils.cd @mirror_dir do
       puts system3(cmd_arg)
