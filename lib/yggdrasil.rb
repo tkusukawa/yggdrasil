@@ -75,25 +75,50 @@ class Yggdrasil
   protected
   include YggdrasilCommon
 
-  def sync_mirror
+  def sync_mirror(target_paths)
+    target_relatives = Array.new
+    if  target_paths.size == 0
+      target_relatives << @current_dir.sub(%r{^/*},'')
+    else
+      target_paths.each do |path|
+        if %r{^/} =~ path
+          target_relatives << path.sub(%r{^/*},'') # cut first '/'
+        else
+          target_relatives << @current_dir.sub(%r{^/*},'') + '/' + path
+        end
+        f = '/'+target_relatives[-1]
+        error "no such file of directory:#{f}" unless File.exist?(f)
+      end
+    end
+
     updates = Array.new
+    @target_file_num = 0
     FileUtils.cd @mirror_dir do
-      cmd = "#@svn update --no-auth-cache --non-interactive"
-      cmd += " -r #{@options[:revision]}" if @options.has_key?(:revision)
-      cmd += username_password_options_to_read_repo
-      system3(cmd)
+      files = Array.new
       cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"
       cmd += username_password_options_to_read_repo
       out = system3(cmd)
-      files = out.split(/\n/)
-      cmd = "#@svn status -q --no-auth-cache --non-interactive"
-      cmd += username_password_options_to_read_repo
-      out = system3(cmd)
-      out.split(/\n/).each do |line|
-        files << $1 if /^.*\s(\S+)\s*$/ =~ line
+      ls_files = out.split(/\n/)
+      target_relatives.each do |target_relative|
+        ls_files.each do |ls_file|
+          files << ls_file if ls_file.match("^#{target_relative}")
+        end
+        cmd = "#@svn update --no-auth-cache --non-interactive"
+        cmd += " -r #{@options[:revision]}" if @options.has_key?(:revision)
+        cmd += username_password_options_to_read_repo
+        cmd += ' '+target_relative
+        system3(cmd)
+        cmd = "#@svn status -q --no-auth-cache --non-interactive"
+        cmd += username_password_options_to_read_repo
+        cmd += ' '+target_relative
+        out = system3(cmd)
+        out.split(/\n/).each do |line|
+          files << $1 if /^.*\s(\S+)\s*$/ =~ line
+        end
       end
       files.sort!
       files.uniq!
+      @target_file_num = files.size
       files.each do |file|
         if !File.exist?("/#{file}")
           system3 "#@svn delete #{file} --force" +
@@ -117,42 +142,7 @@ class Yggdrasil
         end
       end
     end
-    updates
-  end
-
-  def select_updates(updates, target_paths)
-
-    target_relatives = Array.new
-    if  target_paths.size == 0
-      target_relatives << @current_dir.sub(%r{^/*},'')
-    else
-      target_paths.each do |path|
-        if %r{^/} =~ path
-          target_relatives << path.sub(%r{^/*},'') # cut first '/'
-        else
-          target_relatives << @current_dir.sub(%r{^/*},'') + '/' + path
-        end
-        f = '/'+target_relatives[-1]
-        error "no such file of directory:#{f}" unless File.exist?(f)
-      end
-    end
-
-    # search updated files in the specified dir
-    cond = '^'+target_relatives.join('|^') # make reg exp
-    matched_updates = Array.new
-    updates.each do |update|
-      matched_updates << update if update[1].match(cond)
-    end
-
-    # search parent updates of matched updates
-    parents = Array.new
-    updates.each do |update|
-      matched_updates.each do |matched_update|
-        parents << update if matched_update[1].match("^#{update[1]}/")
-      end
-    end
-    matched_updates += parents
-    matched_updates.sort.uniq
+    updates.sort.uniq
   end
 
   def confirm_updates(updates, yes_no=%w{Y n})

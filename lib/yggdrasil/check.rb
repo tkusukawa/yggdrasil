@@ -14,8 +14,7 @@ class Yggdrasil
 
     exec_checker
 
-    updates = sync_mirror
-    matched_updates = select_updates(updates, @arg_paths)
+    matched_updates = sync_mirror(@arg_paths)
 
     check_result = String.new
     if matched_updates.size != 0
@@ -51,7 +50,7 @@ class Yggdrasil
             next if File.directory?(result_path)
             cmd = "#@svn diff --no-auth-cache --non-interactive"
             cmd += username_password_options_to_read_repo
-            cmd += " "+result_path
+            cmd += ' '+result_path
             check_result << system3(cmd) +"\n"
           end
         end
@@ -69,18 +68,15 @@ class Yggdrasil
         sock.puts check_result
         sock.close
       end
-      if check_result == ''
-        puts 'Yggdrasil check: OK.'
-      else
-        puts check_result
-        puts "Yggdrasil check: NG!!!"
-      end
+    end
+
+    puts @target_file_num.to_s + ' files checked.'
+    return if @target_file_num == 0
+    if check_result == ''
+      puts 'Yggdrasil check: OK.'
     else
-      if check_result == ''
-        puts 'no files.'
-      else
-        puts check_result
-      end
+      puts check_result
+      puts 'Yggdrasil check: NG!!!'
     end
   end
 end

@@ -9,7 +9,7 @@ class Yggdrasil
 
     get_user_pass_if_need_to_read_repo
     exec_checker
-    sync_mirror
+    sync_mirror(@arg_paths)
 
     paths = Array.new
     err_paths = Array.new

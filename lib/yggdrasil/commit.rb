@@ -10,8 +10,7 @@ class Yggdrasil
 
     exec_checker
 
-    updates = sync_mirror
-    matched_updates = select_updates(updates, @arg_paths)
+    matched_updates = sync_mirror(@arg_paths)
     if matched_updates.size == 0
       puts 'no files.'
       return

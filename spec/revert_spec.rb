@@ -27,7 +27,7 @@ describe Yggdrasil, 'revert' do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "no files.\n"
+    out.should == "3 files checked.\nYggdrasil check: OK.\n"
   end
 
   it 'should revert modified file' do
@@ -45,7 +45,7 @@ describe Yggdrasil, 'revert' do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "no files.\n"
+    out.should == "3 files checked.\nYggdrasil check: OK.\n"
   end
 
   it 'should accept password interactive' do
@@ -61,7 +61,7 @@ describe Yggdrasil, 'revert' do
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "no files.\n"
+    out.should == "3 files checked.\nYggdrasil check: OK.\n"
   end
 
   it 'should revert specified file only' do
@@ -81,6 +81,7 @@ describe Yggdrasil, 'revert' do
     puts out
     out.gsub!(%r{ +}, ' ')
     out.should == <<"EOS"
+3 files checked.
 M 3 tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A
@@ -92,6 +93,7 @@ Index: tmp/yggdrasil-test/A
  hoge
 +A
 
+Yggdrasil check: NG!!!
 EOS
   end
 
@@ -111,6 +113,7 @@ EOS
     puts out
     out.gsub!(%r{ +},' ')
     out.should == <<"EOS"
+3 files checked.
 D 3 tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A
@@ -121,6 +124,7 @@ Index: tmp/yggdrasil-test/A
 -hoge
 -hoge
 
+Yggdrasil check: NG!!!
 EOS
   end
 
@@ -143,6 +147,6 @@ EOS
                             %w{--username hoge --password foo}
     end
     puts out
-    out.should == "no files.\n"
+    out.should == "3 files checked.\nYggdrasil check: OK.\n"
   end
 end

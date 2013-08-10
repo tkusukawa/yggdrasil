@@ -87,11 +87,11 @@ EOS
   end
 
   it 'should fail by spell miss of option' do
-    cmd = %w{st --username hoge --password foo --non-inteactive}
+    cmd = %w{st --username hoge --password foo --hoge}
     err = catch_err do
       lambda{Yggdrasil.command(cmd)}.should raise_error(SystemExit)
     end
-    err.should == "#{File.basename($0)} error: invalid options: --non-inteactive\n\n"
+    err.should == "#{File.basename($0)} error: invalid options: --hoge\n\n"
   end
 
   it 'should execute checker and svn add the result' do
@@ -104,6 +104,7 @@ EOS
     out = catch_out {Yggdrasil.command(cmd, "Y\n")}
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
+10 files checked.
 A 0 tmp/yggdrasil-test/.yggdrasil
 A 0 tmp/yggdrasil-test/.yggdrasil/checker
 A 0 tmp/yggdrasil-test/.yggdrasil/checker/hoge
@@ -161,6 +162,7 @@ EOS
 0:D tmp/yggdrasil-test/.yggdrasil/checker/hoge
 1:D tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 OK? [A|q|<num to diff>]:#{' '}
+9 files checked.
 D 4 tmp/yggdrasil-test/.yggdrasil/checker/hoge
 D 4 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 

@@ -9,8 +9,7 @@ class Yggdrasil
     @arg_paths << '/' if @arg_paths.size == 0
     get_user_pass_if_need_to_read_repo
 
-    updates = sync_mirror
-    matched_updates = select_updates(updates, @arg_paths)
+    matched_updates = sync_mirror(@arg_paths)
     if matched_updates.size == 0
       puts 'no files.'
       return
