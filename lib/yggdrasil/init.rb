@@ -31,7 +31,7 @@ class Yggdrasil
       end
       puts "Already exist config file: #@config_file"
       exit 1 if @options[:non_interactive?]
-      print "Overwrite? [Yn]:"
+      print 'Overwrite? [Yn]: '
       res = $stdin.gets
       puts
       return nil unless res
@@ -100,7 +100,7 @@ class Yggdrasil
         msg = "not exist directory(s) in repository: #{url_parts[url_parts_num...url_parts.size].join('/')}"
         error msg if @options[:non_interactive?]
         puts msg
-        print 'make directory(s)? [Yn]:'
+        print 'make directory(s)? [Yn]: '
         input = $stdin.gets
         error 'can not gets $stdin' if input.nil?
         puts
@@ -157,7 +157,7 @@ class Yggdrasil
 
   def init_get_repo_interactive
     loop do
-      print 'Input svn repo URL:'
+      print 'Input svn repo URL: '
       input = $stdin.gets
       error 'can not input svn repo URL' unless input
       puts

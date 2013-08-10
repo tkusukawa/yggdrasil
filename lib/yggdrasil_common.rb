@@ -66,7 +66,7 @@ module YggdrasilCommon
   def input_user_pass
     until @options.has_key?(:username) do
       error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
-      print 'Input svn username:'
+      print 'Input svn username: '
       input = $stdin.gets
       error 'can not input username' unless input
       puts
@@ -76,7 +76,7 @@ module YggdrasilCommon
     end
     until @options.has_key?(:password) do
       error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
-      print 'Input svn password:'
+      print 'Input svn password: '
       #input = `sh -c 'read -s hoge;echo $hoge'`
       system3 'stty -echo', false
       input = $stdin.gets

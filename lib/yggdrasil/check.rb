@@ -17,7 +17,7 @@ class Yggdrasil
 
     check_result = String.new
     if matched_updates.size != 0
-      confirmed_updates = confirm_updates(matched_updates) do |relative_path|
+      confirmed_updates = confirm_updates(matched_updates, %w{A q}) do |relative_path|
         FileUtils.cd @mirror_dir do
           cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
           cmd += username_password_options_to_read_repo

@@ -153,19 +153,19 @@ class Yggdrasil
     matched_updates.sort.uniq
   end
 
-  def confirm_updates(updates)
+  def confirm_updates(updates, yes_no=%w{Y n})
     until @options.has_key?(:non_interactive?)
       puts
       (0...updates.size).each do |i|
         puts "#{i}:#{updates[i][0]} #{updates[i][1]}"
       end
-      print 'OK? [Y|n|<num to diff>]:'
+      print "OK? [#{yes_no[0]}|#{yes_no[1]}|<num to diff>]: "
       res = $stdin.gets
       puts
       return nil unless res
       res.chomp!
-      return nil if res == 'n'
-      break if res == 'Y'
+      break if res == yes_no[0]
+      return nil if res == yes_no[1]
       next unless updates[res.to_i]
       if /^\d+$/ =~ res
         yield updates[res.to_i][1]

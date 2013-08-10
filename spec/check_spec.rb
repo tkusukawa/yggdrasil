@@ -14,61 +14,61 @@ describe Yggdrasil, 'check' do
 
   it 'should display check result by "check"' do
     cmd = %w{check --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "n\n")}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
 0:A tmp/yggdrasil-test/C
 1:D tmp/yggdrasil-test/A
 2:M tmp/yggdrasil-test/B
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 EOS
   end
 
   it 'should display check result by "c"' do
     cmd = %w{c --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "n\n")}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
 0:A tmp/yggdrasil-test/C
 1:D tmp/yggdrasil-test/A
 2:M tmp/yggdrasil-test/B
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 EOS
   end
 
   it 'should display check result by "status"' do
     cmd = %w{status --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "n\n")}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
 0:A tmp/yggdrasil-test/C
 1:D tmp/yggdrasil-test/A
 2:M tmp/yggdrasil-test/B
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 EOS
   end
 
   it 'should display check result by "stat"' do
     cmd = %w{stat --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "n\n")}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
 0:A tmp/yggdrasil-test/C
 1:D tmp/yggdrasil-test/A
 2:M tmp/yggdrasil-test/B
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 EOS
   end
 
   it 'should display check result by "st"' do
     cmd = %w{st --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "n\n")}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
 0:A tmp/yggdrasil-test/C
 1:D tmp/yggdrasil-test/A
 2:M tmp/yggdrasil-test/B
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 EOS
 
     `echo hoge > /tmp/yggdrasil-test/A`
@@ -117,12 +117,12 @@ EOS
     puts "\n---- should delete result if checker deleted"
     `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
     cmd = %w{check --username hoge --password foo}
-    out = catch_out {Yggdrasil.command(cmd, "Y\n")}
+    out = catch_out {Yggdrasil.command(cmd, "A\n")}
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
 
 0:D tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
-OK? [Y|n|<num to diff>]:
+OK? [A|q|<num to diff>]:#{' '}
 D 4 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 
 Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
@@ -180,7 +180,7 @@ EOS
     `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
     Yggdrasil.command %w{check --non-interactive}
 
-    sleep 1
+    sleep 2
     File.exist?('/tmp/yggdrasil-test/.yggdrasil/results').should be_true
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}
@@ -205,7 +205,7 @@ EOS
                       "Y\nHOGE\n"
 
     `echo foo >> /tmp/yggdrasil-test/A`
-    Yggdrasil.command %w{check}, "Y\n"
+    Yggdrasil.command %w{check}, "A\n"
 
     files = Dir.entries('/tmp/yggdrasil-test/.yggdrasil/results')
     result_files = files.select{|file| %r{^#{Socket.gethostname}} =~ file}

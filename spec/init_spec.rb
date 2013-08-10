@@ -115,13 +115,13 @@ EOS
           "Y\n"
       end
     out.should == <<"EOS"
-Input svn repo URL:
+Input svn repo URL:#{' '}
 check SVN access...
-Input svn username:
-Input svn password:
+Input svn username:#{' '}
+Input svn password:#{' '}
 SVN access OK: svn://localhost/tmp/yggdrasil-test/svn-repo
 not exist directory(s) in repository: mng-repo/host-name
-make directory(s)? [Yn]:
+make directory(s)? [Yn]:#{' '}
 add svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo
 add svn://localhost/tmp/yggdrasil-test/svn-repo/mng-repo/host-name
 EOS
@@ -174,7 +174,7 @@ EOS
     end
     out.should == <<"EOS"
 Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
-Overwrite? [Yn]:
+Overwrite? [Yn]:#{' '}
 EOS
   end
 
@@ -186,7 +186,7 @@ EOS
     end
     out.should == <<"EOS"
 Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
-Overwrite? [Yn]:
+Overwrite? [Yn]:#{' '}
 check SVN access...
 SVN access OK: file:///tmp/yggdrasil-test/.yggdrasil/private_repo
 EOS
