@@ -142,4 +142,17 @@ describe Yggdrasil, 'commit' do
     res.should == "A\nc/\n"
   end
 
+  it 'should commit deleted directory' do
+    puts '---- should commit deleted directory'
+    `rm -rf /tmp/yggdrasil-test/c`
+
+    Yggdrasil.command %w{commit -m delete --debug} +
+                          %w{--username hoge --password foo},
+                      "0\n1\nY\n"
+
+    puts "\n-- check committed delete file"
+    res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
+    puts res
+    res.should == "A\n"
+  end
 end
