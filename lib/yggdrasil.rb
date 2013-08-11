@@ -247,8 +247,12 @@ class Yggdrasil
 
     # add checker script and checker result
     result_files = Array.new
-    Find.find(@checker_dir) {|f| result_files << f unless f == @checker_dir}
-    Find.find(@checker_result_dir) {|f| result_files << f unless f == @checker_result_dir}
+    Find.find(@checker_dir) do |f|
+      result_files << f if File.file?(f) && File.executable?(f)
+    end
+    Find.find(@checker_result_dir) do |f|
+      result_files << f if File.file?(f)
+    end
     if result_files.size != 0
       stdout = $stdout
       $stdout = StringIO.new
