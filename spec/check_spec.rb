@@ -285,6 +285,35 @@ EOS
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == "\n"
   end
 
+  it 'should recover delete flag' do
+    pending "under construction..."
+    puts "\n---- should recover delete flag"
+
+    `mkdir /tmp/yggdrasil-test/c`
+    `echo bar > /tmp/yggdrasil-test/c/C`
+
+    Yggdrasil.command %w{add /tmp/yggdrasil-test/c/C}
+    Yggdrasil.command %w{commit --username hoge --password foo} +
+                          %w{-m BAR --non-interactive}
+
+    `mv /tmp/yggdrasil-test/c /tmp/yggdrasil-test/cc`
+    cmd = %w{c --username hoge --password foo}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
+    out.should == <<"EOS"
+
+0:D tmp/yggdrasil-test/c
+1:D tmp/yggdrasil-test/c/C
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+
+    `mv /tmp/yggdrasil-test/cc /tmp/yggdrasil-test/c`
+    cmd = %w{c --username hoge --password foo}
+    out = catch_out {Yggdrasil.command(cmd, "q\n")}
+    out.should == <<"EOS"
+
+EOS
+  end
+
   after(:all) do
     sock = TCPSocket.open('localhost', 4000)
     sock.puts('quit')
