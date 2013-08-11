@@ -29,8 +29,8 @@ class Yggdrasil
         `rm -rf #@config_file`
         break
       end
+      error "Already exist config file. use --force to ignore" if @options[:non_interactive?]
       puts "Already exist config file: #@config_file"
-      exit 1 if @options[:non_interactive?]
       print 'Overwrite? [Yn]: '
       res = $stdin.gets
       puts
@@ -152,6 +152,7 @@ class Yggdrasil
 
 
   def init_get_repo_interactive
+    error "need --repo or --server" if @options[:non_interactive?]
     loop do
       print 'Input svn repo URL: '
       input = $stdin.gets

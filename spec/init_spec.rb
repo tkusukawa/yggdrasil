@@ -15,6 +15,14 @@ describe Yggdrasil, 'init' do
     err.should == "#{File.basename($0)} error: Not enough arguments provided: --repo\n\n"
   end
 
+  it 'should error: "no --repo at --non-interactive"' do
+    puts '---- should error: "no --repo at --non-interactive"'
+    err = catch_err do
+      lambda{Yggdrasil.command(%w{init --non-interactive})}.should raise_error(SystemExit)
+    end
+    err.should == "#{File.basename($0)} error: need --repo or --server\n\n"
+  end
+
   it 'should error: can not access to SVN server' do
     puts '---- should error: can not access to SVN server'
     `rm -rf /tmp/yggdrasil-test/.yggdrasil`
@@ -195,15 +203,14 @@ EOS
 
   it 'should error --non-interactive: already exist config file' do
     puts '---- should error --non-interactive: already exist config file'
-    out = catch_out do
+    err = catch_err do
       cmd_args = %w{init --repo file:///tmp/yggdrasil-test/svn-repo}+
           %w{--username hoge --password foo} +
           %w{--non-interactive}
       lambda{Yggdrasil.command(cmd_args)}.should raise_error(SystemExit)
     end
-    out.should == <<"EOS"
-Already exist config file: /tmp/yggdrasil-test/.yggdrasil/config
-EOS
+    err.should == "#{File.basename($0)} error: Already exist config file. use --force to ignore\n\n"
+
     config = `cat /tmp/yggdrasil-test/.yggdrasil/config | grep repo=`
     config.should == <<"EOS"
 repo=file:///tmp/yggdrasil-test/.yggdrasil/private_repo
