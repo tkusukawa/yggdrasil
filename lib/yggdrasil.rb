@@ -138,7 +138,14 @@ class Yggdrasil
       out.split(/\n/).each do |line|
         next if /^Status against revision/ =~ line
         if /^(.).*\s(\S+)\s*$/ =~ line
-          updates << [$1, $2]
+          stat = $1
+          file = $2
+          files.each do |target|
+            if file =~ /^#{target}/ || target =~ /^#{file}/
+              updates << [stat, file]
+              break
+            end
+          end
         end
       end
     end

@@ -213,4 +213,79 @@ Yggdrasil check: OK.
 EOS
 
   end
+
+  it 'should commit only specified files' do
+    puts '---- should commit only specified files'
+
+    `echo hoge >> /tmp/yggdrasil-test/A`
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/A
+1:M tmp/yggdrasil-test/B
+2:M tmp/yggdrasil-test/c/A
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+
+    out = catch_out do
+      Yggdrasil.command %w{commit -m absolutePath --debug /tmp/yggdrasil-test/A} +
+                            %w{--username hoge --password foo},
+                        "Y\n"
+    end
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/A
+OK? [Y|n|<num to diff>]:#{' '}
+Sending        tmp/yggdrasil-test/A
+Transmitting file data .
+Committed revision 12.
+EOS
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/B
+1:M tmp/yggdrasil-test/c/A
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+
+    out = catch_out do
+      FileUtils.cd '/tmp/yggdrasil-test' do
+        Yggdrasil.command %w{commit -m absolutePath --debug c} +
+                              %w{--username hoge --password foo},
+                          "Y\n"
+      end
+    end
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/c/A
+OK? [Y|n|<num to diff>]:#{' '}
+Sending        tmp/yggdrasil-test/c/A
+Transmitting file data .
+Committed revision 13.
+EOS
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/B
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+
+    out = catch_out do
+      Yggdrasil.command %w{commit -m absolutePath --debug} +
+                            %w{--username hoge --password foo},
+                        "Y\n"
+    end
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/B
+OK? [Y|n|<num to diff>]:#{' '}
+Sending        tmp/yggdrasil-test/B
+Transmitting file data .
+Committed revision 14.
+EOS
+  end
+
 end
