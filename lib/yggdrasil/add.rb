@@ -26,7 +26,7 @@ class Yggdrasil
         else
           Dir.mkdir mirror_path
         end
-        cmd = "#@svn add #{mirror_path}"
+        cmd = "#{@svn} add #{mirror_path}"
         cmd += ' ' + @arg_options.join(' ') if @arg_options.size != 0
         puts system3(cmd)
       end

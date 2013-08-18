@@ -286,7 +286,7 @@ EOS
   end
 
   it 'should recover delete flag' do
-    pending "under construction..."
+    pending 'under construction...'
     puts "\n---- should recover delete flag"
 
     `mkdir /tmp/yggdrasil-test/c`

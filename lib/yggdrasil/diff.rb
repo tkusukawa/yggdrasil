@@ -30,7 +30,7 @@ class Yggdrasil
       error "following files are not managed.\n"+err_paths.join("\n")
     end
 
-    cmd_arg = "#@svn diff --no-auth-cache --non-interactive"
+    cmd_arg = "#{@svn} diff --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
     cmd_arg += ' ' + @arg_options.join(' ') if @arg_options.size != 0
     cmd_arg += " -r #{@options[:diff_rev]}" if @options.has_key?(:diff_rev)

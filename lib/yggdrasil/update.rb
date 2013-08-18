@@ -17,7 +17,7 @@ class Yggdrasil
 
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
-        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+        cmd = "#{@svn} diff --no-auth-cache --non-interactive #{relative_path}"
         cmd += username_password_options_to_read_repo
         puts system3(cmd)
       end
@@ -26,11 +26,11 @@ class Yggdrasil
     return if confirmed_updates.size == 0
 
     FileUtils.cd @mirror_dir do
-      cmd = "#@svn revert #{confirmed_updates.reverse.join(' ')}"
+      cmd = "#{@svn} revert #{confirmed_updates.reverse.join(' ')}"
       system3 cmd
 
       # make ls hash
-      cmd = "#@svn ls -R #@repo --no-auth-cache --non-interactive"
+      cmd = "#{@svn} ls -R #{@repo} --no-auth-cache --non-interactive"
       cmd += username_password_options_to_read_repo
       out = system3(cmd)
 
@@ -40,8 +40,8 @@ class Yggdrasil
       # reflect mirror to real file
       confirmed_updates.each do |file|
         if ls_hash.has_key?(file)
-          if File.file?("#@mirror_dir/#{file}")
-            FileUtils.copy_file "#@mirror_dir/#{file}", "/#{file}"
+          if File.file?("#{@mirror_dir}/#{file}")
+            FileUtils.copy_file "#{@mirror_dir}/#{file}", "/#{file}"
           end
         else
           system3 "rm -rf #{@mirror_dir + '/' + file}"

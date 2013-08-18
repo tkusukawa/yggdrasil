@@ -4,9 +4,9 @@ class Yggdrasil
   def help(args)
     if args.size == 0
       puts <<EOS
-usage: #@base_cmd <subcommand> [options] [args]
+usage: #{@base_cmd} <subcommand> [options] [args]
 Yggdrasil version #{VERSION}
-Type '#@base_cmd help <subcommand>' for help on a specific subcommand.
+Type '#{@base_cmd} help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    add
@@ -22,7 +22,7 @@ Available subcommands:
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
-At first, you should type '#@base_cmd init' to create config file.
+At first, you should type '#{@base_cmd} init' to create config file.
 
 EOS
     elsif args.size != 1 then
@@ -32,14 +32,14 @@ EOS
         when 'add'
           puts <<"EOS"
 add: Add files to management list (add to subversion)
-usage #@base_cmd add [FILES...]
+usage #{@base_cmd} add [FILES...]
 
 EOS
 
         when 'check', 'c', 'status', 'stat', 'st' # check (c, status, stat, st)
           puts <<"EOS"
 check (c, status, stat, st): check updating of managed files and the execution output of a commands.
-usage: #@base_cmd check [OPTIONS...]
+usage: #{@base_cmd} check [OPTIONS...]
 
   This subcommand execute the executable files in ~/.yggdrasil/checker/, and
   the outputs are checked difference to repository with other managed files.
@@ -60,7 +60,7 @@ EOS
         when 'cleanup' ################################################ cleanup
           puts <<"EOS"
 cleanup: clean up the working copy
-usage: #@base_cmd cleanup [OPTIONS...]
+usage: #{@base_cmd} cleanup [OPTIONS...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -70,7 +70,7 @@ EOS
         when 'commit', 'ci' ####################################### commit (ci)
           puts <<"EOS"
 commit (ci): Send changes from your local file to the repository.
-usage: #@base_cmd commit [OPTIONS...] [FILES...]
+usage: #{@base_cmd} commit [OPTIONS...] [FILES...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -82,7 +82,7 @@ EOS
         when 'diff', 'di' ########################################### diff (di)
           puts <<"EOS"
 diff (di): Display the differences between two revisions or paths.
-usage: #@base_cmd diff [OPTIONS...] [PATH...]
+usage: #{@base_cmd} diff [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -100,13 +100,13 @@ EOS
         when 'help', '--help', 'h', '-h', '?' ###################### help (?,h)
           puts <<"EOS"
 help (?,h): Describe the usage of this program or its subcommands.
-usage: #@base_cmd help [SUBCOMMAND]
+usage: #{@base_cmd} help [SUBCOMMAND]
 
 EOS
         when 'init' ###################################################### init
           puts <<"EOS"
 init: Check environment and initialize configuration.
-usage: #@base_cmd init [OPTIONS...]
+usage: #{@base_cmd} init [OPTIONS...]
 
 Valid options:
   --repo ARG               : specify svn repository URL
@@ -126,7 +126,7 @@ EOS
         when 'list', 'ls' ########################################### list (ls)
           puts <<"EOS"
 list (ls): List directory entries in the repository.
-usage: #@base_cmd list [OPTIONS...] [PATH...]
+usage: #{@base_cmd} list [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -145,7 +145,7 @@ EOS
         when 'log' ######################################################## log
           puts <<"EOS"
 log: Show the log messages for a set of revision(s) and/or file(s).
-usage: #@base_cmd log [OPTIONS...] [PATH]
+usage: #{@base_cmd} log [OPTIONS...] [PATH]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -165,7 +165,7 @@ EOS
         when 'update', 'up', 'revert' ##################### update (up, revert)
           puts <<"EOS"
 update (up, revert): Set the files to the contents of the newest repository.
-usage: #@base_cmd update [OPTIONS...] [PATH...]
+usage: #{@base_cmd} update [OPTIONS...] [PATH...]
 
 Valid options:
   --username ARG           : specify a username ARG
@@ -178,7 +178,7 @@ EOS
         when 'version', '--version', '-v' ######################## version (-v)
           puts <<"EOS"
 version: See the program version
-usage: #@base_cmd version
+usage: #{@base_cmd} version
 
 EOS
         else

@@ -53,8 +53,8 @@ class YggdrasilServer
     @base_cmd = File::basename($0)
     @current_dir = `pwd`.chomp
     @config_dir = "#{ENV['HOME']}/.yggdrasil"
-    @server_config_file = "#@config_dir/server_config"
-    @results_dir = "#@config_dir/results"
+    @server_config_file = "#{@config_dir}/server_config"
+    @results_dir = "#{@config_dir}/results"
 
     return unless exist_config
     configs = read_config(@server_config_file)

@@ -100,7 +100,7 @@ module YggdrasilCommon
       else
         cmd_display = (cmd.split)[0]+' ...'
       end
-      $stderr.puts "#@base_cmd error: command failure: #{cmd_display}"
+      $stderr.puts "#{@base_cmd} error: command failure: #{cmd_display}"
       $stderr.puts 'command output:'
       $stderr.puts out
       exit stat.exitstatus
@@ -110,7 +110,7 @@ module YggdrasilCommon
 
   # @param [String] msg
   def error(msg)
-    $stderr.puts "#@base_cmd error: #{msg}"
+    $stderr.puts "#{@base_cmd} error: #{msg}"
     $stderr.puts
     exit 1
   end

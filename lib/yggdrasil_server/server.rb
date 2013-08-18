@@ -7,7 +7,7 @@ class YggdrasilServer
     end
 
     ctime = Time.now
-    $stdout.printf "Start: yggdrasil server (port:#@port)[%04d-%02d-%02d %02d:%02d:%02d.%03d]\n",
+    $stdout.printf "Start: yggdrasil server (port:#{@port})[%04d-%02d-%02d %02d:%02d:%02d.%03d]\n",
            ctime.year, ctime.month, ctime.day, ctime.hour, ctime.min, ctime.sec, (ctime.usec/1000).round
     $stdout.flush
     TCPServer.do_not_reverse_lookup = true
@@ -43,7 +43,7 @@ class YggdrasilServer
       sock.close
       if @options.has_key?(:debug?) && msg == MESSAGE_QUIT
         ctime = Time.now
-        $stdout.printf "Quit: yggdrasil server (port:#@port)[%04d-%02d-%02d %02d:%02d:%02d.%03d]\n",
+        $stdout.printf "Quit: yggdrasil server (port:#{@port})[%04d-%02d-%02d %02d:%02d:%02d.%03d]\n",
                        ctime.year, ctime.month, ctime.day, ctime.hour, ctime.min, ctime.sec, (ctime.usec/1000).round
         $stdout.flush
         break

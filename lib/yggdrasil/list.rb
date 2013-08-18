@@ -14,11 +14,11 @@ class Yggdrasil
 
     repos = Array.new
     @arg_paths.each do |path|
-      path = "#@current_dir/#{path}" unless %r{^/} =~ path
+      path = "#{@current_dir}/#{path}" unless %r{^/} =~ path
       repos << @repo+path
     end
 
-    cmd_arg = "#@svn list --no-auth-cache --non-interactive"
+    cmd_arg = "#{@svn} list --no-auth-cache --non-interactive"
     cmd_arg += username_password_options_to_read_repo
     cmd_arg += " -r #{@options[:revision]}" if @options.has_key?(:revision)
     cmd_arg += ' -R' if @options.has_key?(:recursive?)

@@ -26,11 +26,11 @@ class Yggdrasil
 
     while File.exist?(@config_file)
       if @options[:force?]
-        `rm -rf #@config_file`
+        `rm -rf #{@config_file}`
         break
       end
-      error "Already exist config file. use --force to ignore" if @options[:non_interactive?]
-      puts "Already exist config file: #@config_file"
+      error 'Already exist config file. use --force to ignore' if @options[:non_interactive?]
+      puts "Already exist config file: #{@config_file}"
       print 'Overwrite? [Yn]: '
       res = $stdin.gets
       puts
@@ -38,7 +38,7 @@ class Yggdrasil
       res.chomp!
       return nil if res == 'n'
       if res == 'Y'
-        `rm -rf #@config_file`
+        `rm -rf #{@config_file}`
         break
       end
     end
@@ -53,7 +53,7 @@ class Yggdrasil
     @options[:repo].gsub!(/\{host\}/, Socket.gethostname.split('.')[0])
     if @options[:repo] == 'private'
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
-      repo_dir = "#@config_dir/private_repo"
+      repo_dir = "#{@config_dir}/private_repo"
       system3 "svnadmin create #{repo_dir}"
       @options[:repo] = "file://#{repo_dir}"
     end
@@ -109,10 +109,10 @@ class Yggdrasil
         break if input == 'Y'
       end
       input_user_pass
-      `rm -rf #@mirror_dir`
+      `rm -rf #{@mirror_dir}`
       system3 "#{svn} checkout -N --no-auth-cache --non-interactive" +
                   " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" +
-                  " #{url_parts[0...url_parts_num].join('/')} #@mirror_dir"
+                  " #{url_parts[0...url_parts_num].join('/')} #{@mirror_dir}"
       add_paths = Array.new
       path = @mirror_dir
       while url_parts_num < url_parts.size
@@ -127,7 +127,7 @@ class Yggdrasil
       system3 "#{svn} commit -m 'yggdrasil init' --no-auth-cache --non-interactive" +
                   " --username '#{@options[:username]}' --password '#{@options[:password]}'" +
                   ' ' + add_paths.join(' ')
-      system3 "rm -rf #@mirror_dir"
+      system3 "rm -rf #{@mirror_dir}"
     end
 
     # make config file
@@ -141,8 +141,8 @@ class Yggdrasil
     end
 
     # make mirror dir
-    `rm -rf #@mirror_dir`
-    cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #@mirror_dir"
+    `rm -rf #{@mirror_dir}`
+    cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #{@mirror_dir}"
     cmd += " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" unless anon_access
     system3 cmd
 
@@ -152,7 +152,7 @@ class Yggdrasil
 
 
   def init_get_repo_interactive
-    error "need --repo or --server" if @options[:non_interactive?]
+    error 'need --repo or --server' if @options[:non_interactive?]
     loop do
       print 'Input svn repo URL: '
       input = $stdin.gets

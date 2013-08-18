@@ -18,7 +18,7 @@ class Yggdrasil
 
     confirmed_updates = confirm_updates(matched_updates) do |relative_path|
       FileUtils.cd @mirror_dir do
-        cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+        cmd = "#{@svn} diff --no-auth-cache --non-interactive #{relative_path}"
         cmd += username_password_options_to_read_repo
         puts system3(cmd)
       end
@@ -45,7 +45,7 @@ class Yggdrasil
 
     input_user_pass
     FileUtils.cd @mirror_dir do
-      cmd = "#@svn commit -m '#{@options[:message]}'"\
+      cmd = "#{@svn} commit -m '#{@options[:message]}'"\
             ' --no-auth-cache --non-interactive'\
             " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
             " #{confirmed_updates.join(' ')}"

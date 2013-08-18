@@ -20,7 +20,7 @@ class Yggdrasil
     if matched_updates.size != 0
       confirmed_updates = confirm_updates(matched_updates, %w{A q}) do |relative_path|
         FileUtils.cd @mirror_dir do
-          cmd = "#@svn diff --no-auth-cache --non-interactive #{relative_path}"
+          cmd = "#{@svn} diff --no-auth-cache --non-interactive #{relative_path}"
           cmd += username_password_options_to_read_repo
           puts system3(cmd)
         end
@@ -30,7 +30,7 @@ class Yggdrasil
 
       ##############  add status information to check_result
       FileUtils.cd @mirror_dir do
-        cmd = "#@svn status -quN --no-auth-cache --non-interactive"
+        cmd = "#{@svn} status -quN --no-auth-cache --non-interactive"
         cmd += username_password_options_to_read_repo
         cmd += " #{confirmed_updates.join(' ')}"
         check_result = system3(cmd)
@@ -48,7 +48,7 @@ class Yggdrasil
           if result_line =~ /\s(\S+)$/
             result_path = $1
             next if File.directory?(result_path)
-            cmd = "#@svn diff --no-auth-cache --non-interactive"
+            cmd = "#{@svn} diff --no-auth-cache --non-interactive"
             cmd += username_password_options_to_read_repo
             cmd += ' '+result_path
             check_result << system3(cmd) +"\n"

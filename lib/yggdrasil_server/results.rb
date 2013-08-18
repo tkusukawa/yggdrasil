@@ -13,7 +13,7 @@ class YggdrasilServer
     alert = false
     files.each do |file|
       next if /^\./ =~ file
-      absolute = "#@results_dir/#{file}"
+      absolute = "#{@results_dir}/#{file}"
       if @options.has_key?(:expire)
         stat = File.stat(absolute)
         if stat.mtime < (Time.now - @options[:expire].to_i * 60)
@@ -23,7 +23,7 @@ class YggdrasilServer
           next
         end
       end
-      buf = File.read("#@results_dir/#{file}")
+      buf = File.read("#{@results_dir}/#{file}")
       if buf.gsub(/\s*\n/m, '') != ''
         alert = true
         puts "######## #{file} Mismatch:"

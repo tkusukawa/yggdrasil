@@ -6,9 +6,9 @@ class YggdrasilServer
   def help(args)
     if args.size == 0
       puts <<EOS
-usage: #@base_cmd <subcommand> [options] [args]
+usage: #{@base_cmd} <subcommand> [options] [args]
 Yggdrasil version #{Yggdrasil::VERSION}
-Type '#@base_cmd help <subcommand>' for help on a specific subcommand.
+Type '#{@base_cmd} help <subcommand>' for help on a specific subcommand.
 
 Available subcommands:
    daemon
@@ -21,7 +21,7 @@ Available subcommands:
 Yggdrasil server is a TCP server
 to receive/record the yggdrasil check result of all managed servers.
 
-At first, you should type '#@base_cmd init' to create config file.
+At first, you should type '#{@base_cmd} init' to create config file.
 
 EOS
     elsif args.size != 1 then
@@ -43,13 +43,13 @@ EOS
         when 'help', '--help', 'h', '-h', '?' ###################### help (h,?)
           puts <<"EOS"
 help (?,h): Describe the usage of this program or its subcommands.
-usage: #@base_cmd help [SUBCOMMAND]
+usage: #{@base_cmd} help [SUBCOMMAND]
 
 EOS
         when 'init' ###################################################### init
           puts <<"EOS"
 init: setup yggdrasil server configuration.
-usage: #@base_cmd init [OPTIONS...]
+usage: #{@base_cmd} init [OPTIONS...]
 
 Valid options:
   --port ARG               : specify a TCP port number ARG
@@ -65,7 +65,7 @@ EOS
         when 'results', 'res' ################################### results (res)
           puts <<"EOS"
 results: display the result of yggdrasil check command.
-usage: #@base_cmd results [OPTIONS...]
+usage: #{@base_cmd} results [OPTIONS...]
 
 Valid options:
   --expire ARG              : minutes from the final report, to judge the host not be alive
@@ -74,7 +74,7 @@ EOS
         when 'version', '--version', '-v' ######################## version (-v)
           puts <<"EOS"
 version: See the program version
-usage: #@base_cmd version
+usage: #{@base_cmd} version
 
 EOS
         else

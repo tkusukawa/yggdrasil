@@ -57,10 +57,10 @@ class Yggdrasil
     @base_cmd = File::basename($0)
     @current_dir = `pwd`.chomp
     @config_dir = "#{ENV['HOME']}/.yggdrasil"
-    @config_file = "#@config_dir/config"
-    @mirror_dir = "#@config_dir/mirror"
-    @checker_dir = "#@config_dir/checker"
-    @checker_result_dir = "#@config_dir/checker_result"
+    @config_file = "#{@config_dir}/config"
+    @mirror_dir = "#{@config_dir}/mirror"
+    @checker_dir = "#{@config_dir}/checker"
+    @checker_result_dir = "#{@config_dir}/checker_result"
 
     return unless exist_config
     configs = read_config(@config_file)
@@ -95,7 +95,7 @@ class Yggdrasil
     @target_file_num = 0
     FileUtils.cd @mirror_dir do
       files = Array.new
-      cmd = "#@svn ls #@repo -R --no-auth-cache --non-interactive"
+      cmd = "#{@svn} ls #{@repo} -R --no-auth-cache --non-interactive"
       cmd += username_password_options_to_read_repo
       out = system3(cmd)
       ls_files = out.split(/\n/)
@@ -103,12 +103,12 @@ class Yggdrasil
         ls_files.each do |ls_file|
           files << ls_file if ls_file.match("^#{target_relative}")
         end
-        cmd = "#@svn update --no-auth-cache --non-interactive"
+        cmd = "#{@svn} update --no-auth-cache --non-interactive"
         cmd += " -r #{@options[:revision]}" if @options.has_key?(:revision)
         cmd += username_password_options_to_read_repo
         cmd += ' '+target_relative
         system3(cmd)
-        cmd = "#@svn status -q --no-auth-cache --non-interactive"
+        cmd = "#{@svn} status -q --no-auth-cache --non-interactive"
         cmd += username_password_options_to_read_repo
         cmd += ' '+target_relative
         out = system3(cmd)
@@ -121,18 +121,18 @@ class Yggdrasil
       @target_file_num = files.size
       files.each do |file|
         if !File.exist?("/#{file}")
-          system3 "#@svn delete #{file} --force" +
+          system3 "#{@svn} delete #{file} --force" +
                       ' --no-auth-cache --non-interactive'
         elsif File.file?("/#{file}")
-          if !File.exist?("#@mirror_dir/#{file}")
-            cmd = "#@svn revert #{file}"
+          if !File.exist?("#{@mirror_dir}/#{file}")
+            cmd = "#{@svn} revert #{file}"
             system3 cmd
           end
-          FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
+          FileUtils.copy_file "/#{file}", "#{@mirror_dir}/#{file}"
           #`cp -fd /#{file} #@mirror_dir/#{file}`
         end
       end
-      cmd = "#@svn status -qu --no-auth-cache --non-interactive"
+      cmd = "#{@svn} status -qu --no-auth-cache --non-interactive"
       cmd += username_password_options_to_read_repo
       out = system3(cmd)
       out.split(/\n/).each do |line|
@@ -232,14 +232,14 @@ class Yggdrasil
 
   def exec_checker
     # execute checker
-    `rm -rf #@checker_result_dir`
+    `rm -rf #{@checker_result_dir}`
     Dir.mkdir @checker_result_dir, 0755
     if File.exist?(@checker_dir)
       Find.find(@checker_dir) do |file|
         if File.file?(file) && File.executable?(file)
-          if file =~ %r{^#@checker_dir(.*)$}
+          if file =~ %r{^#{@checker_dir}(.*)$}
             file_body = $1
-            system3("#{file} > #@checker_result_dir#{file_body}")
+            system3("#{file} > #{@checker_result_dir}#{file_body}")
           end
         end
       end
