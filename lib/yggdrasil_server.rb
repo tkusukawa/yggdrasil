@@ -51,7 +51,7 @@ class YggdrasilServer
 
   def initialize(exist_config = true)
     @base_cmd = File::basename($0)
-    @current_dir = `readlink -f .`.chomp
+    @current_dir = `pwd`.chomp
     @config_dir = "#{ENV['HOME']}/.yggdrasil"
     @server_config_file = "#@config_dir/server_config"
     @results_dir = "#@config_dir/results"

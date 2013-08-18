@@ -155,4 +155,62 @@ describe Yggdrasil, 'commit' do
     puts res
     res.should == "A\n"
   end
+
+  it 'should commit symbolic link files' do
+    puts '---- should commit symbolic link files'
+    `ln -s /tmp/yggdrasil-test/A /tmp/yggdrasil-test/B`
+    `ln -s /tmp/yggdrasil-test /tmp/yggdrasil-test/c`
+
+puts '1'
+    Yggdrasil.command %w{add /tmp/yggdrasil-test/B /tmp/yggdrasil-test/c/A}
+puts '2'
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+
+0:A tmp/yggdrasil-test/B
+1:A tmp/yggdrasil-test/c
+2:A tmp/yggdrasil-test/c/A
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+    puts '3'
+
+    Yggdrasil.command %w{commit -m addSymbolicLinks --debug} +
+                          %w{--username hoge --password foo},
+                      "Y\n"
+    puts '4'
+
+    res = `svn ls file:///tmp/yggdrasil-test/svn-repo/mng-repo/host-name/tmp/yggdrasil-test`
+    puts res
+    res.should == "A\nB\nc/\n"
+    puts '5'
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+6 files checked.
+Yggdrasil check: OK.
+EOS
+
+    `echo hoge >> /tmp/yggdrasil-test/A`
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+
+0:M tmp/yggdrasil-test/A
+1:M tmp/yggdrasil-test/B
+2:M tmp/yggdrasil-test/c/A
+OK? [A|q|<num to diff>]:#{' '}
+EOS
+
+    Yggdrasil.command %w{commit -m addSymbolicLinks --debug} +
+                          %w{--username hoge --password foo},
+                      "Y\n"
+
+    out = catch_out {Yggdrasil.command %w{c --username hoge --password foo}}
+    out.should == <<"EOS"
+6 files checked.
+Yggdrasil check: OK.
+EOS
+
+  end
 end

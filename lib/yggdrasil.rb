@@ -55,7 +55,7 @@ class Yggdrasil
 
   def initialize(exist_config = true)
     @base_cmd = File::basename($0)
-    @current_dir = `readlink -f .`.chomp
+    @current_dir = `pwd`.chomp
     @config_dir = "#{ENV['HOME']}/.yggdrasil"
     @config_file = "#@config_dir/config"
     @mirror_dir = "#@config_dir/mirror"
@@ -128,8 +128,8 @@ class Yggdrasil
             cmd = "#@svn revert #{file}"
             system3 cmd
           end
-          #FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
-          `cp -fd /#{file} #@mirror_dir/#{file}`
+          FileUtils.copy_file "/#{file}", "#@mirror_dir/#{file}"
+          #`cp -fd /#{file} #@mirror_dir/#{file}`
         end
       end
       cmd = "#@svn status -qu --no-auth-cache --non-interactive"

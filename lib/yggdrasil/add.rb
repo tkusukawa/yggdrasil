@@ -3,9 +3,15 @@ class Yggdrasil
   # @param [Array] args
   def add(args)
     parse_options(args, {})
+    error "invalid options: #{(@arg_options).join(', ')}" if @arg_options.size != 0
+
     while (arg = @arg_paths.shift)
 
-      file_path = system3("readlink -f #{arg}").chomp
+      if arg =~ /^\//
+        file_path = arg
+      else
+        file_path = `pwd`.chomp + '/' + arg
+      end
       unless File.exist?(file_path)
         puts "no such file: #{file_path}"
         next
@@ -16,7 +22,7 @@ class Yggdrasil
         mirror_path += "/#{part}"
         next if File.exist?(mirror_path)
         if part.equal?(file_path_parts[-1]) && File.file?(file_path)
-          FileUtils.copy file_path, mirror_path
+          FileUtils.copy_file file_path, mirror_path
         else
           Dir.mkdir mirror_path
         end
