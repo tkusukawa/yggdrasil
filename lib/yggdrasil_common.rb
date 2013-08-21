@@ -69,7 +69,6 @@ module YggdrasilCommon
       print 'Input svn username: '
       input = $stdin.gets
       error 'can not input username' unless input
-      puts
       input.chomp!
       return if input.size == 0
       @options[:username] = @options[:ro_username] = input
