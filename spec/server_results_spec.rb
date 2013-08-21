@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.dirname(__FILE__) + '/spec_helper'
 require 'yggdrasil_server'
 
@@ -80,6 +81,22 @@ Index: tmp/yggdrasil-test/A
 
 EOS
   end
+
+  it 'should show s-jis results' do
+    puts '---- should show s-jis results'
+
+    `rm /tmp/yggdrasil-test/.yggdrasil/results/*`
+    `echo 'あいうえお' | nkf -s > /tmp/yggdrasil-test/.yggdrasil/results/hoge`
+
+    out = catch_out do
+      lambda{YggdrasilServer.command(%w{results})}.should raise_error(SystemExit)
+    end
+    out.should == <<"EOS"
+######## hoge Mismatch:
+あいうえお
+EOS
+  end
+
 
   after(:all) do
     sleep 1

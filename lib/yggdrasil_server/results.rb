@@ -1,3 +1,5 @@
+require 'nkf'
+
 class YggdrasilServer
 
   # @param [Array] args
@@ -24,6 +26,7 @@ class YggdrasilServer
         end
       end
       buf = File.read("#{@results_dir}/#{file}")
+      buf = NKF::nkf('-wm0', buf)
       if buf.gsub(/\s*\n/m, '') != ''
         alert = true
         puts "######## #{file} Mismatch:"
