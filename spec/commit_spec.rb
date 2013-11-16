@@ -288,4 +288,41 @@ Committed revision 14.
 EOS
   end
 
+  it 'should commit with quote character comment' do
+    puts '---- should commit with quote character comment'
+    `echo A >> /tmp/yggdrasil-test/A`
+
+    out = catch_out do
+      Yggdrasil.command %w{commit --debug} +
+                            %w{--username hoge --password foo} +
+                            %w{-m} + ["with quote<'>"],
+                        "Y\n"
+    end
+    out.should == <<EOS
+
+0:M tmp/yggdrasil-test/A
+1:M tmp/yggdrasil-test/B
+2:M tmp/yggdrasil-test/c/A
+OK? [Y|n|<num to diff>]:#{' '}
+Sending        tmp/yggdrasil-test/A
+Sending        tmp/yggdrasil-test/B
+Sending        tmp/yggdrasil-test/c/A
+Transmitting file data ...
+Committed revision 15.
+EOS
+
+    out = catch_out do
+      Yggdrasil.command %w{log -r HEAD --username hoge --password foo}
+    end
+    out.gsub!(%r{20..-..-.. .*20..\)}, '')
+    out.should == <<EOS
+------------------------------------------------------------------------
+r15 | hoge |  | 1 line
+
+with quote<'>
+------------------------------------------------------------------------
+EOS
+
+  end
+
 end

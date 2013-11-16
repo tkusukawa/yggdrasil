@@ -60,7 +60,7 @@ end
 
 def catch_err
   exit 1 unless block_given?
-  tmp_err = $stdout
+  tmp_err = $stderr
   $stderr = StringIO.new
   yield
   $stderr, tmp_err = tmp_err, $stderr

@@ -45,7 +45,7 @@ class Yggdrasil
 
     input_user_pass
     FileUtils.cd @mirror_dir do
-      cmd = "#{@svn} commit -m '#{@options[:message]}'"\
+      cmd = "#{@svn} commit -m \"#{@options[:message].gsub('"', '\"')}\""\
             ' --no-auth-cache --non-interactive'\
             " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
             " #{confirmed_updates.join(' ')}"
