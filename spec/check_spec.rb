@@ -96,7 +96,6 @@ EOS
 
   it 'should execute checker and svn add the result' do
     puts "\n---- should execute checker and svn add the result"
-    `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
     `echo 'echo hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
     `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
 

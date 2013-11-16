@@ -18,7 +18,6 @@ Available subcommands:
    init
    list (ls)
    log
-   update (up, revert)
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
@@ -160,18 +159,6 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
   -q [--quiet]             : print nothing, or only summary information
   -v [--verbose]           : print extra information
-
-EOS
-        when 'update', 'up', 'revert' ##################### update (up, revert)
-          puts <<"EOS"
-update (up, revert): Set the files to the contents of the newest repository.
-usage: #{@base_cmd} update [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-  --non-interactive        : do no interactive prompting
-  -r [--revision] ARG      : revision number
 
 EOS
 

@@ -11,7 +11,6 @@ require 'yggdrasil/cleanup'
 require 'yggdrasil/diff'
 require 'yggdrasil/list'
 require 'yggdrasil/log'
-require 'yggdrasil/update'
 require 'yggdrasil/check'
 
 class Yggdrasil
@@ -43,8 +42,6 @@ class Yggdrasil
         new.list(args[1..-1])
       when 'log'
         new.log(args[1..-1])
-      when 'update', 'up', 'revert'
-        new.update(args[1..-1])
       when 'version', '--version', '-v'
         new(false).version
       else

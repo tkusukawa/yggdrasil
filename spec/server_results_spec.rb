@@ -33,7 +33,6 @@ describe YggdrasilServer, 'results' do
     Yggdrasil.command %w{init --debug --server localhost:4000} +
                           %w{--username hoge --password foo},
                       "Y\nhoge\nfoo\n"
-    `rm -f /tmp/yggdrasil-test/.yggdrasil/checker/gem_list`
 
     `echo hoge > /tmp/yggdrasil-test/A`
     Yggdrasil.command %w{add /tmp/yggdrasil-test/A}

@@ -18,7 +18,6 @@ Available subcommands:
    init
    list (ls)
    log
-   update (up, revert)
    version
 
 Yggdrasil is a subversion wrapper to manage server configurations and conditions.
@@ -50,12 +49,12 @@ EOS
     out.should == show_subcommands
   end
 
-  it 'should be unknown subcommand on "hoge"' do
-    puts '---- should be unknown subcommand on "hoge"'
+  it 'should be unknown subcommand on "revert"' do
+    puts '---- should be unknown subcommand on "revert"'
     err = catch_err do
-      lambda{Yggdrasil.command(%w{hoge})}.should raise_error(SystemExit)
+      lambda{Yggdrasil.command(%w{revert})}.should raise_error(SystemExit)
     end
-    err.should == "Unknown subcommand: 'hoge'\n"
+    err.should == "Unknown subcommand: 'revert'\n"
   end
 
   help_help = <<"EOS"
@@ -217,38 +216,6 @@ Valid options:
                                 'PREV'       revision just before COMMITTED
   -q [--quiet]             : print nothing, or only summary information
   -v [--verbose]           : print extra information
-
-EOS
-  end
-
-  it 'should show help of update' do
-    puts '---- should show help of update'
-    out = catch_out{Yggdrasil.command %w{help update}}
-    out.should == <<"EOS"
-update (up, revert): Set the files to the contents of the newest repository.
-usage: #{File.basename($0)} update [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-  --non-interactive        : do no interactive prompting
-  -r [--revision] ARG      : revision number
-
-EOS
-  end
-
-  it 'should show help of revert' do
-    puts '---- should show help of revert'
-    out = catch_out{Yggdrasil.command %w{help revert}}
-    out.should == <<"EOS"
-update (up, revert): Set the files to the contents of the newest repository.
-usage: #{File.basename($0)} update [OPTIONS...] [PATH...]
-
-Valid options:
-  --username ARG           : specify a username ARG
-  --password ARG           : specify a password ARG
-  --non-interactive        : do no interactive prompting
-  -r [--revision] ARG      : revision number
 
 EOS
   end
