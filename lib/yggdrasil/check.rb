@@ -61,10 +61,13 @@ class Yggdrasil
       if /^(.+):(\d+)$/ =~ @options[:server]
         host = $1
         port = $2
+        error 'no hostname in config' unless @options.has_key?(:hostname)
+
+        hostname = @options[:hostname]
         # put check_result to server
         sock = TCPSocket.open(host, port)
         error "can not connect to server: #{host}:#{port}" if sock.nil?
-        sock.puts "put_result #{Socket.gethostname}"
+        sock.puts "put_result #{hostname}"
         sock.puts check_result
         sock.close
       end

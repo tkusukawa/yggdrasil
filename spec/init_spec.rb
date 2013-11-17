@@ -158,6 +158,15 @@ EOS
                       "Y\nhoge\nfoo\n"
 
     File.exist?('/tmp/yggdrasil-test/.yggdrasil/config').should be_true
+
+    config = `cat /tmp/yggdrasil-test/.yggdrasil/config`
+    config.should =~ /^path=/
+    config.should =~ /^svn=/
+    config.should =~ /^svn_version=/
+    config.should =~ /^repo=/
+    config.should =~ /^anon-access=/
+    config.should =~ /^server=/
+    config.should =~ /^hostname=/
   end
 
   it 'should success init subcommand with server option AGAIN' do

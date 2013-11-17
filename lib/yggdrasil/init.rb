@@ -43,14 +43,23 @@ class Yggdrasil
       end
     end
 
-    get_server_config(true) if @options.has_key?(:server)
+    hostname = Socket.gethostname
+    if @options.has_key?(:server)
+      get_server_config(true)
+      if @options[:repo] =~ /\{HOST\}/
+        @options[:repo].gsub!(/\{HOST\}/, hostname)
+      elsif @options[:repo] =~ /\{host\}/
+        hostname = hostname.split('.')[0]
+        @options[:repo].gsub!(/\{host\}/, hostname)
+      else
+        error 'REPO(server config) must contain {HOST} or {host}'
+      end
+    end
 
     init_get_repo_interactive unless @options.has_key?(:repo)
 
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
-    @options[:repo].gsub!(/\{HOST\}/, Socket.gethostname)
-    @options[:repo].gsub!(/\{host\}/, Socket.gethostname.split('.')[0])
     if @options[:repo] == 'private'
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
       repo_dir = "#{@config_dir}/private_repo"
@@ -137,7 +146,10 @@ class Yggdrasil
              "svn_version=#{svn_version}\n"\
              "repo=#{@options[:repo]}\n"\
              "anon-access=#{anon_access ? 'read' : 'none'}\n"
-      f.puts "server=#{@options[:server]}\n" if @options.has_key?(:server)
+      if @options.has_key?(:server)
+        f.puts "server=#{@options[:server]}\n"\
+               "hostname=#{hostname}\n"
+      end
     end
 
     # make mirror dir

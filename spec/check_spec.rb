@@ -284,6 +284,19 @@ EOS
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == "\n"
   end
 
+  it 'should WARNING if wrong hostname' do
+    puts "\n---- should WARNING if wrong hostname"
+
+    `cat /tmp/yggdrasil-test/.yggdrasil/config | grep -v hostname > /tmp/yggdrasil-test/.yggdrasil/config_`
+    `mv /tmp/yggdrasil-test/.yggdrasil/config_ /tmp/yggdrasil-test/.yggdrasil/config`
+    `echo hostname=hoge.hoge.com >> /tmp/yggdrasil-test/.yggdrasil/config`
+
+    out = catch_out do
+      Yggdrasil.command %w{check --non-interactive}
+    end
+    out.should =~ /WARNING: hostname mismatch with config/
+  end
+
   it 'should recover delete flag' do
     pending 'under construction...'
     puts "\n---- should recover delete flag"

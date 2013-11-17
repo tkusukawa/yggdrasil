@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'socket'
 
 require 'yggdrasil_common'
 
@@ -67,6 +68,14 @@ class Yggdrasil
     @anon_access = (configs[:anon_access] == 'read')
     @options ||= Hash.new
     @options[:server] = configs[:server] if configs.has_key?(:server)
+    if configs.has_key?(:hostname)
+      config_hostname = configs[:hostname]
+      get_hostname = Socket.gethostname
+      unless config_hostname.split('.')[0] == get_hostname.split('.')[0]
+        puts "WARNING: hostname mismatch with config<#{config_hostname}>!=hostname<#{get_hostname}>"
+      end
+      @options[:hostname] = config_hostname
+    end
   end
 
   protected

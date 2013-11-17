@@ -54,7 +54,7 @@ usage: #{@base_cmd} init [OPTIONS...]
 Valid options:
   --port ARG               : specify a TCP port number ARG
   --repo ARG               : URL of subversion repository
-                             ARG can contain {HOST} or a {host}
+                             ARG must contain {HOST} or {host}
                              {HOST} is replaced by client hostname with domain
                              {host} is replaced by client hostname without domain
                              e.g. svn://192.168.3.5/servers/{host}/ygg

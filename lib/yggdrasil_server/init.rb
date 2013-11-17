@@ -40,6 +40,10 @@ class YggdrasilServer
     end
     @options[:repo].chomp!
     @options[:repo].chomp!('/')
+    unless @options[:repo] =~ /\{HOST\}/ || @options[:repo] =~ /\{host\}/
+      error 'REPO must contain {HOST} or {host}'
+    end
+
 
     unless @options.has_key?(:ro_password)
       puts 'Input read-only username/password (clients use this to read repo).'

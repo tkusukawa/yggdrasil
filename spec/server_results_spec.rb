@@ -43,31 +43,52 @@ describe YggdrasilServer, 'results' do
     Yggdrasil.command %w{check}
     sleep 1
     out = catch_out do
-      YggdrasilServer.command %w{results --expire 30}
+      YggdrasilServer.command %w{results --expire 30 --debug}
     end
     out.should == ''
   end
 
-  it 'should show results' do
-    puts '---- should show results'
+  it 'should not show alert (there is result file, but there is no host in the repo)' do
+    puts '---- should not show alert (there is result file, but there is no host in the repo)'
+
+    `echo hoge > /tmp/yggdrasil-test/.yggdrasil/results/removed-host_192.168.1.30`
+    sleep 1
+
+    out = catch_out do
+      YggdrasilServer.command %w{results --expire 30 --debug}
+    end
+    out.should == "WARNING: delete result file (removed-host_192.168.1.30)\n\n"
+  end
+
+  it 'should show alert (there is no result, but it exist in the repo)' do
+    puts '---- should show alert (there is no result, but it exist in the repo)'
+
+    `rm -f /tmp/yggdrasil-test/.yggdrasil/results/*`
+
+    out = catch_out do
+      lambda{YggdrasilServer.command(%w{results --expire 30 --debug})}.should raise_error(SystemExit)
+    end
+    out.should == <<"EOS"
+######## No check result: #{Socket.gethostname}
+
+EOS
+
+  end
+
+  it 'should show alert (difference)' do
+    puts '---- should show alert (difference)'
 
     `echo foo >> /tmp/yggdrasil-test/A`
     Yggdrasil.command %w{check --non-interactive}
 
-    `echo hoge > /tmp/yggdrasil-test/.yggdrasil/results/hoge-old`
-    File.utime Time.local(2001, 5, 22, 23, 59, 59),
-               Time.local(2001, 5, 1, 0, 0, 0),
-               '/tmp/yggdrasil-test/.yggdrasil/results/hoge-old'
     sleep 1
 
     out = catch_out do
-      lambda{YggdrasilServer.command(%w{results --expire 30})}.should raise_error(SystemExit)
+      lambda{YggdrasilServer.command(%w{results --expire 30 --debug})}.should raise_error(SystemExit)
     end
     out.gsub! /[ ]+/, ' '
     out.should == <<"EOS"
-######## hoge-old: last check is too old: 2001-05-01 00:00:00 +0900
-
-######## #{Socket.gethostname}_127.0.0.1 Mismatch:
+######## Difference: #{Socket.gethostname}_127.0.0.1
 M 2 tmp/yggdrasil-test/A
 
 Index: tmp/yggdrasil-test/A
@@ -81,17 +102,35 @@ Index: tmp/yggdrasil-test/A
 EOS
   end
 
+  it 'should show alert (expired)' do
+    puts '---- should show results'
+
+    File.utime Time.local(2001, 5, 22, 23, 59, 59),
+               Time.local(2001, 5, 1, 0, 0, 0),
+               "/tmp/yggdrasil-test/.yggdrasil/results/#{Socket.gethostname}_127.0.0.1"
+    sleep 1
+
+    out = catch_out do
+      lambda{YggdrasilServer.command(%w{results --expire 30 --debug})}.should raise_error(SystemExit)
+    end
+    out.gsub! /[ ]+/, ' '
+    out.should == <<"EOS"
+######## Expired: #{Socket.gethostname}_127.0.0.1 (2001-05-01 00:00:00 +0900)
+
+EOS
+  end
+
   it 'should show s-jis results' do
     puts '---- should show s-jis results'
 
     `rm /tmp/yggdrasil-test/.yggdrasil/results/*`
-    `echo 'あいうえお' | nkf -s > /tmp/yggdrasil-test/.yggdrasil/results/hoge`
+    `echo 'あいうえお' | nkf -s > /tmp/yggdrasil-test/.yggdrasil/results/#{Socket.gethostname}_127.0.0.1`
 
     out = catch_out do
-      lambda{YggdrasilServer.command(%w{results})}.should raise_error(SystemExit)
+      lambda{YggdrasilServer.command(%w{results --debug})}.should raise_error(SystemExit)
     end
     out.should == <<"EOS"
-######## hoge Mismatch:
+######## Difference: #{Socket.gethostname}_127.0.0.1
 あいうえお
 EOS
   end
