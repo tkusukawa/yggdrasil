@@ -28,7 +28,9 @@ class Yggdrasil
         end
         cmd = "#{@svn} add #{mirror_path}"
         cmd += ' ' + @arg_options.join(' ') if @arg_options.size != 0
-        puts system3(cmd)
+        out = system3(cmd)
+        out.gsub!(/ #{@mirror_dir}/, ' ')
+        puts out
       end
     end
   end

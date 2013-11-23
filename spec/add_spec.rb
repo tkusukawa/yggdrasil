@@ -18,10 +18,20 @@ describe Yggdrasil, 'add' do
 
   it 'should success: add exist files (relative)' do
     puts '---- should success: add exist files'
-    Yggdrasil.command %w{add Gemfile /etc/fstab}
+    out = catch_out do
+      Yggdrasil.command %w{add Gemfile /etc/fstab}
+    end
+    out.should == <<"EOS"
+A         /home
+A         /home/kusu
+A         /home/kusu/work
+A         /home/kusu/work/yggdrasil
+A         /home/kusu/work/yggdrasil/Gemfile
+A         /etc
+A         /etc/fstab
+EOS
+
     File.exist?("/tmp/yggdrasil-test/.yggdrasil/mirror#{`readlink -f Gemfile`.chomp}").should be_true
-  end
-  it 'should success: add exist files (absolute)' do
     File.exist?("/tmp/yggdrasil-test/.yggdrasil/mirror#{`readlink -f /etc/fstab`.chomp}").should be_true
   end
 end
