@@ -47,7 +47,7 @@ class Yggdrasil
     FileUtils.cd @mirror_dir do
       cmd = "#{@svn} commit -m \"#{@options[:message].gsub('"', '\"')}\""\
             ' --no-auth-cache --non-interactive'\
-            " --username '#{@options[:username]}' --password '#{@options[:password]}'"\
+            " --username '#{@username}' --password '#{@password}'"\
             " #{confirmed_updates.join(' ')}"
       puts system3(cmd)
     end

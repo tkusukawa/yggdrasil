@@ -13,6 +13,8 @@ class YggdrasilServer
     if !@options.has_key?(:ro_username) && @options.has_key?(:ro_password)
       error '--ro-password option need --ro-username, too.'
     end
+    @ro_username = @options[:ro_username] if @options.has_key?(:ro_username)
+    @ro_password = @options[:ro_password] if @options.has_key?(:ro_password)
 
     until @options.has_key?(:port)
       print 'Input tcp port number: '
@@ -45,7 +47,7 @@ class YggdrasilServer
     end
 
 
-    unless @options.has_key?(:ro_password)
+    unless defined?(@ro_password)
       puts 'Input read-only username/password (clients use this to read repo).'
       puts 'ATTENTION! username/password are stored to disk unencrypted!'
       input_user_pass
@@ -56,9 +58,9 @@ class YggdrasilServer
     File.open(@server_config_file, 'w') do |f|
       f.write "port=#{@options[:port]}\n"\
               "repo=#{@options[:repo]}\n"
-      if @options.has_key?(:ro_password)
-        f.write "ro_username=#{@options[:ro_username]}\n"\
-                "ro_password=#{@options[:ro_password]}\n"
+      if defined?(@ro_password)
+        f.write "ro_username=#{@ro_username}\n"\
+                "ro_password=#{@ro_password}\n"
       end
     end
   end

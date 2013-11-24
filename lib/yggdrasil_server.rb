@@ -8,6 +8,7 @@ require 'yggdrasil_server/init'
 require 'yggdrasil_server/server'
 require 'yggdrasil_server/results'
 
+require 'yggdrasil_server/get_configs'
 require 'yggdrasil_server/get_repo'
 require 'yggdrasil_server/get_ro_id_pw'
 require 'yggdrasil_server/put_result'
@@ -15,6 +16,7 @@ require 'yggdrasil_server/put_result'
 class YggdrasilServer
   MESSAGE_QUIT = 'quit'
   MESSAGES = {
+      :get_configs => [:key_str],
       :get_repo => [],
       :get_ro_id_pw => [],
       :put_result => [:hostname],

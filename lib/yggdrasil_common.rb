@@ -64,16 +64,16 @@ module YggdrasilCommon
   end
 
   def input_user_pass
-    until @options.has_key?(:username) do
+    until defined?(@username)
       error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
       print 'Input svn username: '
       input = $stdin.gets
       error 'can not input username' unless input
       input.chomp!
       return if input.size == 0
-      @options[:username] = @options[:ro_username] = input
+      @username = @ro_username = input
     end
-    until @options.has_key?(:password) do
+    until defined?(@password)
       error 'Can\'t get username or password' if @options.has_key?(:non_interactive?)
       print 'Input svn password: '
       #input = `sh -c 'read -s hoge;echo $hoge'`
@@ -83,7 +83,7 @@ module YggdrasilCommon
       puts
       error 'can not input password' unless input
       input.chomp!
-      @options[:password] = @options[:ro_password] = input
+      @password = @ro_password = input
     end
   end
 
@@ -112,5 +112,17 @@ module YggdrasilCommon
     $stderr.puts "#{@base_cmd} error: #{msg}"
     $stderr.puts
     exit 1
+  end
+
+  def make_key(key_str)
+    key = 0
+    (0...key_str.size).each {|i| key = ((key << 1) + key_str[i].ord) & 0xFF}
+    key
+  end
+
+  def obfuscate(src_str, key)
+    res = String.new
+    (0...src_str.size).each {|i| res[i] = (src_str[i].ord ^ key).chr}
+    res
   end
 end

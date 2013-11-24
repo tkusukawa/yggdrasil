@@ -10,8 +10,8 @@ class Yggdrasil
          '--repo'=>:repo, '--parents'=>:parents?,
          '--non-interactive'=>:non_interactive?,
          '--force'=>:force?, '--server'=>:server })
-    @options[:ro_username] = @options[:username] if @options.has_key?(:username)
-    @options[:ro_password] = @options[:password] if @options.has_key?(:password)
+    @ro_username = @username = @options[:username] if @options.has_key?(:username)
+    @ro_password = @password = @options[:password] if @options.has_key?(:password)
 
     if @arg_options.size+@arg_paths.size != 0
       error "invalid arguments: #{(@arg_options+@arg_paths).join(', ')}"
@@ -43,37 +43,26 @@ class Yggdrasil
       end
     end
 
-    hostname = Socket.gethostname
-    if @options.has_key?(:server)
-      get_server_config(true)
-      if @options[:repo] =~ /\{HOST\}/
-        @options[:repo].gsub!(/\{HOST\}/, hostname)
-      elsif @options[:repo] =~ /\{host\}/
-        hostname = hostname.split('.')[0]
-        @options[:repo].gsub!(/\{host\}/, hostname)
-      else
-        error 'REPO(server config) must contain {HOST} or {host}'
-      end
-    end
+    @repo = @options[:repo] if @options.has_key?(:repo)
+    get_server_configs(@options[:server]) if @options.has_key?(:server)
+    init_get_repo_interactive unless defined?(@repo)
 
-    init_get_repo_interactive unless @options.has_key?(:repo)
-
-    @options[:repo].chomp!
-    @options[:repo].chomp!('/')
-    if @options[:repo] == 'private'
+    @repo.chomp!
+    @repo.chomp!('/')
+    if @repo == 'private'
       Dir.mkdir @config_dir, 0755 unless File.exist?(@config_dir)
       repo_dir = "#{@config_dir}/private_repo"
       system3 "svnadmin create #{repo_dir}"
-      @options[:repo] = "file://#{repo_dir}"
+      @repo = "file://#{repo_dir}"
     end
 
     puts 'check SVN access...'
-    if @options.has_key?(:ro_username)
+    if defined?(@ro_username)
       anon_access = false
     else
       anon_access = true
     end
-    url_parts = @options[:repo].split('/')
+    url_parts = @repo.split('/')
     url_parts_num = url_parts.size
     url = ''
     loop do
@@ -83,7 +72,7 @@ class Yggdrasil
           url_parts_num = url_parts.size
           get_user_pass_if_need_to_read_repo
         else
-          error "can not access to '#{@options[:repo]}'."
+          error "can not access to '#{@repo}'."
         end
       end
       puts "url_parts_num=#{url_parts_num}" if @options[:debug?]
@@ -120,7 +109,7 @@ class Yggdrasil
       input_user_pass
       `rm -rf #{@mirror_dir}`
       system3 "#{svn} checkout -N --no-auth-cache --non-interactive" +
-                  " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" +
+                  " --username '#{@ro_username}' --password '#{@ro_password}'" +
                   " #{url_parts[0...url_parts_num].join('/')} #{@mirror_dir}"
       add_paths = Array.new
       path = @mirror_dir
@@ -134,7 +123,7 @@ class Yggdrasil
         url_parts_num += 1
       end
       system3 "#{svn} commit -m 'yggdrasil init' --no-auth-cache --non-interactive" +
-                  " --username '#{@options[:username]}' --password '#{@options[:password]}'" +
+                  " --username '#{@username}' --password '#{@password}'" +
                   ' ' + add_paths.join(' ')
       system3 "rm -rf #{@mirror_dir}"
     end
@@ -144,18 +133,16 @@ class Yggdrasil
       f.puts "path=#{ENV['PATH']}\n"\
              "svn=#{svn}\n"\
              "svn_version=#{svn_version}\n"\
-             "repo=#{@options[:repo]}\n"\
+             "repo=#{@repo}\n"\
              "anon-access=#{anon_access ? 'read' : 'none'}\n"
-      if @options.has_key?(:server)
-        f.puts "server=#{@options[:server]}\n"\
-               "hostname=#{hostname}\n"
-      end
+
+      f.puts "server=#{@options[:server]}\n" if @options.has_key?(:server)
     end
 
     # make mirror dir
     `rm -rf #{@mirror_dir}`
-    cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@options[:repo]} #{@mirror_dir}"
-    cmd += " --username '#{@options[:ro_username]}' --password '#{@options[:ro_password]}'" unless anon_access
+    cmd = "#{svn} checkout --no-auth-cache --non-interactive #{@repo} #{@mirror_dir}"
+    cmd += " --username '#{@ro_username}' --password '#{@ro_password}'" unless anon_access
     system3 cmd
 
     # make checker directory
@@ -171,7 +158,7 @@ class Yggdrasil
       error 'can not input svn repo URL' unless input
       puts
       if %r{^(http://|https://|file://|svn://|private)} =~ input
-        @options[:repo] = input
+        @repo = input
         break
       end
 

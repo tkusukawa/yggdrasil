@@ -284,17 +284,20 @@ EOS
     `cat /tmp/yggdrasil-test/.yggdrasil/results/#{result_files[0]}`.should == "\n"
   end
 
-  it 'should WARNING if wrong hostname' do
-    puts "\n---- should WARNING if wrong hostname"
+  it 'should ERROR if repo config mismatch' do
+    puts "\n---- should ERROR if repo config mismatch"
 
-    `cat /tmp/yggdrasil-test/.yggdrasil/config | grep -v hostname > /tmp/yggdrasil-test/.yggdrasil/config_`
-    `mv /tmp/yggdrasil-test/.yggdrasil/config_ /tmp/yggdrasil-test/.yggdrasil/config`
-    `echo hostname=hoge.hoge.com >> /tmp/yggdrasil-test/.yggdrasil/config`
+    `echo repo=hoge.hoge.com >> /tmp/yggdrasil-test/.yggdrasil/config`
 
-    out = catch_out do
-      Yggdrasil.command %w{check --non-interactive}
+    err = catch_err do
+      lambda{Yggdrasil.command(%w{check --non-interactive})}.should raise_error(SystemExit)
     end
-    out.should =~ /WARNING: hostname mismatch with config/
+    err.should == <<"EOS"
+rspec error: mismatch repo config with server setting.
+config: hoge.hoge.com
+server: svn://localhost/tmp/yggdrasil-test/svn-repo/servers/yggdrasil-dev.kusu.myhome.cx
+
+EOS
   end
 
   it 'should recover delete flag' do

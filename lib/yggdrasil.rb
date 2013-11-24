@@ -66,15 +66,10 @@ class Yggdrasil
     error 'need "svn" in config file' unless (@svn = configs[:svn])
     error 'need "repo" in config file' unless (@repo = configs[:repo])
     @anon_access = (configs[:anon_access] == 'read')
-    @options ||= Hash.new
-    @options[:server] = configs[:server] if configs.has_key?(:server)
-    if configs.has_key?(:hostname)
-      config_hostname = configs[:hostname]
-      get_hostname = Socket.gethostname
-      unless config_hostname.split('.')[0] == get_hostname.split('.')[0]
-        puts "WARNING: hostname mismatch with config<#{config_hostname}>!=hostname<#{get_hostname}>"
-      end
-      @options[:hostname] = config_hostname
+
+    if configs.has_key?(:server)
+      @server = configs[:server]
+      get_server_configs(@server)
     end
   end
 
@@ -194,49 +189,63 @@ class Yggdrasil
   end
 
   def username_password_options_to_read_repo
-    if @options.has_key?(:ro_password)
-      " --username #{@options[:ro_username]} --password #{@options[:ro_password]}"
+    if defined?(@ro_password)
+      " --username #{@ro_username} --password #{@ro_password}"
     else
       ''
     end
   end
 
   def get_user_pass_if_need_to_read_repo
+    @username = @options[:username] if @options.has_key?(:username)
+    @password = @options[:password] if @options.has_key?(:password)
     unless @anon_access
-      get_server_config if !@options.has_key?(:ro_username) && @options.has_key?(:server)
-      input_user_pass unless @options.has_key?(:ro_password)
+      input_user_pass unless defined?(@ro_password)
     end
-    @options[:ro_username] = @options[:username] if @options.has_key?(:username)
-    @options[:ro_password] = @options[:password] if @options.has_key?(:password)
+    @ro_username = @username if @username
+    @ro_password = @password if @password
   end
 
-  def get_server_config(need_repo = false)
-    if /^(.+):(\d+)$/ =~ @options[:server]
+  def get_server_configs(host_port)
+    if /^(.+):(\d+)$/ =~ host_port
       host = $1
       port = $2
 
-      if need_repo
-        # get repo
-        sock = TCPSocket.open(host, port)
-        error "can not connect to server: #{host}:#{port}" if sock.nil?
-        sock.puts 'get_repo'
-        rcv = sock.gets
-        error 'can not get repo from server' if rcv.nil?
-        @options[:repo] = rcv.chomp
-        sock.close
-      end
-
-      #get read-only username/password
+      # connect
       sock = TCPSocket.open(host, port)
       error "can not connect to server: #{host}:#{port}" if sock.nil?
-      sock.puts('get_ro_id_pw')
-      username = sock.gets
-      unless username.nil?
-        @options[:ro_username] = username.chomp
-        password = sock.gets
-        error 'can not get ro_password' if password.nil?
-        @options[:ro_password] = password.chomp
+
+      # send GET with key string
+      key_str = Time.now.strftime('%H:%M:%S')
+      sock.puts "get_configs #{key_str}"
+      key = make_key(key_str)
+      rcv = sock.read
+      error 'can not get configs from server' if rcv.nil?
+      msg = obfuscate(rcv, key).split("\n")
+
+      # repo
+      error 'can not get repo from server' if msg.size < 1
+      config_repo = @repo
+      server_repo = msg[0]
+      if server_repo =~ /\{HOST\}/
+        @hostname = Socket.gethostname
+        server_repo.gsub!(/\{HOST\}/, @hostname)
       end
+      if server_repo =~ /\{host\}/
+        @hostname = Socket.gethostname.split('.')[0]
+        server_repo.gsub!(/\{host\}/, @hostname)
+      end
+      if config_repo && config_repo != server_repo
+        error "mismatch repo config with server setting.\n" +
+                  "config: #{config_repo}\n" +
+                  "server: #{server_repo}"
+      end
+      @repo = server_repo
+      # username
+      @ro_username = msg[1] if msg.size >= 2
+      # password
+      @ro_password = msg[2] if msg.size >= 3
+
       sock.close
     else
       error "invalid host:port '#{@options[:server]}'"

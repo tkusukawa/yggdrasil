@@ -166,7 +166,6 @@ EOS
     config.should =~ /^repo=/
     config.should =~ /^anon-access=/
     config.should =~ /^server=/
-    config.should =~ /^hostname=/
   end
 
   it 'should success init subcommand with server option AGAIN' do
@@ -247,6 +246,7 @@ EOS
     sock = TCPSocket.open('localhost', 4000)
     sock.puts('quit')
     sock.close
+    `pkill svnserve`
     Process.waitall
   end
 end
