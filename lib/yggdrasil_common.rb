@@ -114,15 +114,31 @@ module YggdrasilCommon
     exit 1
   end
 
-  def make_key(key_str)
-    key = 0
-    (0...key_str.size).each {|i| key = ((key << 1) + key_str[i].ord) & 0xFF}
-    key
+  def obfuscate(src_str, key_str)
+    seed = [0,0,0,0]
+    # make seed
+    (0...key_str.size).each do |i|
+      seed[3] = (seed[3]^key_str[i].ord)
+      seed = my_rand(seed)
+    end
+
+    # puts "seed = #{seed.inspect}"
+    res = String.new
+    (0...src_str.size).each do |i|
+      seed = my_rand(seed)
+      res[i] = (src_str[i].ord ^ (seed[3] & 0xFF)).chr
+      # printf "c[%03d]:0x%02X->0x%02X (0x%02X)\n",i,src_str[i].ord,res[i].ord, seed[3] & 0xFF
+    end
+
+    res
   end
 
-  def obfuscate(src_str, key)
-    res = String.new
-    (0...src_str.size).each {|i| res[i] = (src_str[i].ord ^ key).chr}
-    res
+  def my_rand(seed)
+    t = (seed[0]^(seed[0]<<11))
+    seed[0] = seed[1]
+    seed[1] = seed[2]
+    seed[2] = seed[3]
+    seed[3] = (seed[3]^(seed[3]>>19))^(t^(t>>8))
+    seed
   end
 end

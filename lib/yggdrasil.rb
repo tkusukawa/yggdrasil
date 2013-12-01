@@ -218,10 +218,9 @@ class Yggdrasil
       # send GET with key string
       key_str = Time.now.strftime('%H:%M:%S')
       sock.puts "get_configs #{key_str}"
-      key = make_key(key_str)
       rcv = sock.read
       error 'can not get configs from server' if rcv.nil?
-      msg = obfuscate(rcv, key).split("\n")
+      msg = obfuscate(rcv, key_str).split("\n")
 
       # repo
       error 'can not get repo from server' if msg.size < 1
