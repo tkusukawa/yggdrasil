@@ -1,5 +1,5 @@
 class Yggdrasil
-  VERSION = '0.1.0.beta02'
+  VERSION = '0.1.0.beta03'
 
 
   def version

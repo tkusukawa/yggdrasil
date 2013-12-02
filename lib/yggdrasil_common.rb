@@ -126,7 +126,7 @@ module YggdrasilCommon
     res = String.new
     (0...src_str.size).each do |i|
       seed = my_rand(seed)
-      res[i] = (src_str[i].ord ^ (seed[3] & 0xFF)).chr
+      res += (src_str[i].ord ^ (seed[3] & 0xFF)).chr
       # printf "c[%03d]:0x%02X->0x%02X (0x%02X)\n",i,src_str[i].ord,res[i].ord, seed[3] & 0xFF
     end
 
