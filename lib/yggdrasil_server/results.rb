@@ -35,7 +35,7 @@ class YggdrasilServer
         repo_hosts.delete host
       else
         # There is no host in the REPO
-        puts "WARNING: delete result file (#{file})"
+        puts "Notice: delete result file (#{file})"
         puts
         File.unlink absolute # delete result file
         next

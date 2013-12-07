@@ -57,7 +57,7 @@ describe YggdrasilServer, 'results' do
     out = catch_out do
       YggdrasilServer.command %w{results --expire 30 --debug}
     end
-    out.should == "WARNING: delete result file (removed-host_192.168.1.30)\n\n"
+    out.should == "Notice: delete result file (removed-host_192.168.1.30)\n\n"
   end
 
   it 'should show alert (there is no result, but it exist in the repo)' do
