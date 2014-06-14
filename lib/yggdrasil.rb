@@ -260,7 +260,7 @@ class Yggdrasil
         if File.file?(file) && File.executable?(file)
           if file =~ %r{^#{@checker_dir}(.*)$}
             file_body = $1
-            system3("#{file} > #{@checker_result_dir}#{file_body}")
+            system3("#{file} > #{@checker_result_dir}#{file_body}", false)
           end
         end
       end

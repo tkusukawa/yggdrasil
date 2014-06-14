@@ -134,6 +134,50 @@ Yggdrasil check: NG!!!
 EOS
   end
 
+  it 'should not fail yggdrasil by checker failure' do
+    puts "\n---- should not fail yggdrasil by checker failure"
+    `echo 'ehco hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
+    `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
+
+    cmd = %w{check --username hoge --password foo --non-interactive}
+    out = catch_out {Yggdrasil.command(cmd, "Y\n")}
+
+    `echo 'echo hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
+    `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
+
+    out.gsub! /[ ]+/, ' '
+    out.should == <<"EOS"
+9 files checked.
+A 0 tmp/yggdrasil-test/.yggdrasil
+A 0 tmp/yggdrasil-test/.yggdrasil/checker
+A 0 tmp/yggdrasil-test/.yggdrasil/checker/hoge
+A 0 tmp/yggdrasil-test/.yggdrasil/checker_result
+A 0 tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+
+Index: tmp/yggdrasil-test/.yggdrasil/checker/hoge
+===================================================================
+--- tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
++++ tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
+@@ -0,0 +1 @@
++ehco hoge
+
+Property changes on: tmp/yggdrasil-test/.yggdrasil/checker/hoge
+___________________________________________________________________
+Added: svn:executable
+ + *
+
+
+Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
+===================================================================
+--- tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(revision 0)
++++ tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(revision 0)
+@@ -0,0 +1 @@
++/tmp/yggdrasil-test/.yggdrasil/checker/hoge: line 1: ehco: command not found
+
+Yggdrasil check: NG!!!
+EOS
+  end
+
   it 'should commit the checker result' do
     puts "\n---- should commit the checker result"
     cmd = %w{commit / --username hoge --password foo --non-interactive -m add\ checker}
