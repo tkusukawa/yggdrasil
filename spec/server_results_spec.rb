@@ -135,6 +135,19 @@ EOS
 EOS
   end
 
+  it 'should delete older result file' do
+    puts '---- should delete older result file'
+
+    `echo '' > /tmp/yggdrasil-test/.yggdrasil/results/#{Socket.gethostname}_192.168.1.1`
+    sleep 1
+    `echo '' > /tmp/yggdrasil-test/.yggdrasil/results/#{Socket.gethostname}_127.0.0.1`
+    sleep 1
+
+    out = catch_out do
+      YggdrasilServer.command %w{results --expire 30 --debug}
+    end
+    out.should == "Notice: delete result file (#{Socket.gethostname}_192.168.1.1)\n\n"
+  end
 
   after(:all) do
     sleep 1

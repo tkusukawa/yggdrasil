@@ -26,6 +26,10 @@ class YggdrasilServer
     end
 
     files = Dir.entries(@results_dir)
+    files.sort! do |a, b|
+      File.stat("#{@results_dir}/#{b}").mtime.strftime('%Y%m%d%H%M%S') <=>
+          File.stat("#{@results_dir}/#{a}").mtime.strftime('%Y%m%d%H%M%S')
+    end
     alert = false
     files.each do |file|
       next if /^\./ =~ file
