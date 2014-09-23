@@ -253,31 +253,28 @@ class Yggdrasil
 
   def exec_checker
     # execute checker
+    add_files = Array.new
     `rm -rf #{@checker_result_dir}`
-    Dir.mkdir @checker_result_dir, 0755
+    FileUtils.mkdir_p @checker_result_dir
     if File.exist?(@checker_dir)
       Find.find(@checker_dir) do |file|
         if File.file?(file) && File.executable?(file)
-          if file =~ %r{^#{@checker_dir}(.*)$}
-            file_body = $1
-            system3("#{file} > #{@checker_result_dir}#{file_body}", false)
-          end
+          next unless file =~ %r{^#{@checker_dir}(.*)$}
+          target = $1
+          next if target =~ %r{/\.} # except dot file
+
+          FileUtils.mkdir_p File.dirname("#{@checker_result_dir}#{target}")
+          system3("#{file} > #{@checker_result_dir}#{target}", false)
+          add_files << file
+          add_files << "#{@checker_result_dir}#{target}"
         end
       end
     end
 
-    # add checker script and checker result
-    result_files = Array.new
-    Find.find(@checker_dir) do |f|
-      result_files << f if File.file?(f) && File.executable?(f)
-    end
-    Find.find(@checker_result_dir) do |f|
-      result_files << f if File.file?(f)
-    end
-    if result_files.size != 0
+    if add_files.size != 0
       stdout = $stdout
       $stdout = StringIO.new
-      self.class.new.add result_files
+      self.class.new.add add_files
       $stdout = stdout
     end
   end

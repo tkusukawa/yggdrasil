@@ -342,6 +342,8 @@ config: hoge.hoge.com
 server: svn://localhost/tmp/yggdrasil-test/svn-repo/servers/yggdrasil-dev.kusu.myhome.cx
 
 EOS
+    `grep -v repo=hoge.hoge.com < /tmp/yggdrasil-test/.yggdrasil/config > /tmp/yggdrasil-test/.yggdrasil/config_`
+    `mv /tmp/yggdrasil-test/.yggdrasil/config_ /tmp/yggdrasil-test/.yggdrasil/config`
   end
 
   it 'should recover delete flag' do
@@ -370,6 +372,29 @@ EOS
     out = catch_out {Yggdrasil.command(cmd, "q\n")}
     out.should == <<"EOS"
 
+EOS
+  end
+
+  it 'should ignore .(dot) files' do
+    puts "\n---- should ignore .(dot) files"
+
+    `echo 'echo hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/.aaa`
+    `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/.aaa`
+
+    `mkdir -p /tmp/yggdrasil-test/.yggdrasil/checker/.bbb`
+    `echo 'echo hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/.bbb/hoge`
+    `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/.bbb/hoge`
+
+    `mkdir -p /tmp/yggdrasil-test/.yggdrasil/checker/ccc`
+    `echo 'echo ccc' > /tmp/yggdrasil-test/.yggdrasil/checker/ccc/.ccc`
+    `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/ccc/.ccc`
+
+    cmd = %w{check --username hoge --password foo --non-interactive}
+    out = catch_out {Yggdrasil.command cmd}
+
+    out.should == <<"EOS"
+3 files checked.
+Yggdrasil check: OK.
 EOS
   end
 
