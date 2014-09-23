@@ -136,7 +136,7 @@ EOS
 
   it 'should not fail yggdrasil by checker failure' do
     puts "\n---- should not fail yggdrasil by checker failure"
-    `echo 'ehco hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
+    `echo 'hoge hoge' > /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
     `chmod +x /tmp/yggdrasil-test/.yggdrasil/checker/hoge`
 
     cmd = %w{check --username hoge --password foo --non-interactive}
@@ -159,7 +159,7 @@ Index: tmp/yggdrasil-test/.yggdrasil/checker/hoge
 --- tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
 +++ tmp/yggdrasil-test/.yggdrasil/checker/hoge	(revision 0)
 @@ -0,0 +1 @@
-+ehco hoge
++hoge hoge
 
 Property changes on: tmp/yggdrasil-test/.yggdrasil/checker/hoge
 ___________________________________________________________________
@@ -172,7 +172,7 @@ Index: tmp/yggdrasil-test/.yggdrasil/checker_result/hoge
 --- tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(revision 0)
 +++ tmp/yggdrasil-test/.yggdrasil/checker_result/hoge	(revision 0)
 @@ -0,0 +1 @@
-+/tmp/yggdrasil-test/.yggdrasil/checker/hoge: line 1: ehco: command not found
++/tmp/yggdrasil-test/.yggdrasil/checker/hoge: line 1: hoge: command not found
 
 Yggdrasil check: NG!!!
 EOS
