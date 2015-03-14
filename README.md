@@ -77,6 +77,15 @@ Check updates of configurations/conditions on host:$YGG_SERVER:
 * Ruby
 * Gem
 
+## Links
+
+http://qiita.com/tkusukawa/items/ff6caedc068941235105
+http://kusu.way-nifty.com/blog/2013/09/alminium-yggdra.html<br/>
+http://daily-postit.blogspot.jp/2013/08/yggdrasil.html<br/>
+http://www.slideshare.net/tkusukawa/yggdrasil<br/>
+https://cacoo.com/diagrams/kCM0DOM01zb6quau<br/>
+https://cacoo.com/diagrams/85rQ6KXsr5cZKrsH<br/>
+
 ## License
 
 Copyright (c) 2012-2013 Tomohisa Kusukawa
